@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+/Master/data.json
+/Master/ffmpeg.exe
+/Master/ffprobe.exe
+/Master/logs.log
+/Master/core_test.py
+/Test/

@@ -1,0 +1,14 @@
+{
+  "Strip2": {
+    "domain": "vps402.strip2.co",
+    "pattern": "https://inf-xts\\.spac\\.me/tfil/[^\"']+\\.jpg"
+  },
+  "XGroovy": {
+    "domain": "rt.xgroovy.com",
+    "pattern": "https://i\\.xgroovy\\.com/contents/videos_screenshots/[^\"']+\\.jpg"
+  },
+  "AnalMedia": {
+    "domain": "anal.media",
+    "pattern": "https://anal\\.media/wp-content/uploads/[^\"']+\\.jpg"
+  }
+}
