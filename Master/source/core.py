@@ -1,8 +1,9 @@
 # Parser Deubaso Composifity
+# Master functionality
+
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
-# Master functionality
 
 
 

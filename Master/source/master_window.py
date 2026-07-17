@@ -1,8 +1,9 @@
 # Parser Deubaso Composifity
+# Master window
+
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
-# Master window
 
 
 
@@ -18,7 +19,7 @@ class MASTER():
         self.core = core
 
         # Основное
-        self.version = '2026.07.17.0b'
+        self.version = '2026.07.17.1b'
         self.name = 'Deubaso Composifity'
         self.size_window = [1000, 600]
         self.size_preview = [534, 300]
