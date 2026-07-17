@@ -1,6 +1,8 @@
 # Parser Deubaso Composifity
-# Copyright (c) 2026 Dinger_JC
-# Master GUI
+# Developer: Dinger_JC
+# Project: https://github.com/Dinger-JC/Deubaso-Composifity
+# Telegram channel: https://t.me/Jitus_Circus
+# Master window
 
 
 
@@ -9,20 +11,20 @@ from core import *
 
 
 
-class GUI():
+class MASTER():
     '''Интерфейс'''
     def __init__(self, core):
         '''Инициализация'''
         self.core = core
 
         # Основное
-        self.version = '2026.07.02.0b'
-        self.name: str = 'Deubaso Composifity'
-        self.size_window: list = [1000, 600]
-        self.size_preview: list = [534, 300]
+        self.version = '2026.07.17.0b'
+        self.name = 'Deubaso Composifity'
+        self.size_window = [1000, 600]
+        self.size_preview = [534, 300]
 
         # Цвета
-        self.colors: dict = {
+        self.colors = {
             'main_start': 'rgb(7, 17, 37)',
             'main_end': 'rgb(34, 42, 65)',
             'text': 'rgb(255, 255, 255)',
@@ -40,8 +42,25 @@ class GUI():
 
         # Шрифт
         self.font_family = 'GungsuhW33-Regular'
-        self.font_size_big: int = 18
-        self.font_size_small: int = 14
+        self.font_size_big = 18
+        self.font_size_small = 14
+
+        # Описания
+        self.tooltips = {
+            'speed': 'Current real-time video download speed',
+            'max_speed': 'Maximum fixed speed',
+            'size': 'Total video file size',
+            'quality': 'Basic video qualities:\n'
+                '4K UHD - 3840x2160 (16:9)\n'
+                '2K QHD - 2560x1440 (16:9)\n'
+                'Full HD - 1920x1080 (16:9)\n'
+                'HD - 1280x720 (16:9)\n'
+                'VGA - 640x480 (4:3)\n'
+                'nHD - 640x360 (16:9)\n'
+                'QVGA - 320x240 (4:3)',
+            'fps': 'Video frame rate',
+            'duration': 'Total video length'
+        }
 
         # Отрисовка
         self.Window()
@@ -49,23 +68,25 @@ class GUI():
         self.Name()
         self.Version()
 
-        self.InputBlock()
-        self.title = self.TitleBlock(title = 'Name video')
-        self.progress = self.ProgressBarBlock()
+        self.Input_Block()
 
-        self.status = self.StatusBlock()
-        self.site = self.SiteBlock()
+        self.title = self.Title_Block('Name video')
+        self.status = self.Status_Block()
 
-        self.speed = self.InfoBlock(x = 574, y = 280, title = 'Speed')
-        self.max_speed = self.InfoBlock(x = 716, y = 280, title = 'Max speed')
-        self.size = self.InfoBlock(x = 858, y = 280, title = 'Size')
-        self.quality = self.InfoBlock(x = 574, y = 380, title = 'Quality')
-        self.fps = self.InfoBlock(x = 716, y = 380, title = 'FPS')
-        self.duration = self.InfoBlock(x = 858, y = 380, title = 'Duration')
+        self.progress = self.Progress_Bar_Block()
 
-        self.DownloadButton()
+        self.speed = self.Info_Block([573, 279], 'Speed', self.tooltips['speed'])
+        self.max_speed = self.Info_Block([715, 279], 'Max speed', self.tooltips['max_speed'])
+        self.size = self.Info_Block([857, 279], 'Size', self.tooltips['size'])
+        self.quality = self.Info_Block([573, 379], 'Quality', self.tooltips['quality'])
+        self.fps = self.Info_Block([715, 379], 'FPS', self.tooltips['fps'])
+        self.duration = self.Info_Block([857, 379], 'Duration', self.tooltips['duration'])
 
-        self.PreviewBlock()
+        self.Download_Button()
+        self.Stop_Button()
+        self.Settings_Button()
+
+        self.Preview_Block()
 
     def Window(self):
         '''Главное окно'''
@@ -86,7 +107,7 @@ class GUI():
             }}
         ''')
         self.window.setWindowTitle(f'{self.name} - porn content parser!')
-        self.window.setWindowIcon(QIcon(self.core.files['icon']))
+        self.window.setWindowIcon(QIcon(self.core.files['icon_icon']))
         self.window.setFixedSize(self.size_window[0], self.size_window[1])
 
     def Name(self):
@@ -119,7 +140,7 @@ class GUI():
             font-size: {self.font_size_small}px;
         ''')
 
-    def InputBlock(self):
+    def Input_Block(self):
         '''Блок строки ввода'''
         self.input = QLineEdit(self.window)
         self.input.setGeometry(20, 95, 960, 50)
@@ -146,15 +167,15 @@ class GUI():
 
         self.icon = QLabel(self.input)
         self.icon.setGeometry(15, 10, 30, 30)
-        self.icon.setPixmap(QPixmap(self.core.files['link']))
+        self.icon.setPixmap(QPixmap(self.core.files['link_icon']))
         self.icon.setScaledContents(True)
 
-    def TitleBlock(self, title: str):
+    def Title_Block(self, title: str):
         '''Блок названия контента'''
         # Иконка Download
         self.icon = QLabel(self.window)
         self.icon.setGeometry(21, 165, 44, 45)
-        self.icon.setPixmap(QPixmap(self.core.files['download']))
+        self.icon.setPixmap(QPixmap(self.core.files['download_icon']))
         self.icon.setScaledContents(True)
 
         # Название видео
@@ -166,10 +187,9 @@ class GUI():
             font-family: '{self.font_family}';
             font-size: {self.font_size_big}px;
         ''')
-
         return self.title
 
-    def StatusBlock(self):
+    def Status_Block(self):
         '''Статус'''
         self.status = QLabel('...', self.window)
         self.status.setGeometry(85, 190, 895, 20)
@@ -180,7 +200,6 @@ class GUI():
                     font-size: {self.font_size_small}px; 
                 }}
             ''')
-
         return self.status
 
     def Status(self, type: str, text: str = ''):
@@ -194,7 +213,7 @@ class GUI():
                 }}
             ''')
 
-        if type == 'warning':
+        elif type == 'warning':
             self.status.setStyleSheet(f'''
                 QLabel {{
                     color: {self.colors['warning']};
@@ -207,12 +226,12 @@ class GUI():
             self.status.setText(text)
             self.status.raise_()
             self.status.show()
+
         else:
             self.status.hide()
 
-    def ProgressBarBlock(self):
+    def Progress_Bar_Block(self):
         '''Полоса загрузки'''
-        # Полоса загрузки
         self.progress_bar = QProgressBar(self.window)
         self.progress_bar.setGeometry(20, 230, 960, 30)
         self.progress_bar.setRange(0, 100)
@@ -236,13 +255,13 @@ class GUI():
                 border-radius: 15px;
             }}
         ''')
-
         return self.progress_bar
 
-    def InfoBlock(self, x: int, y: int, title: str, value: str = '-'):
+    def Info_Block(self, position: list, title: str, tooltip: str = '', number: str = '-'):
         '''Блок информации'''
         block = QFrame(self.window)
-        block.setGeometry(x, y, 122, 80)
+        block.setGeometry(position[0], position[1], 122 + 2, 80 + 2)
+        block.setToolTip(tooltip)
         block.setStyleSheet(f'''
             QFrame {{
                 background-color: {self.colors['fill']};
@@ -252,6 +271,16 @@ class GUI():
             QFrame:hover {{
                 background-color: {self.colors['hover_fill']};
                 border-color: {self.colors['hover_stroke']};
+            }}
+            QToolTip {{
+                background-color: {self.colors['hover_fill']};
+                border: 2px solid {self.colors['hover_stroke']};
+                border-radius: 4px;
+                
+                color: {self.colors['text']};
+                font-family: '{self.font_family}';
+                font-size: {self.font_size_small}px;
+                padding: 2px;
             }}
         ''')
 
@@ -269,7 +298,7 @@ class GUI():
         ''')
 
         # Значение
-        value = QLabel(value, block)
+        value = QLabel(number, block)
         value.setGeometry(10, 40, 102, 30)
         value.setAlignment(Qt.AlignmentFlag.AlignCenter)
         value.setStyleSheet(f'''
@@ -280,40 +309,15 @@ class GUI():
             font-family: '{self.font_family}';
             font-size: {self.font_size_small}px;
         ''')
-
         return value
 
-    def SiteBlock(self):
-        '''Сайт'''
-        self.site = QLabel('', self.window)
-        self.site.setGeometry(574, 480, 264, 30)
-        self.site.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.site.setStyleSheet(f'''
-                QLabel {{
-                    color: {self.colors['text']};
-                    font-family: '{self.font_family}';
-                    font-size: {self.font_size_big}px; 
-                }}
-            ''')
-        self.site.hide()
-
-        return self.site
-
-    def Site(self, text: str = ''):
-        '''Показ сайта'''
-        if text:
-            self.site.setText(text)
-            self.site.raise_()
-            self.site.show()
-        else:
-            self.site.hide()
-
-    def DownloadButton(self):
+    def Download_Button(self):
         '''Кнопка скачивания видео'''
-        self.button = QPushButton('Download', self.window)
-        self.button.setGeometry(574, 530, 264, 50)
-        self.button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.button.setStyleSheet(f'''
+        self.download_button = QPushButton('Download', self.window)
+        self.download_button.setGeometry(574, 530, 264, 50)
+        self.download_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.download_button.setToolTip('Download video')
+        self.download_button.setStyleSheet(f'''
             QPushButton {{
                 background: qlineargradient(
                     spread:pad, 
@@ -338,11 +342,94 @@ class GUI():
                 
                 color: {self.colors['sub_text']};
             }}
+            QToolTip {{
+                background-color: {self.colors['hover_fill']};
+                border: 2px solid {self.colors['hover_stroke']};
+                border-radius: 4px;
+                
+                color: {self.colors['text']};
+                font-family: '{self.font_family}';
+                font-size: {self.font_size_small}px;
+                padding: 2px;
+            }}
         ''')
 
-        self.button.clicked.connect(self.Download)
+        self.download_button.clicked.connect(self.Download)
 
-    def PreviewBlock(self):
+    def Stop_Button(self):
+        '''Кнопка остановки скачивания видео'''
+        self.stop_button = QPushButton('', self.window)
+        self.stop_button.setGeometry(858, 530, 51, 50)
+        self.stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.stop_button.setToolTip('Abort the download')
+        self.stop_button.setToolTip('Settings')
+        self.stop_button.setIcon(QIcon(self.core.files['stop_icon'].replace('\\', '/')))
+        self.stop_button.setIconSize(QSize(20, 20))
+        self.stop_button.setStyleSheet(f'''
+            QPushButton {{
+                background-color: {self.colors['fill']};
+                border: 2px solid {self.colors['stroke']};
+                border-radius: 10px;
+
+                color: {self.colors['text']};
+                font-family: '{self.font_family}';
+                font-size: {self.font_size_big}px;
+            }}
+            QPushButton:pressed {{
+                background-color: {self.colors['hover_fill']};
+                border-color: {self.colors['hover_stroke']};
+            }}
+            QToolTip {{
+                background-color: {self.colors['hover_fill']};
+                border: 2px solid {self.colors['hover_stroke']};
+                border-radius: 4px;
+                
+                color: {self.colors['text']};
+                font-family: '{self.font_family}';
+                font-size: {self.font_size_small}px;
+                padding: 2px;
+            }}
+        ''')
+
+        self.stop_button.clicked.connect(self.core.Stop)
+
+    def Settings_Button(self):
+        '''Кнопка настроек'''
+        self.settings_button = QPushButton('', self.window)
+        self.settings_button.setGeometry(929, 530, 51, 50)
+        self.settings_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.settings_button.setToolTip('Settings')
+        self.settings_button.setIcon(QIcon(self.core.files['settings_icon'].replace('\\', '/')))
+        self.settings_button.setIconSize(QSize(20, 20))
+        self.settings_button.setStyleSheet(f'''
+            QPushButton {{
+                background-color: {self.colors['fill']};
+                border: 2px solid {self.colors['stroke']};
+                border-radius: 10px;
+
+                color: {self.colors['text']};
+                font-family: '{self.font_family}';
+                font-size: {self.font_size_big}px;
+            }}
+            QPushButton:pressed {{
+                background-color: {self.colors['hover_fill']};
+                border-color: {self.colors['hover_stroke']};
+            }}
+            QToolTip {{
+                background-color: {self.colors['hover_fill']};
+                border: 2px solid {self.colors['hover_stroke']};
+                border-radius: 4px;
+                
+                color: {self.colors['text']};
+                font-family: '{self.font_family}';
+                font-size: {self.font_size_small}px;
+                padding: 2px;
+            }}
+        ''')
+
+        # self.settings_button.clicked.connect()
+
+    def Preview_Block(self):
         '''Блок превью'''
         # Основное окно
         self.preview = QLabel(self.window)
@@ -353,6 +440,17 @@ class GUI():
                 border-radius: 10px;
             }}
         ''')
+
+        # Размытие
+        self.blur_effect = QGraphicsBlurEffect()
+        self.blur_effect.setBlurRadius(30)
+        self.blur_effect.setBlurHints(QGraphicsBlurEffect.BlurHint.PerformanceHint)
+
+        # Пустой фон
+        self.blur = QLabel(self.preview)
+        self.blur.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
+        self.blur.setStyleSheet('background: transparent; border: none;')
+        self.blur.setGraphicsEffect(self.blur_effect)
 
         # Отображение превью
         self.image = QLabel(self.preview)
@@ -365,7 +463,7 @@ class GUI():
         ''')
 
         # Подгон размера
-        scaled_pixmap = QPixmap(self.core.files['preview']).scaled(
+        scaled_pixmap = QPixmap(self.core.files['preview_icon']).scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation
@@ -384,9 +482,16 @@ class GUI():
 
         self.preview.setMask(mask)
 
-    def UpdatePreview(self, preview_path: str = ''):
+    def Update_Preview(self, preview_path: str = ''):
         '''Подгрузка нового превью'''
         self.load = QPixmap(preview_path)
+
+        blur_pixmap = self.load.scaled(
+            QSize(self.size_preview[0], self.size_preview[1]),
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        self.blur.setPixmap(blur_pixmap)
 
         scaled_pixmap = self.load.scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
@@ -414,8 +519,14 @@ class GUI():
         self.Reset()
         def Thread(url: str):
             self.core.Data(self.core.Link(url))
+            self.core.Main()
+
+            self.speed.setText('-')
+            self.max_speed.setText('-')
+            self.size.setText('-')
+
             self.core.Preview()
-            self.core.MoreInfo()
+            self.core.More_Info()
 
         url = self.input.text()
         self.input.clear()
@@ -429,7 +540,7 @@ class GUI():
     def Download(self):
         '''Скачивание'''
         def Thread():
-            self.core.DownloadVideo()
+            self.core.Download_Video()
 
         thread = threading.Thread(
             target = Thread,
@@ -437,16 +548,3 @@ class GUI():
             daemon = True
         )
         thread.start()
-
-
-
-if __name__ == '__main__':
-    try:
-        other = QApplication(sys.argv)
-        core = Core()
-        master = GUI(core = core)
-        core.gui = master
-        master.window.show()
-        sys.exit(other.exec())
-    except Exception as error:
-        log.error(f'Unexpected error: {error}')
