@@ -19,7 +19,7 @@ class MASTER():
         self.core = core
 
         # Основное
-        self.version = '2026.07.17.1b'
+        self.version = '2026.07.17.2b'
         self.name = 'Deubaso Composifity'
         self.size_window = [1000, 600]
         self.size_preview = [534, 300]
@@ -392,7 +392,7 @@ class MASTER():
             }}
         ''')
 
-        self.stop_button.clicked.connect(self.core.Stop)
+        self.stop_button.clicked.connect(self.core.Stop_Download)
 
     def Settings_Button(self):
         '''Кнопка настроек'''
@@ -519,15 +519,15 @@ class MASTER():
         '''Запуск основной логики'''
         self.Reset()
         def Thread(url: str):
-            self.core.Data(self.core.Link(url))
-            self.core.Main()
+            self.core.Get_Data(self.core.Aliases(url))
+            self.core.Get_Info()
 
             self.speed.setText('-')
             self.max_speed.setText('-')
             self.size.setText('-')
 
-            self.core.Preview()
-            self.core.More_Info()
+            self.core.Get_Preview()
+            self.core.Get_Add_Info()
 
         url = self.input.text()
         self.input.clear()

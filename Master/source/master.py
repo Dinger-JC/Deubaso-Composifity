@@ -9,13 +9,12 @@
 
 # Локальные модули
 try:
-    from core import *
     from master_window import *
     from logger import Log
     log = Log(__name__)
 
 except ImportError:
-    print("Couldn't import local modules.")
+    print('Could not import local modules.')
     sys.exit(1)
 
 

@@ -113,23 +113,32 @@ class CORE:
         self.cancel_download = False
         self.factor = {'KiB': 1024, 'MiB': 1024 ** 2, 'GiB': 1024 ** 3}
 
+        # История
+        if self.settings['history'] == 1:
+            log.info('History recording is enabled.')
+
+        else:
+            log.info('History recording is disabled.')
+
     def Required_Files(self):
         '''Проверка наличия необходимых файлов'''
-        link = 'https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45'
         error = False
 
         for name, path in self.files.items():
             if not os.path.exists(path):
                 log.critical(f'The "{path}" file was not found.')
                 if name == 'ffmpeg' or name == 'ffprobe':
-                    log.critical(f'You can download it here: {link}')
+                    log.critical(
+                        'You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45\n'
+                        'After downloading, move the exe file to the bin folder in the root of the project.'
+                    )
                 error = True
 
         if error:
             log.critical('The program cannot be run due to missing files.')
             os._exit(0)
 
-    def Link(self, url: str) -> str:
+    def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''
         with open(self.file_videos, encoding = 'utf-8') as file:
             videos = json.load(file)
@@ -182,7 +191,7 @@ class CORE:
         self.yt_dlp_options = {
             'http_headers': self.headers, # Заголовки HTTP-запросов
             'progress_hooks': [self.Progress_Hook], # Отслеживание прогресса загрузки
-            'ffmpeg_location': self.files['ffmpeg'], # Путь ffmpeg
+            'ffmpeg_location': self.files['ffmpeg'], # Путь к ffmpeg
             'outtmpl': self.cache_name, # Путь сохраняемого файла
             'format': 'bestvideo+bestaudio/best', # Качество видео
             'merge_output_format': 'mp4', # Формат после загрузки
@@ -197,7 +206,7 @@ class CORE:
             'retries': 5, # Количество попыток переподключения при ошибке загрузки файла
             'fragment_retries': 5, # Количество попыток загрузки каждого отдельного фрагмента видео
             'rm_cached_metadata': True, # Очистка метаданных из кэша перед началом загрузки
-            'nocheckcertificate': True, # Игнорировать ошибки проверки SSL-сертификатов
+            'nocheckcertificate': True, # Игнорирование ошибок проверки SSL-сертификатов
             'quiet': True, # Лог
             'verbose': False # Подробный лог
         }
@@ -209,9 +218,9 @@ class CORE:
             'probesize': '10000000', # Максимальный объем данных для анализа (в байтах)
             'rw_timeout': '15000000', # Общее время на операцию (в микросекундах)
             'reconnect_delay_max': '5', # Максимальное время ожидания (в секундах)
-            'tls_verify': '0', # Отключает проверку SSL-сертификатов
+            'tls_verify': '0', # Проверка SSL-сертификатов
             'reconnect': '1', # Автоматическое переподключение
-            'seekable': '0', # Чтение потока последовательно
+            'seekable': '0', # Чтение потока
             'reconnect_streamed': '1' # Автоматическое переподключение для стримов
         }
 
@@ -257,8 +266,6 @@ class CORE:
         time = now.strftime('%H:%M:%S')
 
         if self.settings['history'] == 1:
-            log.info('History recording is enabled.')
-
             if os.path.exists(self.file_history) and os.path.getsize(self.file_history) > 0:
                 with open(self.file_history, 'r', encoding = 'utf-8') as file:
                     try:
@@ -277,10 +284,7 @@ class CORE:
             with open(self.file_history, 'w', encoding = 'utf-8') as file:
                 json.dump(data, file, indent = 4, ensure_ascii = False)
 
-        else:
-            log.info('History recording is disabled.')
-
-    def File(self):
+    def File_Name(self):
         '''Создание уникального имени файла'''
         counter = 1
         while True:
@@ -345,12 +349,13 @@ class CORE:
         error = errors.get(code, 'Error occurred.')
         full_message = f'Error {code} {error}'
 
+        self.gui.Update_Preview(self.files['preview_icon'])
         self.gui.Status('warning', full_message)
         log.error(full_message)
 
         sys.exit(1)
 
-    def Data(self, url: str):
+    def Get_Data(self, url: str):
         '''Получение данных с сайта'''
         try:
             self.Update_Config(url)
@@ -363,7 +368,7 @@ class CORE:
 
         except requests.exceptions.ConnectionError:
             self.yt_dlp_options = None
-            self.gui.Update_Preview(self.files['preview'])
+            self.gui.Update_Preview(self.files['preview_icon'])
 
             self.gui.Status('warning', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
             log.error(f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
@@ -371,13 +376,13 @@ class CORE:
 
         except requests.exceptions.Timeout:
             self.yt_dlp_options = None
-            self.gui.Update_Preview(self.files['preview'])
+            self.gui.Update_Preview(self.files['preview_icon'])
 
             self.gui.Status('warning', f'Exceeded the waiting time for a response from "{self.domain}".')
             log.error(f'Exceeded the waiting time for a response from "{self.domain}".')
             sys.exit(1)
 
-    def Main(self):
+    def Get_Info(self):
         '''Парсинг названий и прямых ссылок'''
         if self.domain == self.sites['Strip2']['domain']:
             raw_title = self.page.find('title').text
@@ -425,7 +430,7 @@ class CORE:
         log.info(f'| Name: {self.title}')
         log.info(f'| Direct link: {self.video_url}')
 
-    def Preview(self):
+    def Get_Preview(self):
         '''Получение превью'''
         key = next((i for i, v in self.sites.items() if v['domain'] == self.domain), None)
         if key:
@@ -439,7 +444,7 @@ class CORE:
 
         log.info(f'| Preview: {image}')
 
-    def More_Info(self):
+    def Get_Add_Info(self):
         '''Получение дополнительной информации'''
         self.gui.Status('status', 'Getting additional information...')
         log.info('[GETTING ADDITIONAL INFORMATION]')
@@ -498,7 +503,7 @@ class CORE:
             with yt_dlp.YoutubeDL(self.yt_dlp_options) as video:
                 video.download([self.video_url])
 
-            self.File()
+            self.File_Name()
             self.Edit_Tags()
 
             self.gui.speed.setText('-')
@@ -522,7 +527,7 @@ class CORE:
             except Exception:
                 pass
 
-    def Stop(self):
+    def Stop_Download(self):
         '''Прерывание скачивания'''
         self.cancel_download = True
 
