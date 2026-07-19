@@ -13,14 +13,13 @@ from core import *
 
 
 class MASTER():
-    '''Интерфейс'''
-    def __init__(self, core):
+    '''Главное окно'''
+    def __init__(self, core, version):
         '''Инициализация'''
-        self.core = core
-
         # Основное
-        self.version = '2026.07.17.2b'
+        self.core = core
         self.name = 'Deubaso Composifity'
+        self.version = version
         self.size_window = [1000, 600]
         self.size_preview = [534, 300]
 
@@ -38,7 +37,8 @@ class MASTER():
             'hover_end': 'rgb(2, 219, 172)',
             'hover_start_pressed': 'rgba(99, 146, 234, 0.4)',
             'hover_end_pressed': 'rgba(2, 219, 172, 0.4)',
-            'warning': 'rgb(227, 88, 111)'
+            'warning': 'rgb(255, 193, 62)',
+            'error': 'rgb(227, 88, 111)'
         }
 
         # Шрифт
@@ -51,14 +51,14 @@ class MASTER():
             'speed': 'Current real-time video download speed',
             'max_speed': 'Maximum fixed speed',
             'size': 'Total video file size',
-            'quality': 'Basic video qualities:\n'
-                '4K UHD - 3840x2160 (16:9)\n'
-                '2K QHD - 2560x1440 (16:9)\n'
-                'Full HD - 1920x1080 (16:9)\n'
-                'HD - 1280x720 (16:9)\n'
-                'VGA - 640x480 (4:3)\n'
-                'nHD - 640x360 (16:9)\n'
-                'QVGA - 320x240 (4:3)',
+            'quality': 'Basic video qualities:'
+                '\n4K UHD - 3840x2160 (16:9)'
+                '\n2K QHD - 2560x1440 (16:9)'
+                '\nFull HD - 1920x1080 (16:9)'
+                '\nHD - 1280x720 (16:9)'
+                '\nVGA - 640x480 (4:3)'
+                '\nnHD - 640x360 (16:9)'
+                '\nQVGA - 320x240 (4:3)',
             'fps': 'Video frame rate',
             'duration': 'Total video length'
         }
@@ -205,7 +205,8 @@ class MASTER():
 
     def Status(self, type: str, text: str = ''):
         '''Показ статуса'''
-        if type == 'status':
+        if type == 'info':
+            log.info(text)
             self.status.setStyleSheet(f'''
                 QLabel {{
                     color: {self.colors['sub_text']};
@@ -215,9 +216,20 @@ class MASTER():
             ''')
 
         elif type == 'warning':
+            log.warning(text)
             self.status.setStyleSheet(f'''
                 QLabel {{
                     color: {self.colors['warning']};
+                    font-family: '{self.font_family}';
+                    font-size: {self.font_size_small}px; 
+                }}
+            ''')
+
+        elif type == 'error':
+            log.error(text)
+            self.status.setStyleSheet(f'''
+                QLabel {{
+                    color: {self.colors['error']};
                     font-family: '{self.font_family}';
                     font-size: {self.font_size_small}px; 
                 }}
@@ -363,7 +375,7 @@ class MASTER():
         self.stop_button.setGeometry(858, 530, 51, 50)
         self.stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.stop_button.setToolTip('Abort the download')
-        self.stop_button.setToolTip('Settings')
+        self.stop_button.setToolTip('Stop download')
         self.stop_button.setIcon(QIcon(self.core.files['stop_icon'].replace('\\', '/')))
         self.stop_button.setIconSize(QSize(20, 20))
         self.stop_button.setStyleSheet(f'''

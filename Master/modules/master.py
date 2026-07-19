@@ -25,14 +25,14 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
 
         core = CORE()
-        master = MASTER(core = core)
+        master = MASTER(core, '2026.07.20.0b')
         core.gui = master
 
         master.window.show()
         sys.exit(app.exec())
 
     except Exception as e:
-        log.error(f'Unexpected error: {e}')
+        log.critical(f'Unexpected error: {e}')
 
     finally:
         log.info('Shutdown')

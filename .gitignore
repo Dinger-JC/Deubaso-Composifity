@@ -4,4 +4,4 @@ __pycache__/
 /Test/
 /Master/bin/
 /Master/data/
-/Master/source/core_test.py
+/Master/modules/core_test.py

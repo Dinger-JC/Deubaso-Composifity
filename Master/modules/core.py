@@ -78,14 +78,14 @@ class CORE:
             'sites': str(self.file_path / 'config' / 'sites.json'),
             'ffmpeg': str(self.file_path / 'bin' / 'ffmpeg.exe'),
             'ffprobe': str(self.file_path / 'bin' / 'ffprobe.exe'),
-            'icon_icon': str(self.file_path / 'assets' / 'icon.png'),
-            'link_icon': str(self.file_path / 'assets' / 'link.png'),
-            'download_icon': str(self.file_path / 'assets' / 'download.png'),
-            'stop_icon': str(self.file_path / 'assets' / 'stop.png'),
-            'settings_icon': str(self.file_path / 'assets' / 'settings.png'),
-            'preview_icon': str(self.file_path / 'assets' / 'preview.png')
+            'icon_icon': str(self.file_path / 'resources' / 'icon.png'),
+            'link_icon': str(self.file_path / 'resources' / 'link.png'),
+            'download_icon': str(self.file_path / 'resources' / 'download.png'),
+            'stop_icon': str(self.file_path / 'resources' / 'stop.png'),
+            'settings_icon': str(self.file_path / 'resources' / 'settings.png'),
+            'preview_icon': str(self.file_path / 'resources' / 'preview.png')
         }
-        self.Required_Files()
+        self.Required_Files(self.files)
 
         # Второстепенные файлы
         self.file_history = '../data/history.json'
@@ -104,7 +104,7 @@ class CORE:
         self.path.mkdir(parents = True, exist_ok = True)
         self.temp_preview = f'{self.path / 'preview_temp'}.jpg'
 
-        # Основное
+        # Прочее
         self.chrome = '131'
         self.timeout = 30
         self.max_speed = 0
@@ -115,22 +115,22 @@ class CORE:
 
         # История
         if self.settings['history'] == 1:
-            log.info('History recording is enabled.')
+            log.info('History recording is enabled')
 
         else:
-            log.info('History recording is disabled.')
+            log.info('History recording is disabled')
 
-    def Required_Files(self):
+    def Required_Files(self, files: dict):
         '''Проверка наличия необходимых файлов'''
         error = False
 
-        for name, path in self.files.items():
+        for name, path in files.items():
             if not os.path.exists(path):
                 log.critical(f'The "{path}" file was not found.')
                 if name == 'ffmpeg' or name == 'ffprobe':
                     log.critical(
-                        'You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45\n'
-                        'After downloading, move the exe file to the bin folder in the root of the project.'
+                        'You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45'
+                        '\nAfter downloading, move the exe file to the bin folder in the root of the project.'
                     )
                 error = True
 
@@ -150,16 +150,16 @@ class CORE:
 
     def Update_Config(self, url: str):
         '''Обновление конфигурации для каждого видео'''
-        self.gui.Status('status', 'Checking...')
-        log.info('[CHECKING]')
+        self.gui.Status('info', 'Checking...')
+
         log.info(f'| Link: {url}')
 
         # Проверка ссылки
         if not re.search(r'^https?://[\w\.-]+\/.*(video|watch).*', url):
             self.yt_dlp_options = None
             self.gui.Update_Preview(self.files['preview_icon'])
+
             self.gui.Status('warning', 'Incorrect link. This link could not be found.')
-            log.error('Incorrect link. This link could not be found.')
             sys.exit(1)
 
         self.History(url) # Запись в историю
@@ -224,7 +224,7 @@ class CORE:
             'reconnect_streamed': '1' # Автоматическое переподключение для стримов
         }
 
-    def User_Agent(self):
+    def User_Agent(self) -> str:
         '''Генерация случайного браузера'''
         windows_version = secrets.choice(['11.0; Win64; x64', '10.0; Win64; x64', '10.0'])
         chrome_version = f'{self.chrome}.0.{secrets.choice(range(6778, 6807))}.{secrets.choice(range(85, 110))}'
@@ -284,16 +284,6 @@ class CORE:
             with open(self.file_history, 'w', encoding = 'utf-8') as file:
                 json.dump(data, file, indent = 4, ensure_ascii = False)
 
-    def File_Name(self):
-        '''Создание уникального имени файла'''
-        counter = 1
-        while True:
-            self.final_name = Path(self.path) / f'VID {counter} ({self.site}).mp4'
-            if not self.final_name.exists():
-                os.rename(self.cache_name, self.final_name)
-                break
-            counter += 1
-
     def Progress_Hook(self, data):
         '''Загрузка'''
         if self.cancel_download:
@@ -325,7 +315,8 @@ class CORE:
 
         elif data['status'] == 'finished':
             self.gui.progress_bar.setValue(100)
-            self.gui.Status('status', 'Download complete, file is being compiled...')
+
+            self.gui.Status('info', 'Download complete, file is being compiled...')
 
     def Check_Link(self):
         '''Проверка ответа страницы'''
@@ -350,8 +341,7 @@ class CORE:
         full_message = f'Error {code} {error}'
 
         self.gui.Update_Preview(self.files['preview_icon'])
-        self.gui.Status('warning', full_message)
-        log.error(full_message)
+        self.gui.Status('error', full_message)
 
         sys.exit(1)
 
@@ -363,23 +353,20 @@ class CORE:
             self.page = BeautifulSoup(self.response.text, 'html.parser')
             self.Check_Link()
 
-            self.gui.Status('status', 'Getting basic information...')
-            log.info('[GETTING BASIC INFORMATION]')
+            self.gui.Status('info', 'Getting basic information...')
 
         except requests.exceptions.ConnectionError:
             self.yt_dlp_options = None
             self.gui.Update_Preview(self.files['preview_icon'])
 
-            self.gui.Status('warning', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
-            log.error(f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
+            self.gui.Status('error', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
             sys.exit(1)
 
         except requests.exceptions.Timeout:
             self.yt_dlp_options = None
             self.gui.Update_Preview(self.files['preview_icon'])
 
-            self.gui.Status('warning', f'Exceeded the waiting time for a response from "{self.domain}".')
-            log.error(f'Exceeded the waiting time for a response from "{self.domain}".')
+            self.gui.Status('error', f'Exceeded the waiting time for a response from "{self.domain}".')
             sys.exit(1)
 
     def Get_Info(self):
@@ -422,7 +409,6 @@ class CORE:
 
         else:
             self.gui.Status('warning', 'Downloads are only available from Strip2, XGroovy, AnalMedia.')
-            log.error('Downloads are only available from Strip2, XGroovy, AnalMedia.')
             sys.exit(1)
 
         self.gui.title.setText(self.title)
@@ -446,8 +432,7 @@ class CORE:
 
     def Get_Add_Info(self):
         '''Получение дополнительной информации'''
-        self.gui.Status('status', 'Getting additional information...')
-        log.info('[GETTING ADDITIONAL INFORMATION]')
+        self.gui.Status('info', 'Getting additional information...')
 
         try:
             video_info = ffmpeg.probe(self.video_url, cmd = self.files['ffprobe'],  **self.ffprobe_options)
@@ -467,11 +452,10 @@ class CORE:
             log.info(f'| FPS: {fps}')
             log.info(f'| Duration: {duration}')
 
-            self.gui.Status('status', 'Video is ready to download!')
+            self.gui.Status('info', 'Video is ready to download!')
 
         except Exception as e:
-            self.gui.Status('warning', f'Error reading technical info via ffprobe: {e}')
-            log.error(f'Error reading technical info via ffprobe: {e}')
+            self.gui.Status('error', f'Error reading technical info via ffprobe: {e}')
 
     def Edit_Tags(self):
         '''Редактирование тегов'''
@@ -486,18 +470,26 @@ class CORE:
             tags.save()
 
         except Exception as e:
-            log.error(f'Failed to edit mp4 tags: {e}')
+            self.gui.Status('error', f'Failed to edit mp4 tags: {e}')
+
+    def File_Name(self):
+        '''Создание уникального имени файла'''
+        counter = 1
+        while True:
+            self.final_name = Path(self.path) / f'VID {counter} ({self.site}).mp4'
+            if not self.final_name.exists():
+                os.rename(self.cache_name, self.final_name)
+                break
+            counter += 1
 
     def Download_Video(self):
         '''Скачивание видео'''
         self.cancel_download = False
         if not self.yt_dlp_options or not self.video_url:
-            self.gui.Status('warning', 'The link to the video is missing.')
-            log.error('The link to the video is missing.')
+            self.gui.Status('error', 'The link to the video is missing.')
             sys.exit(1)
 
-        self.gui.Status('status', 'Downloading videos...')
-        log.info('[DOWNLOADING VIDEOS]')
+        self.gui.Status('info', 'Downloading videos...')
 
         try:
             with yt_dlp.YoutubeDL(self.yt_dlp_options) as video:
@@ -505,19 +497,16 @@ class CORE:
 
             self.File_Name()
             self.Edit_Tags()
-
             self.gui.speed.setText('-')
-            self.gui.Status('status', f'Downloaded in {str(self.final_name).replace('\\', '/')}')
-            log.info(f'| Downloaded in {self.final_name}')
+
+            self.gui.Status('info', f'Downloaded in {str(self.final_name).replace('\\', '/')}')
 
         except Exception as e:
             if 'Download aborted' in str(e):
                 self.gui.Status('warning', 'Download aborted')
-                log.error('Download aborted')
 
             else:
-                self.gui.Status('warning', f'Unexpected error: {e}')
-                log.error(e)
+                self.gui.Status('error', f'Unexpected error: {e}')
                 sys.exit(1)
 
         finally:

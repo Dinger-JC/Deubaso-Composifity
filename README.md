@@ -7,7 +7,7 @@ Beginning of development 06.01.2026.
 ---
 
 ### Create
-If you want to add video links to your favorites, create a `Master/bin/videos.json` file and write the following code, then add the links to the dictionary:
+If you want to add video links to your favorites, create a `Master/data/videos.json` file and write the following code, then add the links to the dictionary:
 
 ```json
 {
