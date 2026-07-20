@@ -71,25 +71,23 @@ class CORE:
     '''Ядро'''
     def __init__(self):
         '''Инициализация'''
-        # Необходимые файлы
-        self.file_path = Path(__file__).resolve().parent.parent
+        # Файлы
+        self.project = Path(__file__).resolve().parent.parent
         self.files = {
-            'settings': str(self.file_path / 'config' / 'settings.json'),
-            'sites': str(self.file_path / 'config' / 'sites.json'),
-            'ffmpeg': str(self.file_path / 'bin' / 'ffmpeg.exe'),
-            'ffprobe': str(self.file_path / 'bin' / 'ffprobe.exe'),
-            'icon_icon': str(self.file_path / 'resources' / 'icon.png'),
-            'link_icon': str(self.file_path / 'resources' / 'link.png'),
-            'download_icon': str(self.file_path / 'resources' / 'download.png'),
-            'stop_icon': str(self.file_path / 'resources' / 'stop.png'),
-            'settings_icon': str(self.file_path / 'resources' / 'settings.png'),
-            'preview_icon': str(self.file_path / 'resources' / 'preview.png')
+            'ffmpeg': self.project / 'bin' / 'ffmpeg.exe',
+            'ffprobe': self.project / 'bin' / 'ffprobe.exe',
+            'settings': self.project / 'config' / 'settings.json',
+            'sites': self.project / 'config' / 'sites.json',
+            'history': self.project / 'data' / 'history.json',
+            'videos': self.project / 'data' / 'videos.json',
+            'icon_icon': self.project / 'resources' / 'icon.png',
+            'link_icon': self.project / 'resources' / 'link.png',
+            'download_icon': self.project / 'resources' / 'download.png',
+            'stop_icon': self.project / 'resources' / 'stop.png',
+            'settings_icon': self.project / 'resources' / 'settings.png',
+            'preview_icon': self.project / 'resources' / 'preview.png'
         }
-        self.Required_Files(self.files)
-
-        # Второстепенные файлы
-        self.file_history = '../data/history.json'
-        self.file_videos = '../data/videos.json'
+        self.Files(self.files)
 
         # Настройки
         with open(self.files['settings'], encoding = 'utf-8') as file:
@@ -99,53 +97,69 @@ class CORE:
         with open(self.files['sites'], encoding = 'utf-8') as file:
             self.sites = json.load(file)
 
-        # Директория
-        self.path: Path = Path(self.settings['path'])
+        # Директория скачиваемых видео
+        self.path = Path(self.settings['path'])
         self.path.mkdir(parents = True, exist_ok = True)
-        self.temp_preview = f'{self.path / 'preview_temp'}.jpg'
+        self.temp_preview = self.path / 'preview_temp.jpg'
 
         # Прочее
         self.chrome = '131'
         self.timeout = 30
+        self.factor = {'KiB': 1024, 'MiB': 1024 ** 2, 'GiB': 1024 ** 3}
+
+        # Сброс
         self.max_speed = 0
         self.yt_dlp_options = None
         self.video_url = None
         self.cancel_download = False
-        self.factor = {'KiB': 1024, 'MiB': 1024 ** 2, 'GiB': 1024 ** 3}
 
-        # История
+        # Проверка записи истории
         if self.settings['history'] == 1:
-            log.info('History recording is enabled')
+            log.info('History recording is enabled.')
 
         else:
-            log.info('History recording is disabled')
+            log.info('History recording is disabled.')
 
-    def Required_Files(self, files: dict):
-        '''Проверка наличия необходимых файлов'''
+    def Files(self, files: dict):
+        '''Проверка наличия файлов'''
         error = False
 
         for name, path in files.items():
-            if not os.path.exists(path):
-                log.critical(f'The "{path}" file was not found.')
+            if not path.is_file():
                 if name == 'ffmpeg' or name == 'ffprobe':
-                    log.critical(
-                        'You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45'
-                        '\nAfter downloading, move the exe file to the bin folder in the root of the project.'
-                    )
-                error = True
+                    log.critical(f'The "{path}" file was not found.')
+                    log.critical('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
+                    log.critical('After downloading, move the exe file to the bin folder in the root of the project.')
+                    error = True
+
+                elif name == 'history':
+                    return
+
+                elif name == 'videos':
+                    log.warning(f'The "{path}" file was not found.')
+
+                else:
+                    log.critical(f'The "{path}" file was not found.')
+                    error = True
 
         if error:
-            log.critical('The program cannot be run due to missing files.')
             os._exit(0)
 
     def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''
-        with open(self.file_videos, encoding = 'utf-8') as file:
-            videos = json.load(file)
-        presets = videos
+        if not self.files['videos'].is_file():
+            return url
 
-        if url in videos:
-            url = presets[url]
+        try:
+            with open(self.files['videos'], encoding = 'utf-8') as file:
+                videos = json.load(file)
+            presets = videos
+            if url in videos:
+                url = presets[url]
+
+        except json.JSONDecodeError:
+            log.info(f'The "{self.files['videos']}" file is corrupted or has an incorrect JSON format.')
+
         return url
 
     def Update_Config(self, url: str):
@@ -266,12 +280,9 @@ class CORE:
         time = now.strftime('%H:%M:%S')
 
         if self.settings['history'] == 1:
-            if os.path.exists(self.file_history) and os.path.getsize(self.file_history) > 0:
-                with open(self.file_history, 'r', encoding = 'utf-8') as file:
-                    try:
-                        data = json.load(file)
-                    except json.JSONDecodeError:
-                        data = {}
+            if self.files['history'].is_file() and self.files['history'].stat().st_size > 0:
+                with open(self.files['history'], 'r', encoding = 'utf-8') as file:
+                    data = json.load(file)
 
             else:
                 data = {}
@@ -281,7 +292,7 @@ class CORE:
             day_dict = month_dict.setdefault(date, {})
             day_dict[time] = url
 
-            with open(self.file_history, 'w', encoding = 'utf-8') as file:
+            with open(self.files['history'], 'w', encoding = 'utf-8') as file:
                 json.dump(data, file, indent = 4, ensure_ascii = False)
 
     def Progress_Hook(self, data):
@@ -457,6 +468,17 @@ class CORE:
         except Exception as e:
             self.gui.Status('error', f'Error reading technical info via ffprobe: {e}')
 
+    def File_Name(self):
+        '''Создание уникального имени файла'''
+        date = datetime.now().strftime('%Y.%m.%d')
+        counter = 1
+        while True:
+            self.final_name = self.path / f'{date} {self.site} VID {counter}.mp4'
+            if not self.final_name.exists():
+                os.rename(self.cache_name, self.final_name)
+                break
+            counter += 1
+
     def Edit_Tags(self):
         '''Редактирование тегов'''
         try:
@@ -471,16 +493,6 @@ class CORE:
 
         except Exception as e:
             self.gui.Status('error', f'Failed to edit mp4 tags: {e}')
-
-    def File_Name(self):
-        '''Создание уникального имени файла'''
-        counter = 1
-        while True:
-            self.final_name = Path(self.path) / f'VID {counter} ({self.site}).mp4'
-            if not self.final_name.exists():
-                os.rename(self.cache_name, self.final_name)
-                break
-            counter += 1
 
     def Download_Video(self):
         '''Скачивание видео'''

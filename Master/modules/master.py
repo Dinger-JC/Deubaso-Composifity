@@ -25,7 +25,7 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
 
         core = CORE()
-        master = MASTER(core, '2026.07.20.0b')
+        master = MASTER(core, '2026.07.20.1b')
         core.gui = master
 
         master.window.show()
