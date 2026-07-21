@@ -1,4 +1,4 @@
-# Parser Deubaso Composifity
+# Deubaso Composifity
 # Master window
 
 # Developer: Dinger_JC
@@ -9,10 +9,11 @@
 
 # Локальные модули
 from core import *
+from settings import *
 
 
 
-class MASTER():
+class MASTER_WINDOW():
     '''Главное окно'''
     def __init__(self, core, version):
         '''Инициализация'''
@@ -66,7 +67,7 @@ class MASTER():
         # Отрисовка
         self.Window()
 
-        self.Name()
+        self.Title()
         self.Version()
 
         self.Input_Block()
@@ -89,9 +90,14 @@ class MASTER():
 
         self.Preview_Block()
 
+        self.settings = SETTINGS(core = self.core, master_window = self)
+
     def Window(self):
         '''Главное окно'''
         self.window = QMainWindow()
+        self.window.setWindowTitle(f'{self.name} - porn content parser!')
+        self.window.setWindowIcon(QIcon(str(self.core.files['icon_icon'])))
+        self.window.setFixedSize(self.size_window[0], self.size_window[1])
         self.window.setStyleSheet(f'''
             QMainWindow {{
                 background-color: qlineargradient(
@@ -107,11 +113,8 @@ class MASTER():
                 font-size: 24px;
             }}
         ''')
-        self.window.setWindowTitle(f'{self.name} - porn content parser!')
-        self.window.setWindowIcon(QIcon(str(self.core.files['icon_icon'])))
-        self.window.setFixedSize(self.size_window[0], self.size_window[1])
 
-    def Name(self):
+    def Title(self):
         '''Название приложения'''
         self.title = QLabel(self.name, self.window)
         self.title.setGeometry(20, 20, 960, 55)
@@ -440,7 +443,7 @@ class MASTER():
             }}
         ''')
 
-        # self.settings_button.clicked.connect()
+        self.settings_button.clicked.connect(lambda: self.settings.Show())
 
     def Preview_Block(self):
         '''Блок превью'''

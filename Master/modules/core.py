@@ -1,5 +1,5 @@
-# Parser Deubaso Composifity
-# Master functionality
+# Deubaso Composifity
+# Core
 
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
@@ -7,63 +7,8 @@
 
 
 
-# Стандартные библиотеки
-import json
-import math
-import os
-import re
-import secrets
-import string
-import subprocess
-import sys
-import threading
-from datetime import timedelta, datetime
-from fractions import Fraction
-from pathlib import Path
-from pprint import pp
-from urllib.parse import urlparse
-
-# Сторонние библиотеки
-packages = [
-    'ffmpeg-python',
-    'yt-dlp',
-    'beautifulsoup4',
-    'curl-cffi',
-    'PySide6',
-    'mutagen'
-]
-
-try:
-    import ffmpeg
-    import yt_dlp
-    from bs4 import BeautifulSoup
-    from curl_cffi import requests
-    from PySide6.QtGui import *
-    from PySide6.QtCore import *
-    from PySide6.QtWidgets import *
-    from mutagen.mp4 import MP4
-
-except ImportError:
-    print('The required modules are missing. Module installation begins...')
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', *packages])
-
-    import ffmpeg
-    import yt_dlp
-    from bs4 import BeautifulSoup
-    from curl_cffi import requests
-    from PySide6.QtGui import *
-    from PySide6.QtCore import *
-    from PySide6.QtWidgets import *
-    from mutagen.mp4 import MP4
-
 # Локальные модули
-try:
-    from logger import Log
-    log = Log(__name__)
-
-except ImportError:
-    print('Failed to import the logger. It may be missing.')
-    sys.exit(1)
+from master import *
 
 
 
@@ -74,12 +19,16 @@ class CORE:
         # Файлы
         self.project = Path(__file__).resolve().parent.parent
         self.files = {
+            # Папка bin
             'ffmpeg': self.project / 'bin' / 'ffmpeg.exe',
             'ffprobe': self.project / 'bin' / 'ffprobe.exe',
+            # Папка config
             'settings': self.project / 'config' / 'settings.json',
             'sites': self.project / 'config' / 'sites.json',
+            # Папка data
             'history': self.project / 'data' / 'history.json',
             'videos': self.project / 'data' / 'videos.json',
+            # Папка resources
             'icon_icon': self.project / 'resources' / 'icon.png',
             'link_icon': self.project / 'resources' / 'link.png',
             'download_icon': self.project / 'resources' / 'download.png',
@@ -205,7 +154,7 @@ class CORE:
         self.yt_dlp_options = {
             'http_headers': self.headers, # Заголовки HTTP-запросов
             'progress_hooks': [self.Progress_Hook], # Отслеживание прогресса загрузки
-            'ffmpeg_location': self.files['ffmpeg'], # Путь к ffmpeg
+            'ffmpeg_location': str(self.files['ffmpeg']), # Путь к ffmpeg
             'outtmpl': self.cache_name, # Путь сохраняемого файла
             'format': 'bestvideo+bestaudio/best', # Качество видео
             'merge_output_format': 'mp4', # Формат после загрузки
@@ -531,9 +480,3 @@ class CORE:
     def Stop_Download(self):
         '''Прерывание скачивания'''
         self.cancel_download = True
-
-        # if self.cancel_download == True:
-        #     self.gui.stop_button.setText('⏸︎')
-        #
-        # if self.cancel_download == False:
-        #     self.gui.stop_button.setText('■︎')

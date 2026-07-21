@@ -1,3 +1,12 @@
+# Deubaso Composifity
+# Logger
+
+# Developer: Dinger_JC
+# Project: https://github.com/Dinger-JC/Deubaso-Composifity
+# Telegram channel: https://t.me/Jitus_Circus
+
+
+
 # Стандартные библиотеки
 import os
 import logging
