@@ -9,34 +9,17 @@
 
 # Локальные модули
 from master import *
+from logger import *
+log = Log()
 
 
 
 class CORE:
     '''Ядро'''
-    def __init__(self):
+    def __init__(self, files):
         '''Инициализация'''
-        # Файлы
-        self.project = Path(__file__).resolve().parent.parent
-        self.files = {
-            # Папка bin
-            'ffmpeg': self.project / 'bin' / 'ffmpeg.exe',
-            'ffprobe': self.project / 'bin' / 'ffprobe.exe',
-            # Папка config
-            'settings': self.project / 'config' / 'settings.json',
-            'sites': self.project / 'config' / 'sites.json',
-            # Папка data
-            'history': self.project / 'data' / 'history.json',
-            'videos': self.project / 'data' / 'videos.json',
-            # Папка resources
-            'icon_icon': self.project / 'resources' / 'icon.png',
-            'link_icon': self.project / 'resources' / 'link.png',
-            'download_icon': self.project / 'resources' / 'download.png',
-            'stop_icon': self.project / 'resources' / 'stop.png',
-            'settings_icon': self.project / 'resources' / 'settings.png',
-            'preview_icon': self.project / 'resources' / 'preview.png'
-        }
-        self.Files(self.files)
+        # Основное
+        self.files = files
 
         # Настройки
         with open(self.files['settings'], encoding = 'utf-8') as file:
@@ -69,30 +52,30 @@ class CORE:
         else:
             log.info('History recording is disabled.')
 
-    def Files(self, files: dict):
-        '''Проверка наличия файлов'''
-        error = False
-
-        for name, path in files.items():
-            if not path.is_file():
-                if name == 'ffmpeg' or name == 'ffprobe':
-                    log.critical(f'The "{path}" file was not found.')
-                    log.critical('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
-                    log.critical('After downloading, move the exe file to the bin folder in the root of the project.')
-                    error = True
-
-                elif name == 'history':
-                    return
-
-                elif name == 'videos':
-                    log.warning(f'The "{path}" file was not found.')
-
-                else:
-                    log.critical(f'The "{path}" file was not found.')
-                    error = True
-
-        if error:
-            os._exit(0)
+    # def Files(self, files: dict):
+    #     '''Проверка наличия файлов'''
+    #     error = False
+    #
+    #     for name, path in files.items():
+    #         if not path.is_file():
+    #             if name == 'ffmpeg' or name == 'ffprobe':
+    #                 log.critical(f'The "{path}" file was not found.')
+    #                 log.critical('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
+    #                 log.critical('After downloading, move the exe file to the bin folder in the root of the project.')
+    #                 error = True
+    #
+    #             elif name == 'history':
+    #                 return
+    #
+    #             elif name == 'videos':
+    #                 log.warning(f'The "{path}" file was not found.')
+    #
+    #             else:
+    #                 log.critical(f'The "{path}" file was not found.')
+    #                 error = True
+    #
+    #     if error:
+    #         os._exit(0)
 
     def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''

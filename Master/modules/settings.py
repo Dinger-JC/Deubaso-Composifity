@@ -8,18 +8,20 @@
 
 
 # Локальные модули
-from core import *
+from master import *
+from logger import *
+log = Log()
 
 
 
 class SETTINGS():
     '''Окно настроек'''
-    def __init__(self, core, master_window):
+    def __init__(self, files, core, master_window):
         '''Инициализация'''
         # Основное
+        self.files = files
         self.core = core
         self.master = master_window
-        self.size_window = [400, 300]
 
         # Отрисовка
         self.Window()
@@ -30,7 +32,7 @@ class SETTINGS():
         self.window = QMainWindow()
         self.window.setWindowTitle(f'{self.master.name} - Settings')
         self.window.setWindowIcon(QIcon(str(self.core.files['icon_icon'])))
-        self.window.setFixedSize(self.size_window[0], self.size_window[1])
+        self.window.setFixedSize(self.master.size_window[0], self.master.size_window[1])
         self.window.setStyleSheet(f'''
             QMainWindow {{
                 background-color: qlineargradient(
@@ -40,17 +42,12 @@ class SETTINGS():
                     stop:1 {self.master.colors['main_end']}
                 );
             }}
-            QLabel {{
-                color: {self.master.colors['text']};
-                font-family: {self.master.font_family};
-                font-size: 24px;
-            }}
         ''')
 
     def Title(self):
         '''Заголовок окна настроек'''
         self.title = QLabel('Settings', self.window)
-        self.title.setGeometry(20, 20, 360, 40)
+        self.title.setGeometry(20, 20, 960, 55)
         self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title.setStyleSheet(f'''
             QLabel {{
@@ -62,7 +59,7 @@ class SETTINGS():
                 );
 
                 font-family: '{self.master.font_family}';
-                font-size: 28px;
+                font-size: 40px;
             }}
         ''')
 

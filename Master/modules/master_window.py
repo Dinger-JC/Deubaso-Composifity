@@ -8,16 +8,19 @@
 
 
 # Локальные модули
-from core import *
+from master import *
 from settings import *
+from logger import *
+log = Log()
 
 
 
 class MASTER_WINDOW():
     '''Главное окно'''
-    def __init__(self, core, version):
+    def __init__(self, files, core, version):
         '''Инициализация'''
         # Основное
+        self.files = files
         self.core = core
         self.name = 'Deubaso Composifity'
         self.version = version
@@ -90,7 +93,7 @@ class MASTER_WINDOW():
 
         self.Preview_Block()
 
-        self.settings = SETTINGS(core = self.core, master_window = self)
+        self.settings = SETTINGS(self.files, self.core, self)
 
     def Window(self):
         '''Главное окно'''
@@ -106,11 +109,6 @@ class MASTER_WINDOW():
                     stop:0 {self.colors['main_start']}, 
                     stop:1 {self.colors['main_end']}
                 );
-            }}
-            QLabel {{
-                color: {self.colors['text']};
-                font-family: {self.font_family};
-                font-size: 24px;
             }}
         ''')
 

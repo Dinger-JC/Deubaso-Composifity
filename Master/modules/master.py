@@ -56,9 +56,10 @@ finally:
 
 # Локальные модули
 try:
+    from core import *
     from master_window import *
     from logger import *
-    log = Log(__name__)
+    log = Log()
 
 except ImportError:
     print('Could not import local modules.')
@@ -66,13 +67,62 @@ except ImportError:
 
 
 
+project = Path(__file__).resolve().parent.parent
+files = {
+    # Папка bin
+    'ffmpeg': project / 'bin' / 'ffmpeg.exe',
+    'ffprobe': project / 'bin' / 'ffprobe.exe',
+    # Папка config
+    'settings': project / 'config' / 'settings.json',
+    'sites': project / 'config' / 'sites.json',
+    # Папка data
+    'history': project / 'data' / 'history.json',
+    'videos': project / 'data' / 'videos.json',
+    # Папка resources
+    'icon_icon': project / 'resources' / 'icon.png',
+    'link_icon': project / 'resources' / 'link.png',
+    'download_icon': project / 'resources' / 'download.png',
+    'stop_icon': project / 'resources' / 'stop.png',
+    'settings_icon': project / 'resources' / 'settings.png',
+    'preview_icon': project / 'resources' / 'preview.png'
+}
+
+def Files(files):
+    '''Проверка наличия файлов'''
+    error = False
+    for name, path in files.items():
+        if not path.is_file():
+            if name == 'ffmpeg' or name == 'ffprobe':
+                log.critical(f'The "{path}" file was not found.')
+                log.critical('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
+                log.critical('After downloading, move the exe file to the bin folder in the root of the project.')
+                error = True
+
+            elif name == 'history':
+                return
+
+            elif name == 'videos':
+                log.warning(f'The "{path}" file was not found.')
+                return
+
+            else:
+                log.critical(f'The "{path}" file was not found.')
+                error = True
+
+    if error:
+        os._exit(0)
+
+
+
 if __name__ == '__main__':
     try:
+        Files(files)
+
         log.info('Start')
         app = QApplication(sys.argv)
 
-        core = CORE()
-        master = MASTER_WINDOW(core, '2026.07.21.1b')
+        core = CORE(files)
+        master = MASTER_WINDOW(files, core, '2026.07.21.2b')
         core.gui = master
 
         master.window.show()

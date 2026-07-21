@@ -12,8 +12,8 @@ from master import *
 
 
 
-def Log(name):
-    log = logging.getLogger(name)
+def Log():
+    log = logging.getLogger()
     log.setLevel(logging.INFO)
 
     if not log.handlers:
