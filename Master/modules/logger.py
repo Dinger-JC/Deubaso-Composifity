@@ -7,10 +7,8 @@
 
 
 
-# Стандартные библиотеки
-import os
-import logging
-from logging.handlers import RotatingFileHandler
+# Локальные модули
+from master import *
 
 
 

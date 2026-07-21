@@ -9,6 +9,7 @@
 
 # Стандартные библиотеки
 import json
+import logging
 import math
 import os
 import re
@@ -19,6 +20,7 @@ import sys
 import threading
 from datetime import timedelta, datetime
 from fractions import Fraction
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from pprint import pp
 from urllib.parse import urlparse
@@ -70,7 +72,7 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
 
         core = CORE()
-        master = MASTER_WINDOW(core, '2026.07.21.0b')
+        master = MASTER_WINDOW(core, '2026.07.21.1b')
         core.gui = master
 
         master.window.show()
