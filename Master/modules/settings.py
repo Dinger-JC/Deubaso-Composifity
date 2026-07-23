@@ -16,7 +16,7 @@ log = Log()
 
 class SETTINGS():
     '''Окно настроек'''
-    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small):
+    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius):
         '''Инициализация'''
         # Основное
         self.files = files
@@ -28,11 +28,19 @@ class SETTINGS():
         self.font_family = font_family
         self.font_big = font_big
         self.font_small = font_small
+        self.border_radius = border_radius
 
         # Отрисовка
         self.Window()
         self.Text_Top()
         self.Text_Version()
+        self.Block_History()
+
+    def Show(self):
+        '''Показ окна'''
+        self.window.show()
+        self.window.raise_()
+        self.window.activateWindow()
 
     def Window(self):
         '''Окно настроек'''
@@ -81,8 +89,86 @@ class SETTINGS():
             font-size: {self.font_small}px;
         ''')
 
-    def Show(self):
-        '''Показ окна настроек'''
-        self.window.show()
-        self.window.raise_()
-        self.window.activateWindow()
+########################################################################################################################
+
+    def Block_History(self):
+        '''История'''
+        card = QWidget(self.window)
+        card.setGeometry(20, 95, 960, 50)
+        card.setStyleSheet(
+            'background-color: rgba(255, 255, 255, 38);'
+            f'border-radius: {self.border_radius}px;'
+        )
+
+        text = QLabel('History', self.window)
+        text.setGeometry(60, 105, 200, 30)
+        text.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        text.setStyleSheet(f'''
+            color: {self.colors['text']};
+            font-family: '{self.font_family}';
+            font-size: {self.font_big}px;
+        ''')
+
+
+
+    def h(self):
+        '''История'''
+        self.card = QWidget(self.window)
+        self.card.setGeometry(20, 95, 960, 50)
+        self.card.setStyleSheet(
+            'background-color: rgba(255, 255, 255, 38);'
+            f'border-radius: {self.border_radius}px;'
+        )
+
+        # Шрифт из параметров
+        custom_font = QFont(self.font_family, self.font_small)
+
+        # 2. Текст "History"
+        self.lbl_history = QLabel("History", self.window)
+        self.lbl_history.setGeometry(60, 105, 200, 30)
+        self.lbl_history.setFont(custom_font)
+        self.lbl_history.setStyleSheet(f"background: transparent; color: {self.colors['sub_text']};")
+        self.lbl_history.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+        # 3. Текст "Show"
+        self.lbl_show = QLabel("Show", self.window)
+        self.lbl_show.setGeometry(845, 105, 60, 30)
+        self.lbl_show.setFont(custom_font)
+        self.lbl_show.setStyleSheet(f"background: transparent; color: {self.colors['sub_text']};")
+        self.lbl_show.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # 4. Корпус ползунка (Off/On body)
+        self.toggle_body = QWidget(self.window)
+        self.toggle_body.setGeometry(910, 105, 60, 30)
+
+        # Переменная состояния внутри этого же метода (True = ON, False = OFF)
+        self.toggle_is_on = True
+
+        # Функция для быстрого обновления стилей корпуса
+        def update_toggle_style():
+            if self.toggle_is_on:
+                self.toggle_body.setStyleSheet("""
+                    background: qlineargradient(x1:1, y1:0, x2:0, y2:1, stop:0 #02DBAC, stop:1 #6392EA);
+                    border-radius: 15px;
+                """)
+            else:
+                self.toggle_body.setStyleSheet("""
+                    background-color: #444444;
+                    border-radius: 15px;
+                """)
+
+        update_toggle_style()
+
+        # 5. Бегунок внутри ползунка (круг)
+        self.toggle_thumb = QWidget(self.toggle_body)
+        self.toggle_thumb.setStyleSheet(f"background-color: #FFFFFF; border-radius: {self.border_radius}px;")
+
+        # Точки позиций бегунка относительно корпуса (left: 944 -> x=34, left: 910 -> x=6)
+        self.pos_on = QPoint(34, 5)
+        self.pos_off = QPoint(6, 5)
+        self.toggle_thumb.setGeometry(self.pos_on.x(), self.pos_on.y(), 20, 20)
+
+        # Анимация движения бегунка
+        self.toggle_anim = QPropertyAnimation(self.toggle_thumb, b"pos")
+        self.toggle_anim.setDuration(150)
+        self.toggle_anim.setEasingCurve(QEasingCurve.Type.InOutQuad)

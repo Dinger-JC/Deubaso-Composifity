@@ -17,7 +17,7 @@ log = Log()
 
 class MASTER_WINDOW():
     '''Главное окно'''
-    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small):
+    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius):
         '''Инициализация'''
         # Основное
         self.files = files
@@ -29,7 +29,9 @@ class MASTER_WINDOW():
         self.font_family = font_family
         self.font_big = font_big
         self.font_small = font_small
-        self.settings = SETTINGS(files, core, name, version, colors, size_window, font_family, font_big, font_small)
+        self.border_radius = border_radius
+
+        self.settings = SETTINGS(files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius)
 
         # Описания
         self.tooltips = {
@@ -123,14 +125,14 @@ class MASTER_WINDOW():
     def Block_Input(self):
         '''Блок строки ввода'''
         self.input = QLineEdit(self.window)
-        self.input.setGeometry(20, 95, 960, 50)
+        self.input.setGeometry(19, 94, 962, 52)
         self.input.setPlaceholderText('Insert the link to the video (Strip2, XGroovy, AnalMedia)')
         self.input.returnPressed.connect(self.Info)
         self.input.setStyleSheet(f'''
             QLineEdit {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: 10px;
+                border-radius: {self.border_radius}px;
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -256,7 +258,7 @@ class MASTER_WINDOW():
             QFrame {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: 10px;
+                border-radius: {self.border_radius}px;
             }}
             QFrame:hover {{
                 background-color: {self.colors['hover_fill']};
@@ -316,7 +318,7 @@ class MASTER_WINDOW():
                     stop:1 {self.colors['hover_end']}
                 );
                 border: transparent;
-                border-radius: 10px;
+                border-radius: {self.border_radius}px;
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -359,7 +361,7 @@ class MASTER_WINDOW():
             QPushButton {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: 10px;
+                border-radius: {self.border_radius}px;
 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -395,7 +397,7 @@ class MASTER_WINDOW():
             QPushButton {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: 10px;
+                border-radius: {self.border_radius}px;
 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -429,7 +431,7 @@ class MASTER_WINDOW():
         preview.setStyleSheet(f'''
             QLabel {{
                 background-color: #000000;
-                border-radius: 10px;
+                border-radius: {self.border_radius}px;
             }}
         ''')
 

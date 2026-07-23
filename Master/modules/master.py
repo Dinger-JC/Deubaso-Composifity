@@ -70,7 +70,7 @@ files = {
     'ffmpeg': project / 'bin' / 'ffmpeg.exe',
     'ffprobe': project / 'bin' / 'ffprobe.exe',
     # Папка config
-    'settings_config': project / 'config' / 'settings_config.json',
+    'config': project / 'config' / 'config.json',
     'sites': project / 'config' / 'sites.json',
     # Папка data
     'history': project / 'data' / 'history.json',
@@ -91,8 +91,9 @@ files = {
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.07.23.2b'
+version = '2026.07.23.3b'
 size_window = [1000, 600]
+border_radius = 10
 
 # Цвета
 colors = {
@@ -150,7 +151,7 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
 
         core = CORE(files)
-        master = MASTER_WINDOW(files, core, name, version, colors, size_window, font_family, font_big, font_small)
+        master = MASTER_WINDOW(files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius)
         core.signal = master
 
         master.window.show()
