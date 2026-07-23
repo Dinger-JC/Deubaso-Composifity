@@ -56,10 +56,9 @@ try:
     from core import *
     from master_window import *
     from logger import *
-    log = Log()
 
-except ImportError:
-    print('Could not import local modules.')
+except Exception:
+    pass
 
 
 
@@ -90,8 +89,9 @@ files = {
 }
 
 # Основное
+log = Log()
 name = 'Deubaso Composifity'
-version = '2026.07.23.0b'
+version = '2026.07.23.1b'
 size_window = [1000, 600]
 
 # Цвета
@@ -143,9 +143,9 @@ def Files(files):
 
 
 if __name__ == '__main__':
-    try:
-        Files(files)
+    Files(files)
 
+    try:
         log.info('Start')
         app = QApplication(sys.argv)
 

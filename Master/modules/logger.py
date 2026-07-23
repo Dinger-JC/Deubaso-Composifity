@@ -23,10 +23,10 @@ def Log():
             os.makedirs(directory, exist_ok = True)
 
         formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] -> %(message)s')
-        file_logs = RotatingFileHandler(path, maxBytes = 32 * 1024 * 1024)
+        file = RotatingFileHandler(path, maxBytes = 32 * 1024 * 1024)
         console_logs = logging.StreamHandler()
 
-        for handler in [file_logs, console_logs]:
+        for handler in [file, console_logs]:
             handler.setLevel(logging.INFO)
             handler.setFormatter(formatter)
             log.addHandler(handler)

@@ -9,7 +9,7 @@
 
 # Локальные модули
 from master import *
-
+from logger import *
 log = Log()
 
 

@@ -9,8 +9,8 @@
 
 # Локальные модули
 from master import *
-from Master.modules.settings import *
-from Master.modules.logger import *
+from settings import *
+from logger import *
 log = Log()
 
 
