@@ -9,7 +9,7 @@
 
 # Локальные модули
 from master import *
-from logger import *
+
 log = Log()
 
 
@@ -22,7 +22,7 @@ class CORE:
         self.files = files
 
         # Настройки
-        with open(self.files['settings'], encoding = 'utf-8') as file:
+        with open(self.files['settings_config'], encoding = 'utf-8') as file:
             self.settings = json.load(file)
 
         # Поддерживаемые сайты
@@ -52,31 +52,6 @@ class CORE:
         else:
             log.info('History recording is disabled.')
 
-    # def Files(self, files: dict):
-    #     '''Проверка наличия файлов'''
-    #     error = False
-    #
-    #     for name, path in files.items():
-    #         if not path.is_file():
-    #             if name == 'ffmpeg' or name == 'ffprobe':
-    #                 log.critical(f'The "{path}" file was not found.')
-    #                 log.critical('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
-    #                 log.critical('After downloading, move the exe file to the bin folder in the root of the project.')
-    #                 error = True
-    #
-    #             elif name == 'history':
-    #                 return
-    #
-    #             elif name == 'videos':
-    #                 log.warning(f'The "{path}" file was not found.')
-    #
-    #             else:
-    #                 log.critical(f'The "{path}" file was not found.')
-    #                 error = True
-    #
-    #     if error:
-    #         os._exit(0)
-
     def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''
         if not self.files['videos'].is_file():
@@ -96,16 +71,16 @@ class CORE:
 
     def Update_Config(self, url: str):
         '''Обновление конфигурации для каждого видео'''
-        self.gui.Status('info', 'Checking...')
+        self.signal.Status('info', 'Checking...')
 
         log.info(f'| Link: {url}')
 
         # Проверка ссылки
         if not re.search(r'^https?://[\w\.-]+\/.*(video|watch).*', url):
             self.yt_dlp_options = None
-            self.gui.Update_Preview(self.files['preview_icon'])
+            self.signal.Update_Preview(self.files['preview_icon'])
 
-            self.gui.Status('warning', 'Incorrect link. This link could not be found.')
+            self.signal.Status('warning', 'Incorrect link. This link could not be found.')
             sys.exit(1)
 
         self.History(url) # Запись в историю
@@ -230,7 +205,7 @@ class CORE:
     def Progress_Hook(self, data):
         '''Загрузка'''
         if self.cancel_download:
-            self.gui.speed.setText('-')
+            self.signal.speed.setText('-')
             raise Exception('Download aborted')
 
         if data['status'] == 'downloading':
@@ -249,17 +224,17 @@ class CORE:
                 current_percent = 0
             visual_value = max(4, current_percent) if current_percent > 0 else 0
 
-            self.gui.progress_bar.setTextVisible(True)
-            self.gui.progress_bar.setValue(visual_value)
+            self.signal.progress_bar.setTextVisible(True)
+            self.signal.progress_bar.setValue(visual_value)
 
-            self.gui.speed.setText(f'{self.Convert_Bytes(speed, '/s')}')
-            self.gui.max_speed.setText(f'{self.Convert_Bytes(self.max_speed, '/s')}')
-            self.gui.size.setText(f'{self.Convert_Bytes(volume)}')
+            self.signal.speed.setText(f'{self.Convert_Bytes(speed, '/s')}')
+            self.signal.max_speed.setText(f'{self.Convert_Bytes(self.max_speed, '/s')}')
+            self.signal.size.setText(f'{self.Convert_Bytes(volume)}')
 
         elif data['status'] == 'finished':
-            self.gui.progress_bar.setValue(100)
+            self.signal.progress_bar.setValue(100)
 
-            self.gui.Status('info', 'Download complete, file is being compiled...')
+            self.signal.Status('info', 'Download complete, file is being compiled...')
 
     def Check_Link(self):
         '''Проверка ответа страницы'''
@@ -283,8 +258,8 @@ class CORE:
         error = errors.get(code, 'Error occurred.')
         full_message = f'Error {code} {error}'
 
-        self.gui.Update_Preview(self.files['preview_icon'])
-        self.gui.Status('error', full_message)
+        self.signal.Update_Preview(self.files['preview_icon'])
+        self.signal.Status('error', full_message)
 
         sys.exit(1)
 
@@ -296,20 +271,20 @@ class CORE:
             self.page = BeautifulSoup(self.response.text, 'html.parser')
             self.Check_Link()
 
-            self.gui.Status('info', 'Getting basic information...')
+            self.signal.Status('info', 'Getting basic information...')
 
         except requests.exceptions.ConnectionError:
             self.yt_dlp_options = None
-            self.gui.Update_Preview(self.files['preview_icon'])
+            self.signal.Update_Preview(self.files['preview_icon'])
 
-            self.gui.Status('error', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
+            self.signal.Status('error', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
             sys.exit(1)
 
         except requests.exceptions.Timeout:
             self.yt_dlp_options = None
-            self.gui.Update_Preview(self.files['preview_icon'])
+            self.signal.Update_Preview(self.files['preview_icon'])
 
-            self.gui.Status('error', f'Exceeded the waiting time for a response from "{self.domain}".')
+            self.signal.Status('error', f'Exceeded the waiting time for a response from "{self.domain}".')
             sys.exit(1)
 
     def Get_Info(self):
@@ -351,10 +326,10 @@ class CORE:
             self.video_url = video.find('source')['src']
 
         else:
-            self.gui.Status('warning', 'Downloads are only available from Strip2, XGroovy, AnalMedia.')
+            self.signal.Status('warning', 'Downloads are only available from Strip2, XGroovy, AnalMedia.')
             sys.exit(1)
 
-        self.gui.title.setText(self.title)
+        self.signal.title.setText(self.title)
 
         log.info(f'| Name: {self.title}')
         log.info(f'| Direct link: {self.video_url}')
@@ -369,13 +344,13 @@ class CORE:
                 link_image = requests.get(image, impersonate = f'chrome{self.chrome}', timeout = self.timeout).content
                 with open(self.temp_preview, 'wb') as preview:
                     preview.write(link_image)
-                self.gui.Update_Preview(self.temp_preview)
+                self.signal.Update_Preview(self.temp_preview)
 
         log.info(f'| Preview: {image}')
 
     def Get_Add_Info(self):
         '''Получение дополнительной информации'''
-        self.gui.Status('info', 'Getting additional information...')
+        self.signal.Status('info', 'Getting additional information...')
 
         try:
             video_info = ffmpeg.probe(self.video_url, cmd = self.files['ffprobe'],  **self.ffprobe_options)
@@ -387,18 +362,18 @@ class CORE:
             raw_duration = video_stream.get('duration')
             duration = str(timedelta(seconds = float(raw_duration))).split('.')[0] if raw_duration else 'N/A'
 
-            self.gui.quality.setText(f'{width}x{height}')
-            self.gui.fps.setText(fps)
-            self.gui.duration.setText(duration)
+            self.signal.quality.setText(f'{width}x{height}')
+            self.signal.fps.setText(fps)
+            self.signal.duration.setText(duration)
 
             log.info(f'| Quality: {width}x{height}')
             log.info(f'| FPS: {fps}')
             log.info(f'| Duration: {duration}')
 
-            self.gui.Status('info', 'Video is ready to download!')
+            self.signal.Status('info', 'Video is ready to download!')
 
         except Exception as e:
-            self.gui.Status('error', f'Error reading technical info via ffprobe: {e}')
+            self.signal.Status('error', f'Error reading technical info via ffprobe: {e}')
 
     def File_Name(self):
         '''Создание уникального имени файла'''
@@ -424,16 +399,16 @@ class CORE:
             tags.save()
 
         except Exception as e:
-            self.gui.Status('error', f'Failed to edit mp4 tags: {e}')
+            self.signal.Status('error', f'Failed to edit mp4 tags: {e}')
 
     def Download_Video(self):
         '''Скачивание видео'''
         self.cancel_download = False
         if not self.yt_dlp_options or not self.video_url:
-            self.gui.Status('error', 'The link to the video is missing.')
+            self.signal.Status('error', 'The link to the video is missing.')
             sys.exit(1)
 
-        self.gui.Status('info', 'Downloading videos...')
+        self.signal.Status('info', 'Downloading videos...')
 
         try:
             with yt_dlp.YoutubeDL(self.yt_dlp_options) as video:
@@ -441,16 +416,15 @@ class CORE:
 
             self.File_Name()
             self.Edit_Tags()
-            self.gui.speed.setText('-')
-
-            self.gui.Status('info', f'Downloaded in {str(self.final_name).replace('\\', '/')}')
+            self.signal.speed.setText('-')
+            self.signal.Status('info', f'Downloaded in {str(self.final_name).replace('\\', '/')}')
 
         except Exception as e:
             if 'Download aborted' in str(e):
-                self.gui.Status('warning', 'Download aborted')
+                self.signal.Status('warning', 'Download aborted')
 
             else:
-                self.gui.Status('error', f'Unexpected error: {e}')
+                self.signal.Status('error', f'Unexpected error: {e}')
                 sys.exit(1)
 
         finally:

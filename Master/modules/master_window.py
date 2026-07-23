@@ -9,46 +9,27 @@
 
 # Локальные модули
 from master import *
-from settings import *
-from logger import *
+from Master.modules.settings import *
+from Master.modules.logger import *
 log = Log()
 
 
 
 class MASTER_WINDOW():
     '''Главное окно'''
-    def __init__(self, files, core, version):
+    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small):
         '''Инициализация'''
         # Основное
         self.files = files
         self.core = core
-        self.name = 'Deubaso Composifity'
+        self.name = name
         self.version = version
-        self.size_window = [1000, 600]
-        self.size_preview = [534, 300]
-
-        # Цвета
-        self.colors = {
-            'main_start': 'rgb(7, 17, 37)',
-            'main_end': 'rgb(34, 42, 65)',
-            'text': 'rgb(255, 255, 255)',
-            'sub_text': 'rgb(180, 180, 180)',
-            'stroke': 'rgba(0, 0, 0, 0)',
-            'fill': 'rgba(255, 255, 255, 0.15)',
-            'hover_stroke': 'rgb(1, 179, 189)',
-            'hover_fill': 'rgba(0, 67, 112, 0.5)',
-            'hover_start': 'rgb(99, 146, 234)',
-            'hover_end': 'rgb(2, 219, 172)',
-            'hover_start_pressed': 'rgba(99, 146, 234, 0.4)',
-            'hover_end_pressed': 'rgba(2, 219, 172, 0.4)',
-            'warning': 'rgb(255, 193, 62)',
-            'error': 'rgb(227, 88, 111)'
-        }
-
-        # Шрифт
-        self.font_family = 'GungsuhW33-Regular'
-        self.font_size_big = 18
-        self.font_size_small = 14
+        self.colors = colors
+        self.size_window = size_window
+        self.font_family = font_family
+        self.font_big = font_big
+        self.font_small = font_small
+        self.settings = SETTINGS(files, core, name, version, colors, size_window, font_family, font_big, font_small)
 
         # Описания
         self.tooltips = {
@@ -69,37 +50,34 @@ class MASTER_WINDOW():
 
         # Отрисовка
         self.Window()
+        self.Text_Top()
+        self.Text_Version()
 
-        self.Title()
-        self.Version()
+        self.Block_Input()
 
-        self.Input_Block()
+        self.title = self.Text_Content('Name video')
+        self.status = self.Text_Status()
 
-        self.title = self.Title_Block('Name video')
-        self.status = self.Status_Block()
+        self.progress = self.Block_Progress_Bar()
 
-        self.progress = self.Progress_Bar_Block()
+        self.speed = self.Block_Info([573, 279], 'Speed', self.tooltips['speed'])
+        self.max_speed = self.Block_Info([715, 279], 'Max speed', self.tooltips['max_speed'])
+        self.size = self.Block_Info([857, 279], 'Size', self.tooltips['size'])
+        self.quality = self.Block_Info([573, 379], 'Quality', self.tooltips['quality'])
+        self.fps = self.Block_Info([715, 379], 'FPS', self.tooltips['fps'])
+        self.duration = self.Block_Info([857, 379], 'Duration', self.tooltips['duration'])
 
-        self.speed = self.Info_Block([573, 279], 'Speed', self.tooltips['speed'])
-        self.max_speed = self.Info_Block([715, 279], 'Max speed', self.tooltips['max_speed'])
-        self.size = self.Info_Block([857, 279], 'Size', self.tooltips['size'])
-        self.quality = self.Info_Block([573, 379], 'Quality', self.tooltips['quality'])
-        self.fps = self.Info_Block([715, 379], 'FPS', self.tooltips['fps'])
-        self.duration = self.Info_Block([857, 379], 'Duration', self.tooltips['duration'])
+        self.Button_Download()
+        self.Button_Stop()
+        self.Button_Settings()
 
-        self.Download_Button()
-        self.Stop_Button()
-        self.Settings_Button()
-
-        self.Preview_Block()
-
-        self.settings = SETTINGS(self.files, self.core, self)
+        self.Block_Preview()
 
     def Window(self):
         '''Главное окно'''
         self.window = QMainWindow()
-        self.window.setWindowTitle(f'{self.name} - porn content parser!')
-        self.window.setWindowIcon(QIcon(str(self.core.files['icon_icon'])))
+        self.window.setWindowTitle(f'{self.name} - Porn Parser')
+        self.window.setWindowIcon(QIcon(str(self.files['icon_icon'])))
         self.window.setFixedSize(self.size_window[0], self.size_window[1])
         self.window.setStyleSheet(f'''
             QMainWindow {{
@@ -112,12 +90,12 @@ class MASTER_WINDOW():
             }}
         ''')
 
-    def Title(self):
-        '''Название приложения'''
-        self.title = QLabel(self.name, self.window)
-        self.title.setGeometry(20, 20, 960, 55)
-        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.title.setStyleSheet(f'''
+    def Text_Top(self):
+        '''Заголовок окна'''
+        text_top = QLabel(self.name, self.window)
+        text_top.setGeometry(20, 20, 960, 55)
+        text_top.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        text_top.setStyleSheet(f'''
         QLabel {{
             color: qlineargradient(
                 spread:pad,
@@ -131,18 +109,18 @@ class MASTER_WINDOW():
         }}
         ''')
 
-    def Version(self):
+    def Text_Version(self):
         '''Версия'''
-        self.version = QLabel(f'Version: {self.version}', self.window)
-        self.version.setGeometry(5, 5, 200, 20)
-        self.version.setStyleSheet(f'''
+        text_version = QLabel(f'Version: {self.version}', self.window)
+        text_version.setGeometry(5, 5, 200, 20)
+        text_version.setStyleSheet(f'''
             background: transparent;
             color: {self.colors['sub_text']};
             font-family: '{self.font_family}';
-            font-size: {self.font_size_small}px;
+            font-size: {self.font_small}px;
         ''')
 
-    def Input_Block(self):
+    def Block_Input(self):
         '''Блок строки ввода'''
         self.input = QLineEdit(self.window)
         self.input.setGeometry(20, 95, 960, 50)
@@ -156,7 +134,7 @@ class MASTER_WINDOW():
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_big}px;
+                font-size: {self.font_big}px;
                 
                 padding-left: 50px;
                 padding-right: 15px;
@@ -167,31 +145,29 @@ class MASTER_WINDOW():
             }}
         ''')
 
-        self.icon = QLabel(self.input)
-        self.icon.setGeometry(15, 10, 30, 30)
-        self.icon.setPixmap(QPixmap(str(self.core.files['link_icon'])))
-        self.icon.setScaledContents(True)
+        icon = QLabel(self.input)
+        icon.setGeometry(15, 10, 30, 30)
+        icon.setPixmap(QPixmap(str(self.files['link_icon'])))
+        icon.setScaledContents(True)
 
-    def Title_Block(self, title: str):
+    def Text_Content(self, title: str):
         '''Блок названия контента'''
-        # Иконка Download
-        self.icon = QLabel(self.window)
-        self.icon.setGeometry(21, 165, 44, 45)
-        self.icon.setPixmap(QPixmap(str(self.core.files['download_icon'])))
-        self.icon.setScaledContents(True)
+        icon = QLabel(self.window)
+        icon.setGeometry(21, 165, 44, 45)
+        icon.setPixmap(QPixmap(str(self.files['download_icon'])))
+        icon.setScaledContents(True)
 
-        # Название видео
-        self.title = QLabel(title, self.window)
-        self.title.setGeometry(85, 165, 895, 20)
-        self.title.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.title.setStyleSheet(f'''
+        text = QLabel(title, self.window)
+        text.setGeometry(85, 165, 895, 20)
+        text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        text.setStyleSheet(f'''
             color: {self.colors['text']};
             font-family: '{self.font_family}';
-            font-size: {self.font_size_big}px;
+            font-size: {self.font_big}px;
         ''')
-        return self.title
+        return text
 
-    def Status_Block(self):
+    def Text_Status(self):
         '''Статус'''
         self.status = QLabel('...', self.window)
         self.status.setGeometry(85, 190, 895, 20)
@@ -199,7 +175,7 @@ class MASTER_WINDOW():
                 QLabel {{
                     color: {self.colors['sub_text']};
                     font-family: '{self.font_family}';
-                    font-size: {self.font_size_small}px; 
+                    font-size: {self.font_small}px; 
                 }}
             ''')
         return self.status
@@ -212,7 +188,7 @@ class MASTER_WINDOW():
                 QLabel {{
                     color: {self.colors['sub_text']};
                     font-family: '{self.font_family}';
-                    font-size: {self.font_size_small}px; 
+                    font-size: {self.font_small}px; 
                 }}
             ''')
 
@@ -222,7 +198,7 @@ class MASTER_WINDOW():
                 QLabel {{
                     color: {self.colors['warning']};
                     font-family: '{self.font_family}';
-                    font-size: {self.font_size_small}px; 
+                    font-size: {self.font_small}px; 
                 }}
             ''')
 
@@ -232,7 +208,7 @@ class MASTER_WINDOW():
                 QLabel {{
                     color: {self.colors['error']};
                     font-family: '{self.font_family}';
-                    font-size: {self.font_size_small}px; 
+                    font-size: {self.font_small}px; 
                 }}
             ''')
 
@@ -244,7 +220,7 @@ class MASTER_WINDOW():
         else:
             self.status.hide()
 
-    def Progress_Bar_Block(self):
+    def Block_Progress_Bar(self):
         '''Полоса загрузки'''
         self.progress_bar = QProgressBar(self.window)
         self.progress_bar.setGeometry(20, 230, 960, 30)
@@ -256,7 +232,7 @@ class MASTER_WINDOW():
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_big}px;
+                font-size: {self.font_big}px;
                 text-align: center;
             }}
             QProgressBar::chunk {{
@@ -271,7 +247,7 @@ class MASTER_WINDOW():
         ''')
         return self.progress_bar
 
-    def Info_Block(self, position: list, title: str, tooltip: str = '', number: str = '-'):
+    def Block_Info(self, position: list, title: str, tooltip: str = '', number: str = '-'):
         '''Блок информации'''
         block = QFrame(self.window)
         block.setGeometry(position[0], position[1], 122 + 2, 80 + 2)
@@ -293,7 +269,7 @@ class MASTER_WINDOW():
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_small}px;
+                font-size: {self.font_small}px;
                 padding: 2px;
             }}
         ''')
@@ -308,7 +284,7 @@ class MASTER_WINDOW():
         
             color: {self.colors['text']};
             font-family: '{self.font_family}';
-            font-size: {self.font_size_big}px;
+            font-size: {self.font_big}px;
         ''')
 
         # Значение
@@ -321,17 +297,17 @@ class MASTER_WINDOW():
         
             color: {self.colors['sub_text']};
             font-family: '{self.font_family}';
-            font-size: {self.font_size_small}px;
+            font-size: {self.font_small}px;
         ''')
         return value
 
-    def Download_Button(self):
+    def Button_Download(self):
         '''Кнопка скачивания видео'''
-        self.download_button = QPushButton('Download', self.window)
-        self.download_button.setGeometry(574, 530, 264, 50)
-        self.download_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.download_button.setToolTip('Download video')
-        self.download_button.setStyleSheet(f'''
+        download_button = QPushButton('Download', self.window)
+        download_button.setGeometry(574, 530, 264, 50)
+        download_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        download_button.setToolTip('Download video')
+        download_button.setStyleSheet(f'''
             QPushButton {{
                 background: qlineargradient(
                     spread:pad, 
@@ -344,7 +320,7 @@ class MASTER_WINDOW():
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_big}px;
+                font-size: {self.font_big}px;
             }}
             QPushButton:pressed {{
                 background: qlineargradient(
@@ -363,23 +339,23 @@ class MASTER_WINDOW():
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_small}px;
+                font-size: {self.font_small}px;
                 padding: 2px;
             }}
         ''')
 
-        self.download_button.clicked.connect(self.Download)
+        download_button.clicked.connect(self.Download)
 
-    def Stop_Button(self):
+    def Button_Stop(self):
         '''Кнопка остановки скачивания видео'''
-        self.stop_button = QPushButton('', self.window)
-        self.stop_button.setGeometry(858, 530, 51, 50)
-        self.stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.stop_button.setToolTip('Abort the download')
-        self.stop_button.setToolTip('Stop download')
-        self.stop_button.setIcon(QIcon(str(self.core.files['stop_icon']).replace('\\', '/')))
-        self.stop_button.setIconSize(QSize(20, 20))
-        self.stop_button.setStyleSheet(f'''
+        stop_button = QPushButton('', self.window)
+        stop_button.setGeometry(858, 530, 51, 50)
+        stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        stop_button.setToolTip('Abort the download')
+        stop_button.setToolTip('Stop download')
+        stop_button.setIcon(QIcon(str(self.files['stop_icon']).replace('\\', '/')))
+        stop_button.setIconSize(QSize(20, 20))
+        stop_button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
@@ -387,7 +363,7 @@ class MASTER_WINDOW():
 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_big}px;
+                font-size: {self.font_big}px;
             }}
             QPushButton:pressed {{
                 background-color: {self.colors['hover_fill']};
@@ -400,22 +376,22 @@ class MASTER_WINDOW():
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_small}px;
+                font-size: {self.font_small}px;
                 padding: 2px;
             }}
         ''')
 
-        self.stop_button.clicked.connect(self.core.Stop_Download)
+        stop_button.clicked.connect(self.core.Stop_Download)
 
-    def Settings_Button(self):
+    def Button_Settings(self):
         '''Кнопка настроек'''
-        self.settings_button = QPushButton('', self.window)
-        self.settings_button.setGeometry(929, 530, 51, 50)
-        self.settings_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.settings_button.setToolTip('Settings')
-        self.settings_button.setIcon(QIcon(str(self.core.files['settings_icon']).replace('\\', '/')))
-        self.settings_button.setIconSize(QSize(20, 20))
-        self.settings_button.setStyleSheet(f'''
+        settings_button = QPushButton('', self.window)
+        settings_button.setGeometry(929, 530, 51, 50)
+        settings_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        settings_button.setToolTip('Settings')
+        settings_button.setIcon(QIcon(str(self.files['settings_icon']).replace('\\', '/')))
+        settings_button.setIconSize(QSize(20, 20))
+        settings_button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
@@ -423,7 +399,7 @@ class MASTER_WINDOW():
 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_big}px;
+                font-size: {self.font_big}px;
             }}
             QPushButton:pressed {{
                 background-color: {self.colors['hover_fill']};
@@ -436,19 +412,21 @@ class MASTER_WINDOW():
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
-                font-size: {self.font_size_small}px;
+                font-size: {self.font_small}px;
                 padding: 2px;
             }}
         ''')
 
-        self.settings_button.clicked.connect(lambda: self.settings.Show())
+        settings_button.clicked.connect(lambda: self.settings.Show())
 
-    def Preview_Block(self):
+    def Block_Preview(self):
         '''Блок превью'''
+        self.size_preview = [534, 300]
+
         # Основное окно
-        self.preview = QLabel(self.window)
-        self.preview.setGeometry(20, 280, self.size_preview[0], self.size_preview[1])
-        self.preview.setStyleSheet(f'''
+        preview = QLabel(self.window)
+        preview.setGeometry(20, 280, self.size_preview[0], self.size_preview[1])
+        preview.setStyleSheet(f'''
             QLabel {{
                 background-color: #000000;
                 border-radius: 10px;
@@ -457,17 +435,17 @@ class MASTER_WINDOW():
 
         # Размытие
         self.blur_effect = QGraphicsBlurEffect()
-        self.blur_effect.setBlurRadius(30)
+        self.blur_effect.setBlurRadius(10)
         self.blur_effect.setBlurHints(QGraphicsBlurEffect.BlurHint.PerformanceHint)
 
         # Пустой фон
-        self.blur = QLabel(self.preview)
+        self.blur = QLabel(preview)
         self.blur.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
         self.blur.setStyleSheet('background: transparent; border: none;')
         self.blur.setGraphicsEffect(self.blur_effect)
 
         # Отображение превью
-        self.image = QLabel(self.preview)
+        self.image = QLabel(preview)
         self.image.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
         self.image.setScaledContents(False)
         self.image.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -477,7 +455,7 @@ class MASTER_WINDOW():
         ''')
 
         # Подгон размера
-        scaled_pixmap = QPixmap(str(self.core.files['preview_icon'])).scaled(
+        scaled_pixmap = QPixmap(str(self.files['preview_icon'])).scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation
@@ -494,20 +472,20 @@ class MASTER_WINDOW():
         painter.drawRoundedRect(0, 0, self.size_preview[0], self.size_preview[1], 10, 10)
         painter.end()
 
-        self.preview.setMask(mask)
+        preview.setMask(mask)
 
     def Update_Preview(self, preview_path: str = ''):
         '''Подгрузка нового превью'''
-        self.load = QPixmap(preview_path)
+        load = QPixmap(preview_path)
 
-        blur_pixmap = self.load.scaled(
+        blur_pixmap = load.scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.IgnoreAspectRatio,
             Qt.TransformationMode.SmoothTransformation
         )
         self.blur.setPixmap(blur_pixmap)
 
-        scaled_pixmap = self.load.scaled(
+        scaled_pixmap = load.scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation
