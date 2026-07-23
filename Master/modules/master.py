@@ -56,6 +56,7 @@ try:
     from core import *
     from master_window import *
     from logger import *
+    log = Log()
 
 except Exception:
     pass
@@ -89,9 +90,8 @@ files = {
 }
 
 # Основное
-log = Log()
 name = 'Deubaso Composifity'
-version = '2026.07.23.1b'
+version = '2026.07.23.2b'
 size_window = [1000, 600]
 
 # Цвета
