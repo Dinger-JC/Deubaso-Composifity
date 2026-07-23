@@ -65,7 +65,7 @@ class CORE:
                 url = presets[url]
 
         except json.JSONDecodeError:
-            log.info(f'The "{self.files['videos_j']}" file is corrupted or has an incorrect JSON format.')
+            log.info(f'"{self.files['videos_j']}" is corrupted or has an incorrect JSON format.')
 
         return url
 

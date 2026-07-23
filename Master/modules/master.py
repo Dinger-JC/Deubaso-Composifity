@@ -91,7 +91,7 @@ files = {
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.07.23.5b'
+version = '2026.07.23.6b'
 size_window = [1000, 600]
 border_radius = 10
 
@@ -126,16 +126,16 @@ def Files():
     for name, path in files.items():
         if not path.is_file():
             if name == 'ffmpeg' or name == 'ffprobe':
-                print(f'The "{path}" file was not found.')
+                print(f'"{path}" not found.')
                 print('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
                 print('After downloading, move the exe file to the bin folder in the root of the project.')
                 error = True
 
             elif name == 'videos':
-                print(f'The "{path}" file was not found.')
+                print(f'"{path}" not found.')
 
             else:
-                print(f'The "{path}" file was not found.')
+                print(f'"{path}" not found.')
                 error = True
 
     if error:
