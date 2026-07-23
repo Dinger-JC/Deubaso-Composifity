@@ -91,7 +91,7 @@ files = {
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.07.23.4b'
+version = '2026.07.23.5b'
 size_window = [1000, 600]
 border_radius = 10
 
@@ -120,7 +120,7 @@ font_small = 14
 
 
 
-def Files(files):
+def Files():
     '''Проверка наличия файлов'''
     error = False
     for name, path in files.items():
@@ -144,7 +144,7 @@ def Files(files):
 
 
 if __name__ == '__main__':
-    Files(files)
+    Files()
 
     try:
         log.info('Start')

@@ -47,10 +47,10 @@ class CORE:
 
         # Проверка записи истории
         if self.settings['history'] == 1:
-            log.info('History recording is enabled.')
+            log.info('History is enabled.')
 
         else:
-            log.info('History recording is disabled.')
+            log.info('History is disabled.')
 
     def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''
