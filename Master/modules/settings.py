@@ -46,7 +46,7 @@ class SETTINGS():
         '''Окно настроек'''
         self.window = QMainWindow()
         self.window.setWindowTitle(f'{self.name} - Settings')
-        self.window.setWindowIcon(QIcon(str(self.files['icon_icon'])))
+        self.window.setWindowIcon(QIcon(str(self.files['icon_i'])))
         self.window.setFixedSize(self.size_window[0], self.size_window[1])
         self.window.setStyleSheet(f'''
             QMainWindow {{

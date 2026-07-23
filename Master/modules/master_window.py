@@ -79,7 +79,7 @@ class MASTER_WINDOW():
         '''Главное окно'''
         self.window = QMainWindow()
         self.window.setWindowTitle(f'{self.name} - Porn Parser')
-        self.window.setWindowIcon(QIcon(str(self.files['icon_icon'])))
+        self.window.setWindowIcon(QIcon(str(self.files['icon_i'])))
         self.window.setFixedSize(self.size_window[0], self.size_window[1])
         self.window.setStyleSheet(f'''
             QMainWindow {{
@@ -149,14 +149,14 @@ class MASTER_WINDOW():
 
         icon = QLabel(self.input)
         icon.setGeometry(15, 10, 30, 30)
-        icon.setPixmap(QPixmap(str(self.files['link_icon'])))
+        icon.setPixmap(QPixmap(str(self.files['link_i'])))
         icon.setScaledContents(True)
 
     def Text_Content(self, title: str):
         '''Блок названия контента'''
         icon = QLabel(self.window)
         icon.setGeometry(21, 165, 44, 45)
-        icon.setPixmap(QPixmap(str(self.files['download_icon'])))
+        icon.setPixmap(QPixmap(str(self.files['download_i'])))
         icon.setScaledContents(True)
 
         text = QLabel(title, self.window)
@@ -355,7 +355,7 @@ class MASTER_WINDOW():
         stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
         stop_button.setToolTip('Abort the download')
         stop_button.setToolTip('Stop download')
-        stop_button.setIcon(QIcon(str(self.files['stop_icon']).replace('\\', '/')))
+        stop_button.setIcon(QIcon(str(self.files['stop_i']).replace('\\', '/')))
         stop_button.setIconSize(QSize(20, 20))
         stop_button.setStyleSheet(f'''
             QPushButton {{
@@ -391,7 +391,7 @@ class MASTER_WINDOW():
         settings_button.setGeometry(929, 530, 51, 50)
         settings_button.setCursor(Qt.CursorShape.PointingHandCursor)
         settings_button.setToolTip('Settings')
-        settings_button.setIcon(QIcon(str(self.files['settings_icon']).replace('\\', '/')))
+        settings_button.setIcon(QIcon(str(self.files['settings_i']).replace('\\', '/')))
         settings_button.setIconSize(QSize(20, 20))
         settings_button.setStyleSheet(f'''
             QPushButton {{
@@ -457,7 +457,7 @@ class MASTER_WINDOW():
         ''')
 
         # Подгон размера
-        scaled_pixmap = QPixmap(str(self.files['preview_icon'])).scaled(
+        scaled_pixmap = QPixmap(str(self.files['preview_i'])).scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation

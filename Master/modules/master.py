@@ -67,31 +67,31 @@ except Exception:
 project = Path(__file__).resolve().parent.parent
 files = {
     # Папка bin
-    'ffmpeg': project / 'bin' / 'ffmpeg.exe',
-    'ffprobe': project / 'bin' / 'ffprobe.exe',
+    'ffmpeg_e': project / 'bin' / 'ffmpeg.exe',
+    'ffprobe_e': project / 'bin' / 'ffprobe.exe',
     # Папка config
-    'config': project / 'config' / 'config.json',
-    'sites': project / 'config' / 'sites.json',
+    'settings_j': project / 'config' / 'settings.json',
+    'sites_j': project / 'config' / 'sites.json',
     # Папка data
-    'history': project / 'data' / 'history.json',
-    'videos': project / 'data' / 'videos.json',
+    'history_j': project / 'data' / 'history.json',
+    'videos_j': project / 'data' / 'videos.json',
     # Папка modules
-    'core': project / 'modules' / 'core.py',
-    'logger': project / 'modules' / 'logger.py',
-    'master_window': project / 'modules' / 'master_window.py',
-    'settings': project / 'modules' / 'settings.py',
+    'core_p': project / 'modules' / 'core.py',
+    'logger_p': project / 'modules' / 'logger.py',
+    'master_window_p': project / 'modules' / 'master_window.py',
+    'settings_p': project / 'modules' / 'settings.py',
     # Папка resources
-    'download_icon': project / 'resources' / 'download.png',
-    'icon_icon': project / 'resources' / 'icon.png',
-    'link_icon': project / 'resources' / 'link.png',
-    'preview_icon': project / 'resources' / 'preview.png',
-    'settings_icon': project / 'resources' / 'settings.png',
-    'stop_icon': project / 'resources' / 'stop.png'
+    'download_i': project / 'resources' / 'download.png',
+    'icon_i': project / 'resources' / 'icon.png',
+    'link_i': project / 'resources' / 'link.png',
+    'preview_i': project / 'resources' / 'preview.png',
+    'settings_i': project / 'resources' / 'settings.png',
+    'stop_i': project / 'resources' / 'stop.png'
 }
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.07.23.3b'
+version = '2026.07.23.4b'
 size_window = [1000, 600]
 border_radius = 10
 
