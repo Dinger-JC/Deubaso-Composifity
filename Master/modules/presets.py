@@ -8,37 +8,30 @@
 
 
 # Локальные модули
+from config import colors, font_family, font_small, name, size_window, version
 from master import *
 
 
 
-def Window(
-    window, size_window: list,
-    title: str, subtitle: str, icon: str,
-    color_start_window: str, color_end_window: str,
-    color_start_title: str, color_end_title: str,
-    color_version: str,
-    font_family: str, font_size: str,
-    version: str
-):
+def Window(window, title: str):
     '''Главное окно'''
     # Окно
     window.setWindowTitle(title)
-    window.setWindowIcon(QIcon(str(icon)))
+    window.setWindowIcon(QIcon(str(files['icon_i'])))
     window.setFixedSize(size_window[0], size_window[1])
     window.setStyleSheet(f'''
         QMainWindow {{
             background-color: qlineargradient(
                 spread:pad, 
                 x1:0, y1:0, x2:0, y2:1,
-                stop:0 {color_start_window}, 
-                stop:1 {color_end_window}
+                stop:0 {colors['main_start']}, 
+                stop:1 {colors['main_end']}
             );
         }}
     ''')
 
     # Заголовок окна
-    text_top = QLabel(subtitle, window)
+    text_top = QLabel(name, window)
     text_top.setGeometry(20, 20, 960, 55)
     text_top.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
     text_top.setStyleSheet(f'''
@@ -46,8 +39,8 @@ def Window(
             color: qlineargradient(
                 spread:pad,
                 x1:0, y1:0, x2:1, y2:0,
-                stop:0 {color_start_title},
-                stop:1 {color_end_title}
+                stop:0 {colors['hover_start']},
+                stop:1 {colors['hover_end']}
             );
     
             font-family: '{font_family}';
@@ -60,7 +53,7 @@ def Window(
     text_version.setGeometry(5, 5, 200, 20)
     text_version.setStyleSheet(f'''
         background: transparent;
-        color: {color_version};
+        color: {colors['sub_text']};
         font-family: '{font_family}';
-        font-size: {font_size}px;
+        font-size: {font_small}px;
     ''')

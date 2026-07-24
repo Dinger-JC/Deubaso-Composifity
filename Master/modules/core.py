@@ -8,6 +8,7 @@
 
 
 # Локальные модули
+from config import files
 from master import *
 from logger import *
 log = Log()
@@ -16,17 +17,14 @@ log = Log()
 
 class CORE:
     '''Ядро'''
-    def __init__(self, files):
+    def __init__(self):
         '''Инициализация'''
-        # Основное
-        self.files = files
-
         # Настройки
-        with open(self.files['settings_j'], encoding = 'utf-8') as file:
+        with open(files['settings_j'], encoding = 'utf-8') as file:
             self.settings = json.load(file)
 
         # Поддерживаемые сайты
-        with open(self.files['sites_j'], encoding = 'utf-8') as file:
+        with open(files['sites_j'], encoding = 'utf-8') as file:
             self.sites = json.load(file)
 
         # Директория скачиваемых видео
@@ -47,18 +45,18 @@ class CORE:
 
     def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''
-        if not self.files['videos_j'].is_file():
+        if not files['videos_j'].is_file():
             return url
 
         try:
-            with open(self.files['videos_j'], encoding = 'utf-8') as file:
+            with open(files['videos_j'], encoding = 'utf-8') as file:
                 videos = json.load(file)
             presets = videos
             if url in videos:
                 url = presets[url]
 
         except json.JSONDecodeError:
-            log.info(f'"{self.files['videos_j']}" is corrupted or has an incorrect JSON format.')
+            log.info(f'"{files['videos_j']}" is corrupted or has an incorrect JSON format.')
 
         return url
 
@@ -71,7 +69,7 @@ class CORE:
         # Проверка ссылки
         if not re.search(r'^https?://[\w\.-]+\/.*(video|watch).*', url):
             self.yt_dlp_options = None
-            self.signal.Update_Preview(self.files['preview_i'])
+            self.signal.Update_Preview(files['preview_i'])
 
             self.signal.Status('warning', 'Incorrect link. This link could not be found.')
             sys.exit(1)
@@ -105,7 +103,7 @@ class CORE:
         self.yt_dlp_options = {
             'http_headers': self.headers, # Заголовки HTTP-запросов
             'progress_hooks': [self.Progress_Hook], # Отслеживание прогресса загрузки
-            'ffmpeg_location': str(self.files['ffmpeg_e']), # Путь к ffmpeg
+            'ffmpeg_location': str(files['ffmpeg_e']), # Путь к ffmpeg
             'outtmpl': self.cache_name, # Путь сохраняемого файла
             'format': 'bestvideo+bestaudio/best', # Качество видео
             'merge_output_format': 'mp4', # Формат после загрузки
@@ -180,8 +178,8 @@ class CORE:
         time = now.strftime('%H:%M:%S')
 
         if self.settings['history'] == 1:
-            if self.files['history_j'].is_file() and self.files['history_j'].stat().st_size > 0:
-                with open(self.files['history_j'], 'r', encoding = 'utf-8') as file:
+            if files['history_j'].is_file() and files['history_j'].stat().st_size > 0:
+                with open(files['history_j'], 'r', encoding = 'utf-8') as file:
                     data = json.load(file)
 
             else:
@@ -192,7 +190,7 @@ class CORE:
             day_dict = month_dict.setdefault(date, {})
             day_dict[time] = url
 
-            with open(self.files['history_j'], 'w', encoding = 'utf-8') as file:
+            with open(files['history_j'], 'w', encoding = 'utf-8') as file:
                 json.dump(data, file, indent = 4, ensure_ascii = False)
 
     def Progress_Hook(self, data):
@@ -251,7 +249,7 @@ class CORE:
         error = errors.get(code, 'Error occurred.')
         full_message = f'Error {code} {error}'
 
-        self.signal.Update_Preview(self.files['preview_i'])
+        self.signal.Update_Preview(files['preview_i'])
         self.signal.Status('error', full_message)
 
         sys.exit(1)
@@ -268,14 +266,14 @@ class CORE:
 
         except requests.exceptions.ConnectionError:
             self.yt_dlp_options = None
-            self.signal.Update_Preview(self.files['preview_i'])
+            self.signal.Update_Preview(files['preview_i'])
 
             self.signal.Status('error', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
             sys.exit(1)
 
         except requests.exceptions.Timeout:
             self.yt_dlp_options = None
-            self.signal.Update_Preview(self.files['preview_i'])
+            self.signal.Update_Preview(files['preview_i'])
 
             self.signal.Status('error', f'Exceeded the waiting time for a response from "{self.domain}".')
             sys.exit(1)
@@ -346,7 +344,7 @@ class CORE:
         self.signal.Status('info', 'Getting additional information...')
 
         try:
-            video_info = ffmpeg.probe(self.video_url, cmd = self.files['ffprobe_e'],  **self.ffprobe_options)
+            video_info = ffmpeg.probe(self.video_url, cmd = files['ffprobe_e'],  **self.ffprobe_options)
             video_stream = next((stream for stream in video_info['streams'] if stream['codec_type'] == 'video'), None)
 
             width = video_stream.get('width', 0)

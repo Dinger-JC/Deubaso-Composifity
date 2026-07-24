@@ -8,6 +8,7 @@
 
 
 # Локальные модули
+from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, font_family, name
 from master import *
 from presets import *
 from settings import *
@@ -18,71 +19,37 @@ log = Log()
 
 class MASTER_WINDOW():
     '''Главное окно'''
-    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius_small, border_radius_big):
+    def __init__(self, core):
         '''Инициализация'''
         # Основное
-        self.files = files
         self.core = core
-        self.name = name
-        self.version = version
-        self.colors = colors
-        self.size_window = size_window
-        self.font_family = font_family
-        self.font_big = font_big
-        self.font_small = font_small
-        self.border_radius_small = border_radius_small
-        self.border_radius_big = border_radius_big
-
-        self.settings = SETTINGS(files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius_small, border_radius_big)
-
-        # Описания
-        self.tooltips = {
-            'speed': 'Current real-time video download speed',
-            'max_speed': 'Maximum fixed speed',
-            'size': 'Total video file size',
-            'quality': 'Basic video qualities:'
-                '\n4K UHD - 3840x2160 (16:9)'
-                '\n2K QHD - 2560x1440 (16:9)'
-                '\nFull HD - 1920x1080 (16:9)'
-                '\nHD - 1280x720 (16:9)'
-                '\nVGA - 640x480 (4:3)'
-                '\nnHD - 640x360 (16:9)'
-                '\nQVGA - 320x240 (4:3)',
-            'fps': 'Video frame rate',
-            'duration': 'Total video length'
-        }
+        self.settings = SETTINGS(core)
 
         # Отрисовка
         self.window = QMainWindow()
-        Window(
-            self.window, self.size_window,
-            f'{self.name} - Porn Parser', f'{self.name}', self.files['icon_i'],
-            self.colors['main_start'], self.colors['main_end'],
-            self.colors['hover_start'], self.colors['hover_end'],
-            self.colors['sub_text'],
-            self.font_family, self.font_small,
-            self.version
-        )
+        Window(self.window, f'{name} - Porn Parser')
 
         self.Block_Input()
 
-        self.title = self.Text_Content('Name video')
+        self.title = self.Text_Content('Hi, enter the link to the video and download it!')
         self.status = self.Text_Status()
 
         self.progress = self.Block_Progress_Bar()
 
-        self.speed = self.Block_Info([573, 279], 'Speed', self.tooltips['speed'])
-        self.max_speed = self.Block_Info([715, 279], 'Max speed', self.tooltips['max_speed'])
-        self.size = self.Block_Info([857, 279], 'Size', self.tooltips['size'])
-        self.quality = self.Block_Info([573, 379], 'Quality', self.tooltips['quality'])
-        self.fps = self.Block_Info([715, 379], 'FPS', self.tooltips['fps'])
-        self.duration = self.Block_Info([857, 379], 'Duration', self.tooltips['duration'])
+        self.speed = self.Block_Info([573, 279], 'Speed')
+        self.max_speed = self.Block_Info([715, 279], 'Max speed')
+        self.size = self.Block_Info([857, 279], 'Size')
+        self.quality = self.Block_Info([573, 379], 'Quality')
+        self.fps = self.Block_Info([715, 379], 'FPS')
+        self.duration = self.Block_Info([857, 379], 'Duration')
 
         self.Button_Download()
         self.Button_Stop()
         self.Button_Settings()
 
         self.Block_Preview()
+
+        self.window.show()
 
     def Block_Input(self):
         '''Блок строки ввода'''
@@ -92,26 +59,26 @@ class MASTER_WINDOW():
         self.input.returnPressed.connect(self.Info)
         self.input.setStyleSheet(f'''
             QLineEdit {{
-                background-color: {self.colors['fill']};
-                border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius_small}px;
+                background-color: {colors['fill']};
+                border: 2px solid {colors['stroke']};
+                border-radius: {border_radius_small}px;
                 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_big}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
                 
                 padding-left: 50px;
-                padding-right: {self.border_radius_big}px;
+                padding-right: {border_radius_big}px;
             }}
             QLineEdit:hover {{
-                background-color: {self.colors['hover_fill']};
-                border-color: {self.colors['hover_stroke']};
+                background-color: {colors['hover_fill']};
+                border-color: {colors['hover_stroke']};
             }}
         ''')
 
         icon = QLabel(self.input)
         icon.setGeometry(15, 10, 30, 30)
-        icon.setPixmap(QPixmap(str(self.files['link_i'])))
+        icon.setPixmap(QPixmap(str(files['link_i'])))
         icon.setScaledContents(True)
 
     def Text_Content(self, title: str):
@@ -119,7 +86,7 @@ class MASTER_WINDOW():
         # Иконка
         icon = QLabel(self.window)
         icon.setGeometry(21, 165, 44, 45)
-        icon.setPixmap(QPixmap(str(self.files['download_i'])))
+        icon.setPixmap(QPixmap(str(files['download_i'])))
         icon.setScaledContents(True)
 
         # Название
@@ -127,21 +94,23 @@ class MASTER_WINDOW():
         text.setGeometry(85, 165, 895, 20)
         text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         text.setStyleSheet(f'''
-            color: {self.colors['text']};
-            font-family: '{self.font_family}';
-            font-size: {self.font_big}px;
+            QLabel {{
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
+            }}
         ''')
         return text
 
     def Text_Status(self):
         '''Статус'''
-        self.status = QLabel('...', self.window)
+        self.status = QLabel('The download status will be displayed here', self.window)
         self.status.setGeometry(85, 190, 895, 20)
         self.status.setStyleSheet(f'''
                 QLabel {{
-                    color: {self.colors['sub_text']};
-                    font-family: '{self.font_family}';
-                    font-size: {self.font_small}px; 
+                    color: {colors['sub_text']};
+                    font-family: '{font_family}';
+                    font-size: {font_small}px; 
                 }}
             ''')
         return self.status
@@ -152,9 +121,9 @@ class MASTER_WINDOW():
             log.info(text)
             self.status.setStyleSheet(f'''
                 QLabel {{
-                    color: {self.colors['sub_text']};
-                    font-family: '{self.font_family}';
-                    font-size: {self.font_small}px; 
+                    color: {colors['sub_text']};
+                    font-family: '{font_family}';
+                    font-size: {font_small}px; 
                 }}
             ''')
 
@@ -162,9 +131,9 @@ class MASTER_WINDOW():
             log.warning(text)
             self.status.setStyleSheet(f'''
                 QLabel {{
-                    color: {self.colors['warning']};
-                    font-family: '{self.font_family}';
-                    font-size: {self.font_small}px; 
+                    color: {colors['warning']};
+                    font-family: '{font_family}';
+                    font-size: {font_small}px; 
                 }}
             ''')
 
@@ -172,9 +141,9 @@ class MASTER_WINDOW():
             log.error(text)
             self.status.setStyleSheet(f'''
                 QLabel {{
-                    color: {self.colors['error']};
-                    font-family: '{self.font_family}';
-                    font-size: {self.font_small}px; 
+                    color: {colors['error']};
+                    font-family: '{font_family}';
+                    font-size: {font_small}px; 
                 }}
             ''')
 
@@ -193,50 +162,39 @@ class MASTER_WINDOW():
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setStyleSheet(f'''
             QProgressBar {{
-                background-color: {self.colors['fill']};
-                border-radius: {self.border_radius_big}px;
+                background-color: {colors['fill']};
+                border-radius: {border_radius_big}px;
                 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_big}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
                 text-align: center;
             }}
             QProgressBar::chunk {{
                 background: qlineargradient(
                     spread:pad, 
                     x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {self.colors['hover_start']}, 
-                    stop:1 {self.colors['hover_end']}
+                    stop:0 {colors['hover_start']}, 
+                    stop:1 {colors['hover_end']}
                 );
-                border-radius: {self.border_radius_big}px;
+                border-radius: {border_radius_big}px;
             }}
         ''')
         return self.progress_bar
 
-    def Block_Info(self, position: list, title: str, tooltip: str = '', number: str = '-'):
+    def Block_Info(self, position: list, title: str, number: str = '-'):
         '''Блок информации'''
         block = QFrame(self.window)
         block.setGeometry(position[0], position[1], 122 + 2, 80 + 2)
-        block.setToolTip(tooltip)
         block.setStyleSheet(f'''
             QFrame {{
-                background-color: {self.colors['fill']};
-                border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius_small}px;
+                background-color: {colors['fill']};
+                border: 2px solid {colors['stroke']};
+                border-radius: {border_radius_small}px;
             }}
             QFrame:hover {{
-                background-color: {self.colors['hover_fill']};
-                border-color: {self.colors['hover_stroke']};
-            }}
-            QToolTip {{
-                background-color: {self.colors['hover_fill']};
-                border: 2px solid {self.colors['hover_stroke']};
-                border-radius: 4px;
-                
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_small}px;
-                padding: 2px;
+                background-color: {colors['hover_fill']};
+                border-color: {colors['hover_stroke']};
             }}
         ''')
 
@@ -248,9 +206,9 @@ class MASTER_WINDOW():
             background: transparent;
             border: none;
         
-            color: {self.colors['text']};
-            font-family: '{self.font_family}';
-            font-size: {self.font_big}px;
+            color: {colors['text']};
+            font-family: '{font_family}';
+            font-size: {font_big}px;
         ''')
 
         # Значение
@@ -261,9 +219,9 @@ class MASTER_WINDOW():
             background: transparent;
             border: none;
         
-            color: {self.colors['sub_text']};
-            font-family: '{self.font_family}';
-            font-size: {self.font_small}px;
+            color: {colors['sub_text']};
+            font-family: '{font_family}';
+            font-size: {font_small}px;
         ''')
         return value
 
@@ -278,34 +236,34 @@ class MASTER_WINDOW():
                 background: qlineargradient(
                     spread:pad, 
                     x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {self.colors['hover_start']}, 
-                    stop:1 {self.colors['hover_end']}
+                    stop:0 {colors['hover_start']}, 
+                    stop:1 {colors['hover_end']}
                 );
                 border: transparent;
-                border-radius: {self.border_radius_small}px;
+                border-radius: {border_radius_small}px;
                 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_big}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
             }}
             QPushButton:pressed {{
                 background: qlineargradient(
                     spread:pad, 
                     x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {self.colors['hover_start_pressed']}, 
-                    stop:1 {self.colors['hover_end_pressed']}
+                    stop:0 {colors['hover_start_pressed']}, 
+                    stop:1 {colors['hover_end_pressed']}
                 );
                 
-                color: {self.colors['sub_text']};
+                color: {colors['sub_text']};
             }}
             QToolTip {{
-                background-color: {self.colors['hover_fill']};
-                border: 2px solid {self.colors['hover_stroke']};
+                background-color: {colors['hover_fill']};
+                border: 2px solid {colors['hover_stroke']};
                 border-radius: 4px;
                 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_small}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_small}px;
                 padding: 2px;
             }}
         ''')
@@ -319,30 +277,30 @@ class MASTER_WINDOW():
         stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
         stop_button.setToolTip('Abort the download')
         stop_button.setToolTip('Stop download')
-        stop_button.setIcon(QIcon(str(self.files['stop_i']).replace('\\', '/')))
+        stop_button.setIcon(QIcon(str(files['stop_i']).replace('\\', '/')))
         stop_button.setIconSize(QSize(20, 20))
         stop_button.setStyleSheet(f'''
             QPushButton {{
-                background-color: {self.colors['fill']};
-                border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius_small}px;
+                background-color: {colors['fill']};
+                border: 2px solid {colors['stroke']};
+                border-radius: {border_radius_small}px;
 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_big}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
             }}
             QPushButton:pressed {{
-                background-color: {self.colors['hover_fill']};
-                border-color: {self.colors['hover_stroke']};
+                background-color: {colors['hover_fill']};
+                border-color: {colors['hover_stroke']};
             }}
             QToolTip {{
-                background-color: {self.colors['hover_fill']};
-                border: 2px solid {self.colors['hover_stroke']};
+                background-color: {colors['hover_fill']};
+                border: 2px solid {colors['hover_stroke']};
                 border-radius: 4px;
                 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_small}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_small}px;
                 padding: 2px;
             }}
         ''')
@@ -355,30 +313,30 @@ class MASTER_WINDOW():
         settings_button.setGeometry(929, 530, 51, 50)
         settings_button.setCursor(Qt.CursorShape.PointingHandCursor)
         settings_button.setToolTip('Settings')
-        settings_button.setIcon(QIcon(str(self.files['settings_i']).replace('\\', '/')))
+        settings_button.setIcon(QIcon(str(files['settings_i']).replace('\\', '/')))
         settings_button.setIconSize(QSize(20, 20))
         settings_button.setStyleSheet(f'''
             QPushButton {{
-                background-color: {self.colors['fill']};
-                border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius_small}px;
+                background-color: {colors['fill']};
+                border: 2px solid {colors['stroke']};
+                border-radius: {border_radius_small}px;
 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_big}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
             }}
             QPushButton:pressed {{
-                background-color: {self.colors['hover_fill']};
-                border-color: {self.colors['hover_stroke']};
+                background-color: {colors['hover_fill']};
+                border-color: {colors['hover_stroke']};
             }}
             QToolTip {{
-                background-color: {self.colors['hover_fill']};
-                border: 2px solid {self.colors['hover_stroke']};
+                background-color: {colors['hover_fill']};
+                border: 2px solid {colors['hover_stroke']};
                 border-radius: 4px;
                 
-                color: {self.colors['text']};
-                font-family: '{self.font_family}';
-                font-size: {self.font_small}px;
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_small}px;
                 padding: 2px;
             }}
         ''')
@@ -395,7 +353,7 @@ class MASTER_WINDOW():
         preview.setStyleSheet(f'''
             QLabel {{
                 background-color: #000000;
-                border-radius: {self.border_radius_small}px;
+                border-radius: {border_radius_small}px;
             }}
         ''')
 
@@ -408,9 +366,11 @@ class MASTER_WINDOW():
         self.blur = QLabel(preview)
         self.blur.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
         self.blur.setGraphicsEffect(self.blur_effect)
-        self.blur.setStyleSheet('''
-            background: transparent;
-            border: none;
+        self.blur.setStyleSheet(f'''
+            QLabel {{
+                background: transparent;
+                border: none;
+            }}
         ''')
 
         # Отображение превью
@@ -418,13 +378,15 @@ class MASTER_WINDOW():
         self.image.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
         self.image.setScaledContents(False)
         self.image.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
-        self.image.setStyleSheet('''
-            background: transparent;
-            border: none;
+        self.image.setStyleSheet(f'''
+            QLabel {{
+                background: transparent;
+                border: none;
+            }}
         ''')
 
         # Подгон размера
-        scaled_pixmap = QPixmap(str(self.files['preview_i'])).scaled(
+        scaled_pixmap = QPixmap(str(files['preview_i'])).scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation
@@ -462,7 +424,7 @@ class MASTER_WINDOW():
         self.image.setPixmap(scaled_pixmap)
 
     def Reset(self):
-        self.title.setText('Name video')
+        self.title.setText('Hi, enter the link to the video and download it!')
 
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setValue(0)
