@@ -9,6 +9,7 @@
 
 # Локальные модули
 from master import *
+from presets import *
 from settings import *
 from logger import *
 log = Log()
@@ -17,7 +18,7 @@ log = Log()
 
 class MASTER_WINDOW():
     '''Главное окно'''
-    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius):
+    def __init__(self, files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius_small, border_radius_big):
         '''Инициализация'''
         # Основное
         self.files = files
@@ -29,9 +30,10 @@ class MASTER_WINDOW():
         self.font_family = font_family
         self.font_big = font_big
         self.font_small = font_small
-        self.border_radius = border_radius
+        self.border_radius_small = border_radius_small
+        self.border_radius_big = border_radius_big
 
-        self.settings = SETTINGS(files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius)
+        self.settings = SETTINGS(files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius_small, border_radius_big)
 
         # Описания
         self.tooltips = {
@@ -51,9 +53,16 @@ class MASTER_WINDOW():
         }
 
         # Отрисовка
-        self.Window()
-        self.Text_Top()
-        self.Text_Version()
+        self.window = QMainWindow()
+        Window(
+            self.window, self.size_window,
+            f'{self.name} - Porn Parser', f'{self.name}', self.files['icon_i'],
+            self.colors['main_start'], self.colors['main_end'],
+            self.colors['hover_start'], self.colors['hover_end'],
+            self.colors['sub_text'],
+            self.font_family, self.font_small,
+            self.version
+        )
 
         self.Block_Input()
 
@@ -75,53 +84,6 @@ class MASTER_WINDOW():
 
         self.Block_Preview()
 
-    def Window(self):
-        '''Главное окно'''
-        self.window = QMainWindow()
-        self.window.setWindowTitle(f'{self.name} - Porn Parser')
-        self.window.setWindowIcon(QIcon(str(self.files['icon_i'])))
-        self.window.setFixedSize(self.size_window[0], self.size_window[1])
-        self.window.setStyleSheet(f'''
-            QMainWindow {{
-                background-color: qlineargradient(
-                    spread:pad, 
-                    x1:0, y1:1, x2:1, y2:0,
-                    stop:0 {self.colors['main_start']}, 
-                    stop:1 {self.colors['main_end']}
-                );
-            }}
-        ''')
-
-    def Text_Top(self):
-        '''Заголовок окна'''
-        text_top = QLabel(self.name, self.window)
-        text_top.setGeometry(20, 20, 960, 55)
-        text_top.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        text_top.setStyleSheet(f'''
-        QLabel {{
-            color: qlineargradient(
-                spread:pad,
-                x1:0, y1:0, x2:1, y2:0,
-                stop:0 {self.colors['hover_start']},
-                stop:1 {self.colors['hover_end']}
-            );
-            
-            font-family: '{self.font_family}';
-            font-size: 40px;
-        }}
-        ''')
-
-    def Text_Version(self):
-        '''Версия'''
-        text_version = QLabel(f'Version: {self.version}', self.window)
-        text_version.setGeometry(5, 5, 200, 20)
-        text_version.setStyleSheet(f'''
-            background: transparent;
-            color: {self.colors['sub_text']};
-            font-family: '{self.font_family}';
-            font-size: {self.font_small}px;
-        ''')
-
     def Block_Input(self):
         '''Блок строки ввода'''
         self.input = QLineEdit(self.window)
@@ -132,14 +94,14 @@ class MASTER_WINDOW():
             QLineEdit {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius}px;
+                border-radius: {self.border_radius_small}px;
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
                 font-size: {self.font_big}px;
                 
                 padding-left: 50px;
-                padding-right: 15px;
+                padding-right: {self.border_radius_big}px;
             }}
             QLineEdit:hover {{
                 background-color: {self.colors['hover_fill']};
@@ -154,11 +116,13 @@ class MASTER_WINDOW():
 
     def Text_Content(self, title: str):
         '''Блок названия контента'''
+        # Иконка
         icon = QLabel(self.window)
         icon.setGeometry(21, 165, 44, 45)
         icon.setPixmap(QPixmap(str(self.files['download_i'])))
         icon.setScaledContents(True)
 
+        # Название
         text = QLabel(title, self.window)
         text.setGeometry(85, 165, 895, 20)
         text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
@@ -230,7 +194,7 @@ class MASTER_WINDOW():
         self.progress_bar.setStyleSheet(f'''
             QProgressBar {{
                 background-color: {self.colors['fill']};
-                border-radius: 15px;
+                border-radius: {self.border_radius_big}px;
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -244,7 +208,7 @@ class MASTER_WINDOW():
                     stop:0 {self.colors['hover_start']}, 
                     stop:1 {self.colors['hover_end']}
                 );
-                border-radius: 15px;
+                border-radius: {self.border_radius_big}px;
             }}
         ''')
         return self.progress_bar
@@ -258,7 +222,7 @@ class MASTER_WINDOW():
             QFrame {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius}px;
+                border-radius: {self.border_radius_small}px;
             }}
             QFrame:hover {{
                 background-color: {self.colors['hover_fill']};
@@ -279,7 +243,7 @@ class MASTER_WINDOW():
         # Название
         title = QLabel(title, block)
         title.setGeometry(10, 10, 102, 30)
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         title.setStyleSheet(f'''
             background: transparent;
             border: none;
@@ -292,7 +256,7 @@ class MASTER_WINDOW():
         # Значение
         value = QLabel(number, block)
         value.setGeometry(10, 40, 102, 30)
-        value.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        value.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         value.setStyleSheet(f'''
             background: transparent;
             border: none;
@@ -318,7 +282,7 @@ class MASTER_WINDOW():
                     stop:1 {self.colors['hover_end']}
                 );
                 border: transparent;
-                border-radius: {self.border_radius}px;
+                border-radius: {self.border_radius_small}px;
                 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -361,7 +325,7 @@ class MASTER_WINDOW():
             QPushButton {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius}px;
+                border-radius: {self.border_radius_small}px;
 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -397,7 +361,7 @@ class MASTER_WINDOW():
             QPushButton {{
                 background-color: {self.colors['fill']};
                 border: 2px solid {self.colors['stroke']};
-                border-radius: {self.border_radius}px;
+                border-radius: {self.border_radius_small}px;
 
                 color: {self.colors['text']};
                 font-family: '{self.font_family}';
@@ -431,7 +395,7 @@ class MASTER_WINDOW():
         preview.setStyleSheet(f'''
             QLabel {{
                 background-color: #000000;
-                border-radius: {self.border_radius}px;
+                border-radius: {self.border_radius_small}px;
             }}
         ''')
 
@@ -443,14 +407,17 @@ class MASTER_WINDOW():
         # Пустой фон
         self.blur = QLabel(preview)
         self.blur.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
-        self.blur.setStyleSheet('background: transparent; border: none;')
         self.blur.setGraphicsEffect(self.blur_effect)
+        self.blur.setStyleSheet('''
+            background: transparent;
+            border: none;
+        ''')
 
         # Отображение превью
         self.image = QLabel(preview)
         self.image.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
         self.image.setScaledContents(False)
-        self.image.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         self.image.setStyleSheet('''
             background: transparent;
             border: none;

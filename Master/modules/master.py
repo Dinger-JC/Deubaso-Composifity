@@ -79,6 +79,7 @@ files = {
     'core_p': project / 'modules' / 'core.py',
     'logger_p': project / 'modules' / 'logger.py',
     'master_window_p': project / 'modules' / 'master_window.py',
+    'presets_p': project / 'modules' / 'presets.py',
     'settings_p': project / 'modules' / 'settings.py',
     # Папка resources
     'download_i': project / 'resources' / 'download.png',
@@ -91,32 +92,36 @@ files = {
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.07.23.6b'
+version = '2026.07.25.0b'
 size_window = [1000, 600]
-border_radius = 10
-
-# Цвета
-colors = {
-    'main_start': 'rgb(7, 17, 37)',
-    'main_end': 'rgb(34, 42, 65)',
-    'text': 'rgb(255, 255, 255)',
-    'sub_text': 'rgb(180, 180, 180)',
-    'stroke': 'rgba(0, 0, 0, 0)',
-    'fill': 'rgba(255, 255, 255, 0.15)',
-    'hover_stroke': 'rgb(1, 179, 189)',
-    'hover_fill': 'rgba(0, 67, 112, 0.5)',
-    'hover_start': 'rgb(99, 146, 234)',
-    'hover_end': 'rgb(2, 219, 172)',
-    'hover_start_pressed': 'rgba(99, 146, 234, 0.4)',
-    'hover_end_pressed': 'rgba(2, 219, 172, 0.4)',
-    'warning': 'rgb(255, 193, 62)',
-    'error': 'rgb(227, 88, 111)'
-}
-
-# Шрифт
+border_radius_small = 10
+border_radius_big = 15
 font_family = 'GungsuhW33-Regular'
 font_big = 18
 font_small = 14
+
+# Цвета
+colors = {
+    # Задний фон
+    'main_start': 'rgba(7, 17, 37, 1)',
+    'main_end': 'rgba(14, 32, 65, 1)',
+    # Текст
+    'text': 'rgba(255, 255, 255, 1)',
+    'sub_text': 'rgba(180, 180, 180, 1)',
+    # Градиенты
+    'info': 'rgba(15, 20, 39, 1)',
+    'stroke': 'rgba(0, 0, 0, 0)',
+    'fill': 'rgba(255, 255, 255, 0.15)',
+    'hover_stroke': 'rgba(1, 179, 189, 1)',
+    'hover_fill': 'rgba(0, 67, 112, 0.5)',
+    'hover_start': 'rgba(99, 146, 234, 1)',
+    'hover_end': 'rgba(2, 219, 172, 1)',
+    'hover_start_pressed': 'rgba(99, 146, 234, 0.4)',
+    'hover_end_pressed': 'rgba(2, 219, 172, 0.4)',
+    # Статусы
+    'warning': 'rgba(255, 193, 62, 1)',
+    'error': 'rgba(227, 88, 111, 1)'
+}
 
 
 
@@ -151,7 +156,7 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
 
         core = CORE(files)
-        master = MASTER_WINDOW(files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius)
+        master = MASTER_WINDOW(files, core, name, version, colors, size_window, font_family, font_big, font_small, border_radius_small, border_radius_big)
         core.signal = master
 
         master.window.show()

@@ -45,13 +45,6 @@ class CORE:
         self.video_url = None
         self.cancel_download = False
 
-        # Проверка записи истории
-        if self.settings['history'] == 1:
-            log.info('History is enabled.')
-
-        else:
-            log.info('History is disabled.')
-
     def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''
         if not self.files['videos_j'].is_file():
