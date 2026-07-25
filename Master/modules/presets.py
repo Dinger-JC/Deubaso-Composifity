@@ -8,16 +8,16 @@
 
 
 # Локальные модули
-from config import colors, font_family, font_small, name, size_window, version
+from config import colors, font_family, font_small, size_window, version
 from master import *
 
 
 
-def Window(window, title: str):
+def Window(window, title: str, name: str):
     '''Главное окно'''
     # Окно
     window.setWindowTitle(title)
-    window.setWindowIcon(QIcon(str(files['icon_i'])))
+    window.setWindowIcon(QIcon(str(files['logo_i'])))
     window.setFixedSize(size_window[0], size_window[1])
     window.setStyleSheet(f'''
         QMainWindow {{

@@ -24,6 +24,23 @@ files = {
     # Папка data
     'history_j': project / 'data' / 'history.json',
     'videos_j': project / 'data' / 'videos.json',
+    # Папка images/png
+    'download_i': project / 'images' / 'png' / 'download.png',
+    'link_i': project / 'images' / 'png' / 'link.png',
+    'logo_i': project / 'images' / 'png' / 'logo.png',
+    'preview_i': project / 'images' / 'png' / 'preview.png',
+    'settings_i': project / 'images' / 'png' / 'settings.png',
+    'stop_i': project / 'images' / 'png' / 'stop.png',
+    # Папка images/social
+    'github_i': project / 'images' / 'social' / 'github.png',
+    'telegram_i': project / 'images' / 'social' / 'telegram.png',
+    'tiktok_i': project / 'images' / 'social' / 'tiktok.png',
+    # Папка images/svg
+    'download_s': project / 'images' / 'svg' / 'download.svg',
+    'link_s': project / 'images' / 'svg' / 'link.svg',
+    'preview_s': project / 'images' / 'svg' / 'preview.svg',
+    'settings_s': project / 'images' / 'svg' / 'settings.svg',
+    'stop_s': project / 'images' / 'svg' / 'stop.svg',
     # Папка modules
     'config_p': project / 'modules' / 'config.py',
     'core_p': project / 'modules' / 'core.py',
@@ -31,18 +48,11 @@ files = {
     'master_window_p': project / 'modules' / 'master_window.py',
     'presets_p': project / 'modules' / 'presets.py',
     'settings_p': project / 'modules' / 'settings.py',
-    # Папка resources
-    'download_i': project / 'resources' / 'download.png',
-    'icon_i': project / 'resources' / 'icon.png',
-    'link_i': project / 'resources' / 'link.png',
-    'preview_i': project / 'resources' / 'preview.png',
-    'settings_i': project / 'resources' / 'settings.png',
-    'stop_i': project / 'resources' / 'stop.png'
 }
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.07.25.1b'
+version = '2026.07.25.2b'
 size_window = [1000, 600]
 border_radius_small = 10
 border_radius_big = 15

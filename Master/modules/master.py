@@ -98,7 +98,6 @@ if __name__ == '__main__':
         master = MASTER_WINDOW(core)
         core.signal = master
 
-        master.window.show()
         sys.exit(app.exec())
 
     except Exception as e:

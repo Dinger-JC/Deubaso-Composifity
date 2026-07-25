@@ -25,9 +25,37 @@ class MASTER_WINDOW():
         self.core = core
         self.settings = SETTINGS(core)
 
+        # Блоки
+        self.blocks = {
+            'speed': {
+                'geometry': [573, 279, 124, 82],
+                'title': 'Speed'
+            },
+            'max_speed': {
+                'geometry': [715, 279, 124, 82],
+                'title': 'Max speed'
+            },
+            'size': {
+                'geometry': [857, 279, 124, 82],
+                'title': 'Size'
+            },
+            'quality': {
+                'geometry': [573, 379, 124, 82],
+                'title': 'Quality'
+            },
+            'fps': {
+                'geometry': [715, 379, 124, 82],
+                'title': 'FPS'
+            },
+            'duration': {
+                'geometry': [857, 379, 124, 82],
+                'title': 'Duration'
+            },
+        }
+
         # Отрисовка
         self.window = QMainWindow()
-        Window(self.window, f'{name} - Porn Parser')
+        Window(self.window, f'{name} - Porn Parser', name)
 
         self.Block_Input()
 
@@ -36,12 +64,12 @@ class MASTER_WINDOW():
 
         self.progress = self.Block_Progress_Bar()
 
-        self.speed = self.Block_Info([573, 279], 'Speed')
-        self.max_speed = self.Block_Info([715, 279], 'Max speed')
-        self.size = self.Block_Info([857, 279], 'Size')
-        self.quality = self.Block_Info([573, 379], 'Quality')
-        self.fps = self.Block_Info([715, 379], 'FPS')
-        self.duration = self.Block_Info([857, 379], 'Duration')
+        self.speed = self.Block_Info(self.blocks['speed'])
+        self.max_speed = self.Block_Info(self.blocks['max_speed'])
+        self.size = self.Block_Info(self.blocks['size'])
+        self.quality = self.Block_Info(self.blocks['quality'])
+        self.fps = self.Block_Info(self.blocks['fps'])
+        self.duration = self.Block_Info(self.blocks['duration'])
 
         self.Button_Download()
         self.Button_Stop()
@@ -70,6 +98,7 @@ class MASTER_WINDOW():
                 padding-left: 50px;
                 padding-right: {border_radius_big}px;
             }}
+            
             QLineEdit:hover {{
                 background-color: {colors['hover_fill']};
                 border-color: {colors['hover_stroke']};
@@ -170,6 +199,7 @@ class MASTER_WINDOW():
                 font-size: {font_big}px;
                 text-align: center;
             }}
+            
             QProgressBar::chunk {{
                 background: qlineargradient(
                     spread:pad, 
@@ -182,16 +212,17 @@ class MASTER_WINDOW():
         ''')
         return self.progress_bar
 
-    def Block_Info(self, position: list, title: str, number: str = '-'):
+    def Block_Info(self, blocks: list, number: str = '-'):
         '''Блок информации'''
         block = QFrame(self.window)
-        block.setGeometry(position[0], position[1], 122 + 2, 80 + 2)
+        block.setGeometry(*blocks['geometry'])
         block.setStyleSheet(f'''
             QFrame {{
                 background-color: {colors['fill']};
                 border: 2px solid {colors['stroke']};
                 border-radius: {border_radius_small}px;
             }}
+            
             QFrame:hover {{
                 background-color: {colors['hover_fill']};
                 border-color: {colors['hover_stroke']};
@@ -199,16 +230,18 @@ class MASTER_WINDOW():
         ''')
 
         # Название
-        title = QLabel(title, block)
+        title = QLabel(blocks['title'], block)
         title.setGeometry(10, 10, 102, 30)
         title.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         title.setStyleSheet(f'''
-            background: transparent;
-            border: none;
-        
-            color: {colors['text']};
-            font-family: '{font_family}';
-            font-size: {font_big}px;
+            QLabel {{
+                background: transparent;
+                border: none;
+            
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
+            }}
         ''')
 
         # Значение
@@ -216,22 +249,24 @@ class MASTER_WINDOW():
         value.setGeometry(10, 40, 102, 30)
         value.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         value.setStyleSheet(f'''
-            background: transparent;
-            border: none;
-        
-            color: {colors['sub_text']};
-            font-family: '{font_family}';
-            font-size: {font_small}px;
+            QLabel {{
+                background: transparent;
+                border: none;
+            
+                color: {colors['sub_text']};
+                font-family: '{font_family}';
+                font-size: {font_small}px;
+            }}
         ''')
         return value
 
     def Button_Download(self):
         '''Кнопка скачивания видео'''
-        download_button = QPushButton('Download', self.window)
-        download_button.setGeometry(574, 530, 264, 50)
-        download_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        download_button.setToolTip('Download video')
-        download_button.setStyleSheet(f'''
+        button = QPushButton('Download', self.window)
+        button.setGeometry(574, 530, 264, 50)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setToolTip('Download video')
+        button.setStyleSheet(f'''
             QPushButton {{
                 background: qlineargradient(
                     spread:pad, 
@@ -246,6 +281,7 @@ class MASTER_WINDOW():
                 font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
+            
             QPushButton:pressed {{
                 background: qlineargradient(
                     spread:pad, 
@@ -256,6 +292,7 @@ class MASTER_WINDOW():
                 
                 color: {colors['sub_text']};
             }}
+            
             QToolTip {{
                 background-color: {colors['hover_fill']};
                 border: 2px solid {colors['hover_stroke']};
@@ -268,18 +305,18 @@ class MASTER_WINDOW():
             }}
         ''')
 
-        download_button.clicked.connect(self.Download)
+        button.clicked.connect(self.Download)
 
     def Button_Stop(self):
         '''Кнопка остановки скачивания видео'''
-        stop_button = QPushButton('', self.window)
-        stop_button.setGeometry(858, 530, 51, 50)
-        stop_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        stop_button.setToolTip('Abort the download')
-        stop_button.setToolTip('Stop download')
-        stop_button.setIcon(QIcon(str(files['stop_i']).replace('\\', '/')))
-        stop_button.setIconSize(QSize(20, 20))
-        stop_button.setStyleSheet(f'''
+        button = QPushButton('', self.window)
+        button.setGeometry(857, 529, 53, 52)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setToolTip('Abort the download')
+        button.setToolTip('Stop download')
+        button.setIcon(QIcon(str(files['stop_i']).replace('\\', '/')))
+        button.setIconSize(QSize(30, 30))
+        button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
                 border: 2px solid {colors['stroke']};
@@ -289,10 +326,17 @@ class MASTER_WINDOW():
                 font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
-            QPushButton:pressed {{
+            
+            QPushButton:hover {{
                 background-color: {colors['hover_fill']};
                 border-color: {colors['hover_stroke']};
             }}
+            
+            QPushButton:pressed {{
+                background-color: {colors['info']};
+                border-color: {colors['stroke']};
+            }}
+            
             QToolTip {{
                 background-color: {colors['hover_fill']};
                 border: 2px solid {colors['hover_stroke']};
@@ -305,17 +349,17 @@ class MASTER_WINDOW():
             }}
         ''')
 
-        stop_button.clicked.connect(self.core.Stop_Download)
+        button.clicked.connect(self.core.Stop_Download)
 
     def Button_Settings(self):
         '''Кнопка настроек'''
-        settings_button = QPushButton('', self.window)
-        settings_button.setGeometry(929, 530, 51, 50)
-        settings_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        settings_button.setToolTip('Settings')
-        settings_button.setIcon(QIcon(str(files['settings_i']).replace('\\', '/')))
-        settings_button.setIconSize(QSize(20, 20))
-        settings_button.setStyleSheet(f'''
+        button = QPushButton('', self.window)
+        button.setGeometry(928, 529, 53, 52)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setToolTip('Settings')
+        button.setIcon(QIcon(str(files['settings_i']).replace('\\', '/')))
+        button.setIconSize(QSize(30, 30))
+        button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
                 border: 2px solid {colors['stroke']};
@@ -325,10 +369,17 @@ class MASTER_WINDOW():
                 font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
-            QPushButton:pressed {{
+            
+            QPushButton:hover {{
                 background-color: {colors['hover_fill']};
                 border-color: {colors['hover_stroke']};
             }}
+            
+            QPushButton:pressed {{
+                background-color: {colors['info']};
+                border-color: {colors['stroke']};
+            }}
+            
             QToolTip {{
                 background-color: {colors['hover_fill']};
                 border: 2px solid {colors['hover_stroke']};
@@ -341,7 +392,7 @@ class MASTER_WINDOW():
             }}
         ''')
 
-        settings_button.clicked.connect(lambda: self.settings.Show())
+        button.clicked.connect(lambda: self.settings.Show())
 
     def Block_Preview(self):
         '''Блок превью'''

@@ -23,16 +23,50 @@ class SETTINGS():
         # Основное
         self.core = core
 
-        # Описания
-        self.tooltips = {
-            'history': 'Record the link history.'
+        # Блоки
+        self.blocks = {
+            'history': {
+                'geometry': [20, 95, 960, 50],
+                'tooltip': 'Record the link history'
+            },
+            'folder': {
+                'geometry': [20, 165, 960, 50],
+                'tooltip': 'The path for saving downloaded videos'
+            }
+        }
+
+        # Ссылки
+        self.links = {
+            'github': {
+                'geometry': [929, 529, 52, 52],
+                'icon': files['github_i'],
+                'tooltip': 'Open GitHub repository',
+                'link': 'https://github.com/Dinger-JC/Deubaso-Composifity'
+            },
+            'telegram': {
+                'geometry': [859, 529, 52, 52],
+                'icon': files['telegram_i'],
+                'tooltip': 'Open Telegram channel',
+                'link': 'https://t.me/Jitus_Circus'
+            },
+            'tiktok': {
+                'geometry': [789, 529, 52, 52],
+                'icon': files['tiktok_i'],
+                'tooltip': 'Open TikTok account',
+                'link': 'https://www.tiktok.com/@dinger_jitus_circus'
+            }
         }
 
         # Отрисовка
         self.window = QMainWindow()
-        Window(self.window, f'{name} - Settings')
+        Window(self.window, f'{name} - Settings', 'Settings')
 
         self.Block_History()
+        self.Block_Folder()
+
+        self.Button_Links(self.links['github'])
+        self.Button_Links(self.links['telegram'])
+        self.Button_Links(self.links['tiktok'])
 
     def Show(self):
         '''Показ окна'''
@@ -40,12 +74,12 @@ class SETTINGS():
         self.window.raise_()
         self.window.activateWindow()
 
-    def Block_History(self):
-        '''История'''
+    def Block_Setting(self, name: str, description: str, block: dict, offset: int = 0):
+        '''Блок настройки'''
         # Плашка
         card = QFrame(self.window)
-        card.setGeometry(20, 95, 960, 50)
-        card.setToolTip(self.tooltips['history'])
+        card.setGeometry(*block['geometry'])
+        card.setToolTip(block['tooltip'])
         card.setStyleSheet(f'''
             QFrame {{
                 background-color: {colors['fill']};
@@ -56,7 +90,7 @@ class SETTINGS():
                 background-color: {colors['hover_fill']};
                 border: 2px solid {colors['hover_stroke']};
                 border-radius: 4px;
-                
+
                 color: {colors['text']};
                 font-family: '{font_family}';
                 font-size: {font_small}px;
@@ -64,29 +98,41 @@ class SETTINGS():
             }}
         ''')
 
-        # Название параметра
-        text_history = QLabel('History', self.window)
-        text_history.setGeometry(60, 105, 200, 30)
-        text_history.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        text_history.setStyleSheet(f'''
+        # Левый текст
+        text_right = QLabel(name, card)
+        text_right.setGeometry(40, 10, 500, 30)
+        text_right.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        text_right.setStyleSheet(f'''
             QLabel {{
+                background-color: transparent;
+                
                 color: {colors['text']};
                 font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
         ''')
 
-        # Показать историю
-        text_show = QLabel('Show', self.window)
-        text_show.setGeometry(845, 105, 60, 30)
-        text_show.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        text_show.setStyleSheet(f'''
+        # Правый текст
+        text_left = QLabel(description, card)
+        text_left.setGeometry(395 + offset, 10, 485, 30)
+        text_left.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        text_left.setStyleSheet(f'''
             QLabel {{
+                background-color: transparent;
+            
                 color: {colors['sub_text']};
                 font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
+            
+            QLabel:hover {{
+                font-style: italic;
+            }}
         ''')
+
+    def Block_History(self):
+        '''Блок истории'''
+        self.Block_Setting('History', 'Show', self.blocks['history'], )
 
         on = QPoint(34, 5)
         off = QPoint(6, 5)
@@ -165,6 +211,7 @@ class SETTINGS():
         slider = QFrame(self.window)
         slider.setGeometry(910, 105, 60, 30)
         slider.mousePressEvent = lambda event: Toggle()
+        slider.setCursor(Qt.CursorShape.PointingHandCursor)
         slider.setStyleSheet(f'''
             QFrame {{
                 background: qlineargradient(
@@ -193,3 +240,53 @@ class SETTINGS():
         animation = QPropertyAnimation(circle, b'pos')
         animation.setDuration(150)
         animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
+
+    def Block_Folder(self):
+        '''Блок выбора пути для видео'''
+        self.Block_Setting('The path of saved videos', self.core.settings['path'].replace('\\', '/'), self.blocks['folder'], 70)
+
+    def Button_Links(self, links: dict):
+        '''Кнопка с ссылкой'''
+        button = QPushButton('', self.window)
+        button.setGeometry(*links['geometry'])
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setToolTip(links['tooltip'])
+        button.setIcon(QIcon(str(links['icon']).replace('\\', '/')))
+        button.setIconSize(QSize(30, 30))
+        button.setStyleSheet(f'''
+            QPushButton {{
+                background-color: {colors['fill']};
+                border: 2px solid {colors['stroke']};
+                border-radius: {border_radius_small}px;
+
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
+            }}
+            
+            QPushButton:hover {{
+                background-color: {colors['hover_fill']};
+                border-color: {colors['hover_stroke']};
+            }}
+            
+            QPushButton:pressed {{
+                background-color: {colors['info']};
+                border-color: {colors['stroke']};
+            }}
+            
+            QToolTip {{
+                background-color: {colors['hover_fill']};
+                border: 2px solid {colors['hover_stroke']};
+                border-radius: 4px;
+
+                color: {colors['text']};
+                font-family: '{font_family}';
+                font-size: {font_small}px;
+                padding: 2px;
+            }}
+        ''')
+
+        def Link():
+            QDesktopServices.openUrl(QUrl(links['link']))
+
+        button.clicked.connect(Link)
