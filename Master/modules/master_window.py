@@ -95,7 +95,7 @@ class MASTER_WINDOW():
                 font-family: '{font_family}';
                 font-size: {font_big}px;
                 
-                padding-left: 50px;
+                padding-left: 45px;
                 padding-right: {border_radius_big}px;
             }}
             
@@ -106,7 +106,7 @@ class MASTER_WINDOW():
         ''')
 
         icon = QLabel(self.input)
-        icon.setGeometry(15, 10, 30, 30)
+        icon.setGeometry(11, 11, 30, 30)
         icon.setPixmap(QPixmap(str(files['link_i'])))
         icon.setScaledContents(True)
 

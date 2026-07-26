@@ -21,7 +21,6 @@ from datetime import timedelta, datetime
 from fractions import Fraction
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from pprint import pp
 from urllib.parse import urlparse
 
 # Сторонние библиотеки

@@ -25,7 +25,9 @@ files = {
     'history_j': project / 'data' / 'history.json',
     'videos_j': project / 'data' / 'videos.json',
     # Папка images/png
+    'clock_i': project / 'images' / 'png' / 'clock.png',
     'download_i': project / 'images' / 'png' / 'download.png',
+    'folder_i': project / 'images' / 'png' / 'folder.png',
     'link_i': project / 'images' / 'png' / 'link.png',
     'logo_i': project / 'images' / 'png' / 'logo.png',
     'preview_i': project / 'images' / 'png' / 'preview.png',
@@ -36,7 +38,9 @@ files = {
     'telegram_i': project / 'images' / 'social' / 'telegram.png',
     'tiktok_i': project / 'images' / 'social' / 'tiktok.png',
     # Папка images/svg
+    'clock_s': project / 'images' / 'svg' / 'clock.svg',
     'download_s': project / 'images' / 'svg' / 'download.svg',
+    'folder_s': project / 'images' / 'svg' / 'folder.svg',
     'link_s': project / 'images' / 'svg' / 'link.svg',
     'preview_s': project / 'images' / 'svg' / 'preview.svg',
     'settings_s': project / 'images' / 'svg' / 'settings.svg',
@@ -52,7 +56,7 @@ files = {
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.07.25.2b'
+version = '2026.07.26.0b'
 size_window = [1000, 600]
 border_radius_small = 10
 border_radius_big = 15

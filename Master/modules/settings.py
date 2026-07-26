@@ -27,10 +27,12 @@ class SETTINGS():
         self.blocks = {
             'history': {
                 'geometry': [20, 95, 960, 50],
+                'icon': files['clock_i'],
                 'tooltip': 'Record the link history'
             },
             'folder': {
                 'geometry': [20, 165, 960, 50],
+                'icon': files['folder_i'],
                 'tooltip': 'The path for saving downloaded videos'
             }
         }
@@ -74,12 +76,12 @@ class SETTINGS():
         self.window.raise_()
         self.window.activateWindow()
 
-    def Block_Setting(self, name: str, description: str, block: dict, offset: int = 0):
+    def Block_Setting(self, name: str, description: str, blocks: dict, offset: int = 0):
         '''Блок настройки'''
         # Плашка
         card = QFrame(self.window)
-        card.setGeometry(*block['geometry'])
-        card.setToolTip(block['tooltip'])
+        card.setGeometry(*blocks['geometry'])
+        card.setToolTip(blocks['tooltip'])
         card.setStyleSheet(f'''
             QFrame {{
                 background-color: {colors['fill']};
@@ -98,9 +100,22 @@ class SETTINGS():
             }}
         ''')
 
+        # Иконка
+        icon = QLabel(card)
+        icon.setGeometry(10, 10, 30, 30)
+        pixmap = QPixmap(str(blocks['icon']))
+        scaled_pixmap = pixmap.scaled(30, 30, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        icon.setPixmap(scaled_pixmap)
+        icon.setStyleSheet(f'''
+            QLabel {{
+                background-color: transparent;
+                border: none;
+            }}
+        ''')
+
         # Левый текст
         text_right = QLabel(name, card)
-        text_right.setGeometry(40, 10, 500, 30)
+        text_right.setGeometry(50, 10, 500, 30)
         text_right.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         text_right.setStyleSheet(f'''
             QLabel {{
