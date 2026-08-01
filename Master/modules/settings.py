@@ -11,6 +11,7 @@
 from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, font_family, name
 from master import *
 from presets import *
+from history import *
 from logger import *
 log = Log()
 
@@ -22,6 +23,7 @@ class SETTINGS():
         '''Инициализация'''
         # Основное
         self.core = core
+        self.history = HISTORY()
 
         # Блоки
         self.blocks = {
@@ -76,7 +78,7 @@ class SETTINGS():
         self.window.raise_()
         self.window.activateWindow()
 
-    def Block_Setting(self, name: str, description: str, blocks: dict, offset: int = 0):
+    def Block_Setting(self, name: str, blocks: dict) -> QFrame:
         '''Блок настройки'''
         # Плашка
         card = QFrame(self.window)
@@ -114,10 +116,10 @@ class SETTINGS():
         ''')
 
         # Левый текст
-        text_right = QLabel(name, card)
-        text_right.setGeometry(50, 10, 500, 30)
-        text_right.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        text_right.setStyleSheet(f'''
+        text_left = QLabel(name, card)
+        text_left.setGeometry(50, 10, 418, 30)
+        text_left.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        text_left.setStyleSheet(f'''
             QLabel {{
                 background-color: transparent;
                 
@@ -127,33 +129,26 @@ class SETTINGS():
             }}
         ''')
 
-        # Правый текст
-        text_left = QLabel(description, card)
-        text_left.setGeometry(395 + offset, 10, 485, 30)
-        text_left.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        text_left.setStyleSheet(f'''
-            QLabel {{
-                background-color: transparent;
-            
-                color: {colors['info']};
-                font-family: '{font_family}';
-                font-size: {font_big}px;
-            }}
-            
-            QLabel:hover {{
-                font-style: italic;
+        # Перегородка
+        block = QFrame(card)
+        block.setGeometry(478, 10, 4, 30)
+        block.setStyleSheet(f'''
+            QFrame {{
+                background-color: {colors['press']};
+                border-radius: 2px;
             }}
         ''')
+        return card
 
     def Block_History(self):
         '''Блок истории'''
-        self.Block_Setting('History', 'Show', self.blocks['history'], )
+        card = self.Block_Setting('History', self.blocks['history'])
 
         on = QPoint(34, 5)
         off = QPoint(6, 5)
 
         # Состояния
-        def Update_Toggle(animate: bool = False):
+        def Update_Slider(animate: bool = False):
             if self.core.settings['history'] == 1:
                 log.info('History is enabled')
 
@@ -220,13 +215,33 @@ class SETTINGS():
             with open(files['settings_j'], 'w', encoding = 'utf-8') as file:
                 json.dump(self.core.settings, file, ensure_ascii = False, indent = 2)
 
-            Update_Toggle(True)
+            Update_Slider(True)
+
+        # Правый текст
+        text_right = QLabel('Show', card)
+        text_right.setGeometry(488, 10, 392, 30)
+        text_right.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        text_right.setCursor(Qt.CursorShape.PointingHandCursor)
+        text_right.mousePressEvent = lambda event: self.history.Show()
+        text_right.setStyleSheet(f'''
+            QLabel {{
+                background-color: transparent;
+
+                color: {colors['info']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
+            }}
+            
+            QLabel:hover {{
+                color: {colors['text']};
+            }}
+        ''')
 
         # Ползунок
-        slider = QFrame(self.window)
-        slider.setGeometry(910, 105, 60, 30)
-        slider.mousePressEvent = lambda event: Toggle()
+        slider = QFrame(card)
+        slider.setGeometry(890, 10, 60, 30)
         slider.setCursor(Qt.CursorShape.PointingHandCursor)
+        slider.mousePressEvent = lambda event: Toggle()
         slider.setStyleSheet(f'''
             QFrame {{
                 background: qlineargradient(
@@ -249,7 +264,7 @@ class SETTINGS():
             }}
         ''')
 
-        Update_Toggle(False)
+        Update_Slider(False)
 
         # Анимация
         animation = QPropertyAnimation(circle, b'pos')
@@ -257,8 +272,27 @@ class SETTINGS():
         animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
 
     def Block_Folder(self):
-        '''Блок выбора пути для видео'''
-        self.Block_Setting('The path of saved videos', self.core.settings['path'].replace('\\', '/'), self.blocks['folder'], 70)
+        '''Блок выбора папки для видео'''
+        card = self.Block_Setting('The path of saved videos', self.blocks['folder'])
+
+        # Правый текст
+        text_right = QLabel(self.core.settings['path'].replace('\\', '/'), card)
+        text_right.setGeometry(488, 10, 462, 30)
+        text_right.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        text_right.setCursor(Qt.CursorShape.PointingHandCursor)
+        text_right.setStyleSheet(f'''
+            QLabel {{
+                background-color: transparent;
+
+                color: {colors['info']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
+            }}
+            
+            QLabel:hover {{
+                color: {colors['text']};
+            }}
+        ''')
 
     def Button_Links(self, links: dict):
         '''Кнопка с ссылкой'''

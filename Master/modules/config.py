@@ -48,6 +48,7 @@ files = {
     # Папка modules
     'config_p': project / 'modules' / 'config.py',
     'core_p': project / 'modules' / 'core.py',
+    'history_p': project / 'modules' / 'history.py',
     'logger_p': project / 'modules' / 'logger.py',
     'master_window_p': project / 'modules' / 'master_window.py',
     'presets_p': project / 'modules' / 'presets.py',
@@ -56,7 +57,7 @@ files = {
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.08.02.0b'
+version = '2026.08.02.1b'
 size_window = [1000, 600]
 border_radius_small = 10
 border_radius_big = 15

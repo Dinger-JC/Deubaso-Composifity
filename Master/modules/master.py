@@ -58,8 +58,8 @@ try:
     from logger import *
     log = Log()
 
-except ImportError as e:
-    print(f'Could not import modules: {e}')
+except ImportError:
+    print(f'Could not import modules.')
 
 
 
