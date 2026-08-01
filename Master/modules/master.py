@@ -94,8 +94,8 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
 
         core = CORE()
-        master = MASTER_WINDOW(core)
-        core.signal = master
+        master_window = MASTER_WINDOW(core)
+        core.signal = master_window
 
         sys.exit(app.exec())
 

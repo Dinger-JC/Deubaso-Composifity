@@ -135,7 +135,7 @@ class SETTINGS():
             QLabel {{
                 background-color: transparent;
             
-                color: {colors['sub_text']};
+                color: {colors['info']};
                 font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
@@ -189,14 +189,14 @@ class SETTINGS():
 
                 slider.setStyleSheet(f'''
                     QFrame {{
-                        background-color: {colors['info']};
+                        background-color: {colors['press']};
                         border-radius: {border_radius_big}px;
                     }}
                 ''')
 
                 circle.setStyleSheet(f'''
                     QFrame {{
-                        background-color: {colors['sub_text']};
+                        background-color: {colors['info']};
                         border-radius: {border_radius_small}px;
                     }}
                 ''')
@@ -285,7 +285,7 @@ class SETTINGS():
             }}
             
             QPushButton:pressed {{
-                background-color: {colors['info']};
+                background-color: {colors['press']};
                 border-color: {colors['stroke']};
             }}
             

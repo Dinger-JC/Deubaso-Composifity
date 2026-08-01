@@ -68,7 +68,6 @@ class CORE:
 
         # Проверка ссылки
         if not re.search(r'^https?://[\w\.-]+\/.*(video|watch).*', url):
-            self.yt_dlp_options = None
             self.signal.Update_Preview(files['preview_i'])
 
             self.signal.Status('warning', 'Incorrect link. This link could not be found.')
@@ -265,14 +264,12 @@ class CORE:
             self.signal.Status('info', 'Getting basic information...')
 
         except requests.exceptions.ConnectionError:
-            self.yt_dlp_options = None
             self.signal.Update_Preview(files['preview_i'])
 
             self.signal.Status('error', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
             sys.exit(1)
 
         except requests.exceptions.Timeout:
-            self.yt_dlp_options = None
             self.signal.Update_Preview(files['preview_i'])
 
             self.signal.Status('error', f'Exceeded the waiting time for a response from "{self.domain}".')
@@ -361,10 +358,13 @@ class CORE:
             log.info(f'| FPS: {fps}')
             log.info(f'| Duration: {duration}')
 
-            self.signal.Status('info', 'Video is ready to download!')
+            self.signal.Status('good', 'Video is ready to download!')
 
         except Exception as e:
             self.signal.Status('error', f'Error reading technical info via ffprobe: {e}')
+
+        finally:
+            self.signal.button.setEnabled(True)
 
     def File_Name(self):
         '''Создание уникального имени файла'''
@@ -395,10 +395,6 @@ class CORE:
     def Download_Video(self):
         '''Скачивание видео'''
         self.cancel_download = False
-        if not self.yt_dlp_options or not self.video_url:
-            self.signal.Status('error', 'The link to the video is missing.')
-            sys.exit(1)
-
         self.signal.Status('info', 'Downloading videos...')
 
         try:

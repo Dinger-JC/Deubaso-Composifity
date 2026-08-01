@@ -53,7 +53,7 @@ def Window(window, title: str, name: str):
     text_version.setGeometry(5, 5, 200, 20)
     text_version.setStyleSheet(f'''
         background: transparent;
-        color: {colors['sub_text']};
+        color: {colors['info']};
         font-family: '{font_family}';
         font-size: {font_small}px;
     ''')

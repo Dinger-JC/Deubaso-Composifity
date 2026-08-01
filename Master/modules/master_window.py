@@ -137,7 +137,7 @@ class MASTER_WINDOW():
         self.status.setGeometry(85, 190, 895, 20)
         self.status.setStyleSheet(f'''
                 QLabel {{
-                    color: {colors['sub_text']};
+                    color: {colors['info']};
                     font-family: '{font_family}';
                     font-size: {font_small}px; 
                 }}
@@ -148,33 +148,23 @@ class MASTER_WINDOW():
         '''Показ статуса'''
         if type == 'info':
             log.info(text)
-            self.status.setStyleSheet(f'''
-                QLabel {{
-                    color: {colors['sub_text']};
-                    font-family: '{font_family}';
-                    font-size: {font_small}px; 
-                }}
-            ''')
+
+        elif type == 'good':
+            log.info(text)
 
         elif type == 'warning':
             log.warning(text)
-            self.status.setStyleSheet(f'''
-                QLabel {{
-                    color: {colors['warning']};
-                    font-family: '{font_family}';
-                    font-size: {font_small}px; 
-                }}
-            ''')
 
         elif type == 'error':
             log.error(text)
-            self.status.setStyleSheet(f'''
-                QLabel {{
-                    color: {colors['error']};
-                    font-family: '{font_family}';
-                    font-size: {font_small}px; 
-                }}
-            ''')
+
+        self.status.setStyleSheet(f'''
+            QLabel {{
+                color: {colors.get(type)};
+                font-family: '{font_family}';
+                font-size: {font_small}px; 
+            }}
+        ''')
 
         if text:
             self.status.setText(text)
@@ -212,7 +202,7 @@ class MASTER_WINDOW():
         ''')
         return self.progress_bar
 
-    def Block_Info(self, blocks: list, number: str = '-'):
+    def Block_Info(self, blocks: list, number: str = '-') -> QLabel:
         '''Блок информации'''
         block = QFrame(self.window)
         block.setGeometry(*blocks['geometry'])
@@ -253,7 +243,7 @@ class MASTER_WINDOW():
                 background: transparent;
                 border: none;
             
-                color: {colors['sub_text']};
+                color: {colors['info']};
                 font-family: '{font_family}';
                 font-size: {font_small}px;
             }}
@@ -262,11 +252,11 @@ class MASTER_WINDOW():
 
     def Button_Download(self):
         '''Кнопка скачивания видео'''
-        button = QPushButton('Download', self.window)
-        button.setGeometry(574, 530, 264, 50)
-        button.setCursor(Qt.CursorShape.PointingHandCursor)
-        button.setToolTip('Download video')
-        button.setStyleSheet(f'''
+        self.button = QPushButton('Download', self.window)
+        self.button.setGeometry(574, 530, 264, 50)
+        self.button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.button.setToolTip('Download video')
+        self.button.setStyleSheet(f'''
             QPushButton {{
                 background: qlineargradient(
                     spread:pad, 
@@ -290,7 +280,7 @@ class MASTER_WINDOW():
                     stop:1 {colors['hover_end_pressed']}
                 );
                 
-                color: {colors['sub_text']};
+                color: {colors['info']};
             }}
             
             QToolTip {{
@@ -305,7 +295,8 @@ class MASTER_WINDOW():
             }}
         ''')
 
-        button.clicked.connect(self.Download)
+        self.button.clicked.connect(self.Download)
+        self.button.setEnabled(False)
 
     def Button_Stop(self):
         '''Кнопка остановки скачивания видео'''
@@ -333,7 +324,7 @@ class MASTER_WINDOW():
             }}
             
             QPushButton:pressed {{
-                background-color: {colors['info']};
+                background-color: {colors['press']};
                 border-color: {colors['stroke']};
             }}
             
@@ -376,7 +367,7 @@ class MASTER_WINDOW():
             }}
             
             QPushButton:pressed {{
-                background-color: {colors['info']};
+                background-color: {colors['press']};
                 border-color: {colors['stroke']};
             }}
             
@@ -476,6 +467,7 @@ class MASTER_WINDOW():
 
     def Reset(self):
         self.title.setText('Hi, enter the link to the video and download it!')
+        self.button.setEnabled(False)
 
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setValue(0)
@@ -491,34 +483,21 @@ class MASTER_WINDOW():
     def Info(self):
         '''Запуск основной логики'''
         self.Reset()
+
         def Thread(url: str):
             self.core.Get_Data(self.core.Aliases(url))
             self.core.Get_Info()
-
-            self.speed.setText('-')
-            self.max_speed.setText('-')
-            self.size.setText('-')
 
             self.core.Get_Preview()
             self.core.Get_Add_Info()
 
         url = self.input.text()
         self.input.clear()
-        thread = threading.Thread(
-            target = Thread,
-            args = (url,),
-            daemon = True
-        )
+
+        thread = threading.Thread(target = Thread, args = (url,), daemon = True)
         thread.start()
 
     def Download(self):
         '''Скачивание'''
-        def Thread():
-            self.core.Download_Video()
-
-        thread = threading.Thread(
-            target = Thread,
-            args = (),
-            daemon = True
-        )
+        thread = threading.Thread(target = self.core.Download_Video(), args = (), daemon = True)
         thread.start()
