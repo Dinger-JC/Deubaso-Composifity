@@ -480,7 +480,7 @@ class MASTER_WINDOW():
         self.duration.setText('-')
 
     def Info(self):
-        '''Запуск основной логики'''
+        '''Поиск основной информации'''
         self.Reset()
 
         def Thread(url: str):
@@ -497,6 +497,6 @@ class MASTER_WINDOW():
         thread.start()
 
     def Download(self):
-        '''Скачивание'''
+        '''Скачивание видео'''
         thread = threading.Thread(target = self.core.Download_Video, daemon = True)
         thread.start()

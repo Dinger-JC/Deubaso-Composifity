@@ -15,7 +15,7 @@ from pathlib import Path
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.08.03.1b'
+version = '2026.08.03.2b'
 size_window = [1000, 600]
 border_radius_small = 10
 border_radius_big = 15
