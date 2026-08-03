@@ -166,8 +166,8 @@ class SETTINGS():
         on = QPoint(34, 5)
         off = QPoint(6, 5)
 
-        # Состояния
         def Update_Slider(animate: bool = False):
+            '''Состояния'''
             if settings['history'] == 1:
                 log.info('History is enabled')
 
@@ -223,8 +223,8 @@ class SETTINGS():
                 else:
                     circle.setGeometry(off.x(), off.y(), 20, 20)
 
-        # Перезапись в настройки
         def Toggle():
+            '''Перезапись в настройки'''
             new_value = 0 if settings['history'] == 1 else 1
             settings['history'] = new_value
 
@@ -273,8 +273,9 @@ class SETTINGS():
     def Block_Folder(self):
         '''Блок выбора папки для видео'''
         def Choose_Folder():
+            '''Выбор папки'''
             current_path = settings['path'].replace('\\', '/')
-            new_path = QFileDialog.getExistingDirectory(self.window, 'Выберите папку', current_path)
+            new_path = QFileDialog.getExistingDirectory(self.window, 'Choose folder', current_path)
 
             if new_path:
                 settings['path'] = new_path
@@ -310,6 +311,7 @@ class SETTINGS():
     def Button_Lower(self, links: dict):
         '''Кнопка с ссылкой'''
         def Link():
+            '''Переход по ссылке'''
             QDesktopServices.openUrl(QUrl(links['link']))
 
         button = QPushButton('', self.window)

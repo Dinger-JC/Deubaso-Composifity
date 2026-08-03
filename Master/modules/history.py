@@ -30,10 +30,20 @@ class HISTORY():
 
     def Tree(self):
         '''Древо'''
+        def Copy_Url(item, column):
+            '''Копирование ссылки'''
+            url = item.text(1)
+            if url and url.startswith('http'):
+                clipboard = QGuiApplication.clipboard()
+                clipboard.setText(url)
+
         self.tree = QTreeWidget(self.window)
         self.tree.setGeometry(18, 93, size_window[0] - 36, size_window[1] - 111)
-        self.tree.setHeaderLabels(['Дата / Время', 'Ссылка'])
+        self.tree.setHeaderLabels(['Date', 'Link'])
+        self.tree.headerItem().setTextAlignment(0, Qt.AlignmentFlag.AlignCenter)
+        self.tree.headerItem().setTextAlignment(1, Qt.AlignmentFlag.AlignCenter)
         self.tree.setColumnWidth(0, 220)
+        self.tree.itemClicked.connect(Copy_Url)
         self.tree.setStyleSheet(f'''
             QTreeWidget {{
                 background-color: transparent;
@@ -84,7 +94,7 @@ class HISTORY():
                 color: {colors['text']};
                 font-family: '{font_family}';
                 font-size: {font_big}px;
-                padding: 10px;
+                padding: 0px 10px;
             }}
 
             QHeaderView::section:first {{
@@ -106,6 +116,16 @@ class HISTORY():
                 font-family: '{font_family}';
                 font-size: {font_small}px;
                 padding: 2px;
+            }}
+        ''')
+
+        # Перегородка
+        line = QFrame(self.window)
+        line.setGeometry(238, 105, 4, 30)
+        line.setStyleSheet(f'''
+            QFrame {{
+                background-color: {colors['press']};
+                border-radius: 2px;
             }}
         ''')
 

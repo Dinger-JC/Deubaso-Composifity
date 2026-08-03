@@ -464,6 +464,7 @@ class MASTER_WINDOW():
         self.image.setPixmap(scaled_pixmap)
 
     def Reset(self):
+        '''Сброс метрик'''
         self.title.setText('Hi, enter the link to the video and download it!')
         self.button.setEnabled(False)
 
