@@ -8,7 +8,7 @@
 
 
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, font_family, name
+from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, font_family, name, settings
 from master import *
 from presets import *
 from history import *
@@ -19,11 +19,11 @@ log = Log()
 
 class SETTINGS():
     '''Окно настроек'''
-    def __init__(self, core):
+    def __init__(self, parent_window):
         '''Инициализация'''
         # Основное
-        self.core = core
-        self.history = HISTORY()
+        self.window = QMainWindow(parent_window)
+        self.history = HISTORY(self.window)
 
         # Блоки
         self.blocks = {
@@ -35,12 +35,12 @@ class SETTINGS():
             'folder': {
                 'geometry': [20, 165, 960, 50],
                 'icon': files['folder_i'],
-                'tooltip': 'The path for saving downloaded videos'
+                'tooltip': 'Path for saving downloaded videos'
             }
         }
 
-        # Ссылки
-        self.links = {
+        # Нижние кнопки
+        self.buttons_lower = {
             'github': {
                 'geometry': [929, 529, 52, 52],
                 'icon': files['github_i'],
@@ -62,15 +62,14 @@ class SETTINGS():
         }
 
         # Отрисовка
-        self.window = QMainWindow()
         Window(self.window, f'{name} - Settings', 'Settings')
 
         self.Block_History()
         self.Block_Folder()
 
-        self.Button_Links(self.links['github'])
-        self.Button_Links(self.links['telegram'])
-        self.Button_Links(self.links['tiktok'])
+        self.Button_Lower(self.buttons_lower['github'])
+        self.Button_Lower(self.buttons_lower['telegram'])
+        self.Button_Lower(self.buttons_lower['tiktok'])
 
     def Show(self):
         '''Показ окна'''
@@ -144,12 +143,32 @@ class SETTINGS():
         '''Блок истории'''
         card = self.Block_Setting('History', self.blocks['history'])
 
+        # Правый текст
+        text_right = QLabel('Show', card)
+        text_right.setGeometry(488, 10, 392, 30)
+        text_right.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        text_right.setCursor(Qt.CursorShape.PointingHandCursor)
+        text_right.mousePressEvent = lambda event: self.history.Show()
+        text_right.setStyleSheet(f'''
+            QLabel {{
+                background-color: transparent;
+
+                color: {colors['info']};
+                font-family: '{font_family}';
+                font-size: {font_big}px;
+            }}
+
+            QLabel:hover {{
+                color: {colors['text']};
+            }}
+        ''')
+
         on = QPoint(34, 5)
         off = QPoint(6, 5)
 
         # Состояния
         def Update_Slider(animate: bool = False):
-            if self.core.settings['history'] == 1:
+            if settings['history'] == 1:
                 log.info('History is enabled')
 
                 slider.setStyleSheet(f'''
@@ -206,36 +225,16 @@ class SETTINGS():
 
         # Перезапись в настройки
         def Toggle():
-            new_value = 0 if self.core.settings['history'] == 1 else 1
-            self.core.settings['history'] = new_value
+            new_value = 0 if settings['history'] == 1 else 1
+            settings['history'] = new_value
 
             if hasattr(self, 'settings'):
-                self.settings['history'] = new_value
+                settings['history'] = new_value
 
             with open(files['settings_j'], 'w', encoding = 'utf-8') as file:
-                json.dump(self.core.settings, file, ensure_ascii = False, indent = 2)
+                json.dump(settings, file, ensure_ascii = False, indent = 2)
 
             Update_Slider(True)
-
-        # Правый текст
-        text_right = QLabel('Show', card)
-        text_right.setGeometry(488, 10, 392, 30)
-        text_right.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-        text_right.setCursor(Qt.CursorShape.PointingHandCursor)
-        text_right.mousePressEvent = lambda event: self.history.Show()
-        text_right.setStyleSheet(f'''
-            QLabel {{
-                background-color: transparent;
-
-                color: {colors['info']};
-                font-family: '{font_family}';
-                font-size: {font_big}px;
-            }}
-            
-            QLabel:hover {{
-                color: {colors['text']};
-            }}
-        ''')
 
         # Ползунок
         slider = QFrame(card)
@@ -273,35 +272,53 @@ class SETTINGS():
 
     def Block_Folder(self):
         '''Блок выбора папки для видео'''
+        def Choose_Folder():
+            current_path = settings['path'].replace('\\', '/')
+            new_path = QFileDialog.getExistingDirectory(self.window, 'Выберите папку', current_path)
+
+            if new_path:
+                settings['path'] = new_path
+                log.info(f'Video folder has changed: {new_path}')
+
+                with open(files['settings_j'], 'w', encoding = 'utf-8') as file:
+                    json.dump(settings, file, indent = 2, ensure_ascii = False)
+                    text_right.setText(new_path.replace('\\', '/'))
+
         card = self.Block_Setting('The path of saved videos', self.blocks['folder'])
 
         # Правый текст
-        text_right = QLabel(self.core.settings['path'].replace('\\', '/'), card)
+        text_right = QPushButton(settings['path'].replace('\\', '/'), card)
         text_right.setGeometry(488, 10, 462, 30)
-        text_right.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         text_right.setCursor(Qt.CursorShape.PointingHandCursor)
+        text_right.clicked.connect(Choose_Folder)
         text_right.setStyleSheet(f'''
-            QLabel {{
+            QPushButton {{
                 background-color: transparent;
+                border: none;
 
                 color: {colors['info']};
                 font-family: '{font_family}';
                 font-size: {font_big}px;
+                text-align: right;
             }}
             
-            QLabel:hover {{
+            QPushButton:hover {{
                 color: {colors['text']};
             }}
         ''')
 
-    def Button_Links(self, links: dict):
+    def Button_Lower(self, links: dict):
         '''Кнопка с ссылкой'''
+        def Link():
+            QDesktopServices.openUrl(QUrl(links['link']))
+
         button = QPushButton('', self.window)
         button.setGeometry(*links['geometry'])
-        button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setToolTip(links['tooltip'])
         button.setIcon(QIcon(str(links['icon']).replace('\\', '/')))
         button.setIconSize(QSize(30, 30))
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.clicked.connect(Link)
         button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
@@ -334,8 +351,3 @@ class SETTINGS():
                 padding: 2px;
             }}
         ''')
-
-        def Link():
-            QDesktopServices.openUrl(QUrl(links['link']))
-
-        button.clicked.connect(Link)

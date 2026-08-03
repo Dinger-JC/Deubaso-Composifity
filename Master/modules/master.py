@@ -92,6 +92,7 @@ if __name__ == '__main__':
     try:
         log.info('Start')
         app = QApplication(sys.argv)
+        app.setQuitOnLastWindowClosed(True)
 
         core = CORE()
         master_window = MASTER_WINDOW(core)

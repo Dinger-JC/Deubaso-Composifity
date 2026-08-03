@@ -8,7 +8,7 @@
 
 
 # Локальные модули
-from config import files
+from config import files, settings, sites
 from master import *
 from logger import *
 log = Log()
@@ -19,19 +19,6 @@ class CORE:
     '''Ядро'''
     def __init__(self):
         '''Инициализация'''
-        # Настройки
-        with open(files['settings_j'], encoding = 'utf-8') as file:
-            self.settings = json.load(file)
-
-        # Поддерживаемые сайты
-        with open(files['sites_j'], encoding = 'utf-8') as file:
-            self.sites = json.load(file)
-
-        # Директория скачиваемых видео
-        self.path = Path(self.settings['path'])
-        self.path.mkdir(parents = True, exist_ok = True)
-        self.temp_preview = self.path / 'preview_temp.jpg'
-
         # Прочее
         self.chrome = '131'
         self.timeout = 30
@@ -75,6 +62,11 @@ class CORE:
 
         self.History(url) # Запись в историю
         self.domain = urlparse(url).netloc # Сайт
+
+        # Директория для видео
+        self.path = Path(settings['path'])
+        self.path.mkdir(parents = True, exist_ok = True)
+        self.temp_preview = self.path / 'preview_temp.jpg'
 
         self.cache_name = f'{self.path / secrets.token_urlsafe(24)}.mp4' # Название кэша
 
@@ -176,7 +168,7 @@ class CORE:
         date = now.strftime('%Y.%m.%d')
         time = now.strftime('%H:%M:%S')
 
-        if self.settings['history'] == 1:
+        if settings['history'] == 1:
             if files['history_j'].is_file() and files['history_j'].stat().st_size > 0:
                 with open(files['history_j'], 'r', encoding = 'utf-8') as file:
                     data = json.load(file)
@@ -277,10 +269,10 @@ class CORE:
 
     def Get_Info(self):
         '''Парсинг названий и прямых ссылок'''
-        if self.domain == self.sites['Strip2']['domain']:
+        if self.domain == sites['Strip2']['domain']:
             raw_title = self.page.find('title').text
             self.title = re.sub(r'\s*[-–—]\s*Strip2.co\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            self.site = next((name for name, info in self.sites.items() if info['domain'] == self.domain), None)
+            self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
 
             links = []
             self.video_url = self.page.find_all('a', href = True)
@@ -293,10 +285,10 @@ class CORE:
                 if find_link and f'/x{len(links) - 1}/' in find_link:
                     self.video_url = find_link
 
-        elif self.domain == self.sites['XGroovy']['domain']:
+        elif self.domain == sites['XGroovy']['domain']:
             raw_title = self.page.find('title').text
             self.title = raw_title
-            self.site = next((name for name, info in self.sites.items() if info['domain'] == self.domain), None)
+            self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
 
             tags = ['4k', '1080p', '720p', '480p', '240p']
             for tag in tags:
@@ -305,10 +297,10 @@ class CORE:
                     self.video_url = video.get('src')
                     break
 
-        elif self.domain == self.sites['AnalMedia']['domain']:
+        elif self.domain == sites['AnalMedia']['domain']:
             raw_title = self.page.find('title').text
             self.title = re.sub(r'\s*[-–—]\s*AnalMedia\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            self.site = next((name for name, info in self.sites.items() if info['domain'] == self.domain), None)
+            self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
 
             video = self.page.find('video')
             self.video_url = video.find('source')['src']
@@ -324,9 +316,9 @@ class CORE:
 
     def Get_Preview(self):
         '''Получение превью'''
-        key = next((i for i, v in self.sites.items() if v['domain'] == self.domain), None)
+        key = next((i for i, v in sites.items() if v['domain'] == self.domain), None)
         if key:
-            match = re.search(self.sites[key]['pattern'], str(self.page))
+            match = re.search(sites[key]['pattern'], str(self.page))
             if match:
                 image = match.group(0)
                 link_image = requests.get(image, impersonate = f'chrome{self.chrome}', timeout = self.timeout).content

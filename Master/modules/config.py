@@ -8,9 +8,44 @@
 
 
 # Стандартные библиотеки
+import json
 from pathlib import Path
 
 
+
+# Основное
+name = 'Deubaso Composifity'
+version = '2026.08.03.0b'
+size_window = [1000, 600]
+border_radius_small = 10
+border_radius_big = 15
+font_family = 'GungsuhW33-Regular'
+font_big = 18
+font_small = 14
+
+# Цвета
+colors = {
+    # Задний фон
+    'main_start': 'rgba(7, 17, 37, 1)',
+    'main_end': 'rgba(14, 32, 65, 1)',
+    # Текст
+    'text': 'rgba(255, 255, 255, 1)',
+    'info': 'rgba(180, 180, 180, 1)',
+    'good': 'rgba(64, 218, 136, 1)',
+    'warning': 'rgba(255, 193, 62, 1)',
+    'error': 'rgba(227, 88, 111, 1)',
+    # Градиенты
+    'hover_start': 'rgba(99, 146, 234, 1)',
+    'hover_end': 'rgba(2, 219, 172, 1)',
+    'hover_start_pressed': 'rgba(99, 146, 234, 0.4)',
+    'hover_end_pressed': 'rgba(2, 219, 172, 0.4)',
+    # Другое
+    'press': 'rgba(15, 20, 39, 1)',
+    'stroke': 'rgba(0, 0, 0, 0)',
+    'fill': 'rgba(255, 255, 255, 0.15)',
+    'hover_stroke': 'rgba(1, 179, 189, 1)',
+    'hover_fill': 'rgba(0, 67, 112, 0.5)'
+}
 
 # Файлы
 project = Path(__file__).resolve().parent.parent
@@ -55,35 +90,14 @@ files = {
     'settings_p': project / 'modules' / 'settings.py',
 }
 
-# Основное
-name = 'Deubaso Composifity'
-version = '2026.08.02.1b'
-size_window = [1000, 600]
-border_radius_small = 10
-border_radius_big = 15
-font_family = 'GungsuhW33-Regular'
-font_big = 18
-font_small = 14
+# Настройки
+with open(files['settings_j'], encoding = 'utf-8') as file:
+    settings = json.load(file)
 
-# Цвета
-colors = {
-    # Задний фон
-    'main_start': 'rgba(7, 17, 37, 1)',
-    'main_end': 'rgba(14, 32, 65, 1)',
-    # Текст
-    'text': 'rgba(255, 255, 255, 1)',
-    'info': 'rgba(180, 180, 180, 1)',
-    'good': 'rgba(64, 218, 136, 1)',
-    'warning': 'rgba(255, 193, 62, 1)',
-    'error': 'rgba(227, 88, 111, 1)',
-    # Градиенты
-    'press': 'rgba(15, 20, 39, 1)',
-    'stroke': 'rgba(0, 0, 0, 0)',
-    'fill': 'rgba(255, 255, 255, 0.15)',
-    'hover_stroke': 'rgba(1, 179, 189, 1)',
-    'hover_fill': 'rgba(0, 67, 112, 0.5)',
-    'hover_start': 'rgba(99, 146, 234, 1)',
-    'hover_end': 'rgba(2, 219, 172, 1)',
-    'hover_start_pressed': 'rgba(99, 146, 234, 0.4)',
-    'hover_end_pressed': 'rgba(2, 219, 172, 0.4)',
-}
+# Поддерживаемые сайты
+with open(files['sites_j'], encoding = 'utf-8') as file:
+    sites = json.load(file)
+
+# История
+with open(files['history_j'], encoding = 'utf-8') as file:
+    history = json.load(file)

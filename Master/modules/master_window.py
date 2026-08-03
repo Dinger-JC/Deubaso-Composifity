@@ -22,8 +22,10 @@ class MASTER_WINDOW():
     def __init__(self, core):
         '''Инициализация'''
         # Основное
+        self.window = QMainWindow()
         self.core = core
-        self.settings = SETTINGS(core)
+        self.settings = SETTINGS(self.window)
+        self.size_preview = [534, 300]
 
         # Блоки
         self.blocks = {
@@ -54,7 +56,6 @@ class MASTER_WINDOW():
         }
 
         # Отрисовка
-        self.window = QMainWindow()
         Window(self.window, f'{name} - Porn Parser', name)
 
         self.Block_Input()
@@ -254,8 +255,8 @@ class MASTER_WINDOW():
         '''Кнопка скачивания видео'''
         self.button = QPushButton('Download', self.window)
         self.button.setGeometry(574, 530, 264, 50)
-        self.button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.button.setToolTip('Download video')
+        self.button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.button.setStyleSheet(f'''
             QPushButton {{
                 background: qlineargradient(
@@ -302,11 +303,10 @@ class MASTER_WINDOW():
         '''Кнопка остановки скачивания видео'''
         button = QPushButton('', self.window)
         button.setGeometry(857, 529, 53, 52)
-        button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setToolTip('Abort the download')
-        button.setToolTip('Stop download')
         button.setIcon(QIcon(str(files['stop_i']).replace('\\', '/')))
         button.setIconSize(QSize(30, 30))
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
@@ -346,10 +346,10 @@ class MASTER_WINDOW():
         '''Кнопка настроек'''
         button = QPushButton('', self.window)
         button.setGeometry(928, 529, 53, 52)
-        button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setToolTip('Settings')
         button.setIcon(QIcon(str(files['settings_i']).replace('\\', '/')))
         button.setIconSize(QSize(30, 30))
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
@@ -387,8 +387,6 @@ class MASTER_WINDOW():
 
     def Block_Preview(self):
         '''Блок превью'''
-        self.size_preview = [534, 300]
-
         # Основное окно
         preview = QLabel(self.window)
         preview.setGeometry(20, 280, self.size_preview[0], self.size_preview[1])
@@ -418,8 +416,8 @@ class MASTER_WINDOW():
         # Отображение превью
         self.image = QLabel(preview)
         self.image.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
-        self.image.setScaledContents(False)
         self.image.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+        self.image.setScaledContents(False)
         self.image.setStyleSheet(f'''
             QLabel {{
                 background: transparent;
@@ -499,5 +497,5 @@ class MASTER_WINDOW():
 
     def Download(self):
         '''Скачивание'''
-        thread = threading.Thread(target = self.core.Download_Video(), args = (), daemon = True)
+        thread = threading.Thread(target = self.core.Download_Video, daemon = True)
         thread.start()
