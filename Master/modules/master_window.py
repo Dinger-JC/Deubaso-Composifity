@@ -484,7 +484,7 @@ class MASTER_WINDOW():
         self.Reset()
 
         def Thread(url: str):
-            self.core.Get_Data(self.core.Aliases(url))
+            self.core.Prepare_Info(self.core.Aliases(url))
             self.core.Get_Info()
 
             self.core.Get_Preview()

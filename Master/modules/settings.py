@@ -40,24 +40,39 @@ class SETTINGS():
         }
 
         # Нижние кнопки
-        self.buttons_lower = {
-            'github': {
-                'geometry': [929, 529, 52, 52],
-                'icon': files['github_i'],
-                'tooltip': 'Open GitHub repository',
-                'link': 'https://github.com/Dinger-JC/Deubaso-Composifity'
+        self.buttons = {
+            'social': {
+                'github': {
+                    'geometry': [929, 529, 52, 52],
+                    'icon': files['github_i'],
+                    'tooltip': 'Open GitHub repository',
+                    'link': 'https://github.com/Dinger-JC/Deubaso-Composifity'
+                },
+                'telegram': {
+                    'geometry': [859, 529, 52, 52],
+                    'icon': files['telegram_i'],
+                    'tooltip': 'Open Telegram channel',
+                    'link': 'https://t.me/Jitus_Circus'
+                },
+                'tiktok': {
+                    'geometry': [789, 529, 52, 52],
+                    'icon': files['tiktok_i'],
+                    'tooltip': 'Open TikTok account',
+                    'link': 'https://www.tiktok.com/@dinger_jc'
+                }
             },
-            'telegram': {
-                'geometry': [859, 529, 52, 52],
-                'icon': files['telegram_i'],
-                'tooltip': 'Open Telegram channel',
-                'link': 'https://t.me/Jitus_Circus'
-            },
-            'tiktok': {
-                'geometry': [789, 529, 52, 52],
-                'icon': files['tiktok_i'],
-                'tooltip': 'Open TikTok account',
-                'link': 'https://www.tiktok.com/@dinger_jitus_circus'
+            'other': {
+                'rofl': {
+                    'geometry': [19, 529, 52, 52],
+                    'icon': files['logo_i'],
+                    'tooltip': 'Хэллоу("print"): в рот'
+                },
+                'clear_history': {
+                    'geometry': [89, 529, 52, 52],
+                    'icon': files['trash_i'],
+                    'tooltip': 'Clear history',
+                    'command': 'clear'
+                }
             }
         }
 
@@ -67,9 +82,11 @@ class SETTINGS():
         self.Block_History()
         self.Block_Folder()
 
-        self.Button_Lower(self.buttons_lower['github'])
-        self.Button_Lower(self.buttons_lower['telegram'])
-        self.Button_Lower(self.buttons_lower['tiktok'])
+        self.Button_Social(self.buttons['social']['github'])
+        self.Button_Social(self.buttons['social']['telegram'])
+        self.Button_Social(self.buttons['social']['tiktok'])
+        self.Button_Other(self.buttons['other']['rofl'])
+        self.Button_Clear_History(self.buttons['other']['clear_history'])
 
     def Show(self):
         '''Показ окна'''
@@ -308,19 +325,14 @@ class SETTINGS():
             }}
         ''')
 
-    def Button_Lower(self, links: dict):
-        '''Кнопка с ссылкой'''
-        def Link():
-            '''Переход по ссылке'''
-            QDesktopServices.openUrl(QUrl(links['link']))
-
+    def Button_Preset(self, links: dict) -> QPushButton:
+        '''Кнопка'''
         button = QPushButton('', self.window)
         button.setGeometry(*links['geometry'])
         button.setToolTip(links['tooltip'])
         button.setIcon(QIcon(str(links['icon']).replace('\\', '/')))
         button.setIconSize(QSize(30, 30))
         button.setCursor(Qt.CursorShape.PointingHandCursor)
-        button.clicked.connect(Link)
         button.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
@@ -353,3 +365,34 @@ class SETTINGS():
                 padding: 2px;
             }}
         ''')
+        return button
+
+    def Button_Social(self, button):
+        '''Кнопка с ссылкой'''
+        def Link():
+            '''Переход по ссылке'''
+            QDesktopServices.openUrl(QUrl(button['link']))
+
+        body = self.Button_Preset(button)
+
+        if not button.get('link', '') == '':
+            body.clicked.connect(Link)
+
+    def Button_Other(self, button):
+        '''Другая кнопка'''
+        self.Button_Preset(button)
+
+    def Button_Clear_History(self, button):
+        '''Кнопка очистки истории'''
+        def Clear_History():
+            '''Переход по ссылке'''
+            if os.path.exists(files['history_j']):
+                os.remove(files['history_j'])
+                log.info('History cleared')
+
+        body = self.Button_Preset(button)
+
+        if not button.get('command', '') == '':
+            body.clicked.connect(Clear_History)
+
+

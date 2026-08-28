@@ -9,13 +9,14 @@
 
 # Стандартные библиотеки
 import json
+import os
 from pathlib import Path
 
 
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.08.03.2b'
+version = '2026.08.28.0r'
 size_window = [1000, 600]
 border_radius_small = 10
 border_radius_big = 15
@@ -68,6 +69,7 @@ files = {
     'preview_i': project / 'images' / 'png' / 'preview.png',
     'settings_i': project / 'images' / 'png' / 'settings.png',
     'stop_i': project / 'images' / 'png' / 'stop.png',
+    'trash_i': project / 'images' / 'png' / 'trash.png',
     # Папка images/social
     'github_i': project / 'images' / 'social' / 'github.png',
     'telegram_i': project / 'images' / 'social' / 'telegram.png',
@@ -80,6 +82,7 @@ files = {
     'preview_s': project / 'images' / 'svg' / 'preview.svg',
     'settings_s': project / 'images' / 'svg' / 'settings.svg',
     'stop_s': project / 'images' / 'svg' / 'stop.svg',
+    'trash_s': project / 'images' / 'svg' / 'trash.svg',
     # Папка modules
     'config_p': project / 'modules' / 'config.py',
     'core_p': project / 'modules' / 'core.py',
@@ -99,5 +102,9 @@ with open(files['sites_j'], encoding = 'utf-8') as file:
     sites = json.load(file)
 
 # История
+if not os.path.exists(files['history_j']):
+    with open(files['history_j'], 'w', encoding = 'utf-8') as file:
+        json.dump({}, file)
+
 with open(files['history_j'], encoding = 'utf-8') as file:
     history = json.load(file)

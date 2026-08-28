@@ -60,7 +60,7 @@ class CORE:
             self.signal.Status('warning', 'Incorrect link. This link could not be found.')
             sys.exit(1)
 
-        self.History(url) # Запись в историю
+        self.Write_History(url)
         self.domain = urlparse(url).netloc # Сайт
 
         # Директория для видео
@@ -79,7 +79,7 @@ class CORE:
             'sec-ch-ua-mobile': '?0', # Платформа
             'sec-ch-ua-platform': '"Windows"', # ОС
             'upgrade-insecure-requests': '1', # Просьба о защите
-            'user-agent': self.User_Agent(), # Имитация браузера Chrome (TLS/HTTP2)
+            'user-agent': self.Generate_User_Agent(), # Имитация браузера Chrome (TLS/HTTP2)
             'accept': '*/*', # Фильтр формата данных
             'sec-fetch-site': 'cross-site', # Запрос идет на другой домен
             'sec-fetch-mode': 'cors', # Режим запроса без CORS
@@ -127,7 +127,7 @@ class CORE:
             'reconnect_streamed': '1' # Автоматическое переподключение для стримов
         }
 
-    def User_Agent(self) -> str:
+    def Generate_User_Agent(self) -> str:
         '''Генерация случайного браузера'''
         windows_version = secrets.choice(['11.0; Win64; x64', '10.0; Win64; x64', '10.0'])
         chrome_version = f'{self.chrome}.0.{secrets.choice(range(6778, 6807))}.{secrets.choice(range(85, 110))}'
@@ -160,8 +160,8 @@ class CORE:
             precision = 0
         return f'{num:.{precision}f} {unit}' + format
 
-    def History(self, url: str):
-        '''История видео'''
+    def Write_History(self, url: str):
+        '''Запись в историю'''
         now = datetime.now()
         year = now.strftime('%Y')
         month = now.strftime('%B')
@@ -245,15 +245,15 @@ class CORE:
 
         sys.exit(1)
 
-    def Get_Data(self, url: str):
-        '''Получение данных с сайта'''
+    def Prepare_Info(self, url: str):
+        '''Подготовка информации'''
         try:
             self.Update_Config(url)
             self.response = requests.get(url, impersonate = f'chrome{self.chrome}', timeout = self.timeout)
             self.page = BeautifulSoup(self.response.text, 'html.parser')
             self.Check_Link()
 
-            self.signal.Status('info', 'Getting basic information...')
+            self.signal.Status('info', 'Preparing...')
 
         except requests.exceptions.ConnectionError:
             self.signal.Update_Preview(files['preview_i'])
