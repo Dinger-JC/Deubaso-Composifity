@@ -8,7 +8,7 @@
 
 
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, font_family, name
+from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, name
 from master import *
 from presets import *
 from settings import *
@@ -93,7 +93,6 @@ class MASTER_WINDOW():
                 border-radius: {border_radius_small}px;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
                 
                 padding-left: 45px;
@@ -108,7 +107,7 @@ class MASTER_WINDOW():
 
         icon = QLabel(self.input)
         icon.setGeometry(11, 11, 30, 30)
-        icon.setPixmap(QPixmap(str(files['link_i'])))
+        icon.setPixmap(QPixmap(str(files['link_png'])))
         icon.setScaledContents(True)
 
     def Text_Content(self, title: str):
@@ -116,7 +115,7 @@ class MASTER_WINDOW():
         # Иконка
         icon = QLabel(self.window)
         icon.setGeometry(21, 165, 44, 45)
-        icon.setPixmap(QPixmap(str(files['download_i'])))
+        icon.setPixmap(QPixmap(str(files['download_png'])))
         icon.setScaledContents(True)
 
         # Название
@@ -126,7 +125,6 @@ class MASTER_WINDOW():
         text.setStyleSheet(f'''
             QLabel {{
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
         ''')
@@ -139,7 +137,6 @@ class MASTER_WINDOW():
         self.status.setStyleSheet(f'''
                 QLabel {{
                     color: {colors['info']};
-                    font-family: '{font_family}';
                     font-size: {font_small}px; 
                 }}
             ''')
@@ -162,7 +159,6 @@ class MASTER_WINDOW():
         self.status.setStyleSheet(f'''
             QLabel {{
                 color: {colors.get(type)};
-                font-family: '{font_family}';
                 font-size: {font_small}px; 
             }}
         ''')
@@ -186,7 +182,6 @@ class MASTER_WINDOW():
                 border-radius: {border_radius_big}px;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
                 text-align: center;
             }}
@@ -230,7 +225,6 @@ class MASTER_WINDOW():
                 border: none;
             
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
         ''')
@@ -245,7 +239,6 @@ class MASTER_WINDOW():
                 border: none;
             
                 color: {colors['info']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
             }}
         ''')
@@ -269,7 +262,6 @@ class MASTER_WINDOW():
                 border-radius: {border_radius_small}px;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
             
@@ -290,7 +282,6 @@ class MASTER_WINDOW():
                 border-radius: 4px;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
                 padding: 2px;
             }}
@@ -304,7 +295,7 @@ class MASTER_WINDOW():
         button = QPushButton('', self.window)
         button.setGeometry(857, 529, 53, 52)
         button.setToolTip('Abort the download')
-        button.setIcon(QIcon(str(files['stop_i']).replace('\\', '/')))
+        button.setIcon(QIcon(str(files['stop_png']).replace('\\', '/')))
         button.setIconSize(QSize(30, 30))
         button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setStyleSheet(f'''
@@ -314,7 +305,6 @@ class MASTER_WINDOW():
                 border-radius: {border_radius_small}px;
 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
             
@@ -334,7 +324,6 @@ class MASTER_WINDOW():
                 border-radius: 4px;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
                 padding: 2px;
             }}
@@ -347,7 +336,7 @@ class MASTER_WINDOW():
         button = QPushButton('', self.window)
         button.setGeometry(928, 529, 53, 52)
         button.setToolTip('Settings')
-        button.setIcon(QIcon(str(files['settings_i']).replace('\\', '/')))
+        button.setIcon(QIcon(str(files['settings_png']).replace('\\', '/')))
         button.setIconSize(QSize(30, 30))
         button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setStyleSheet(f'''
@@ -357,7 +346,6 @@ class MASTER_WINDOW():
                 border-radius: {border_radius_small}px;
 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
             
@@ -377,7 +365,6 @@ class MASTER_WINDOW():
                 border-radius: 4px;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
                 padding: 2px;
             }}
@@ -426,7 +413,7 @@ class MASTER_WINDOW():
         ''')
 
         # Подгон размера
-        scaled_pixmap = QPixmap(str(files['preview_i'])).scaled(
+        scaled_pixmap = QPixmap(str(files['preview_png'])).scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation

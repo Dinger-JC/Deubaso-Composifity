@@ -8,7 +8,7 @@
 
 
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, font_family, history, name
+from config import border_radius_big, border_radius_small, colors, font_big, font_small, history, name
 from master import *
 from presets import *
 from logger import *
@@ -51,7 +51,6 @@ class HISTORY():
                 border-radius: {border_radius_small}px;
 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
                 outline: 0;
                 show-decoration-selected: 0;
@@ -92,7 +91,6 @@ class HISTORY():
                 border: none;
 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
                 padding: 0px 10px;
             }}
@@ -113,7 +111,6 @@ class HISTORY():
                 border-radius: 4px;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
                 padding: 2px;
             }}

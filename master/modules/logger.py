@@ -7,7 +7,11 @@
 
 
 
+# Стандартные библиотеки
+import sys
+
 # Локальные модули
+from config import files
 from master import *
 
 
@@ -17,13 +21,12 @@ def Log():
     log.setLevel(logging.INFO)
 
     if not log.handlers:
-        path = '../data/logs.log'
-        directory = os.path.dirname(path)
+        directory = os.path.dirname(files['logs_log'])
         if directory:
             os.makedirs(directory, exist_ok = True)
 
         formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] -> %(message)s')
-        file = RotatingFileHandler(path, maxBytes = 32 * 1024 * 1024)
+        file = RotatingFileHandler(files['logs_log'], maxBytes = 32 * 1024 * 1024)
         console_logs = logging.StreamHandler()
 
         for handler in [file, console_logs]:

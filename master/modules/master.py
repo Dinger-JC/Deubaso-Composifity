@@ -8,6 +8,7 @@
 
 
 # Стандартные библиотеки
+import ctypes
 import json
 import logging
 import math
@@ -24,35 +25,18 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 # Сторонние библиотеки
-packages = ['beautifulsoup4', 'curl-cffi', 'ffmpeg-python', 'mutagen', 'PySide6', 'yt-dlp']
-
-try:
-    import ffmpeg
-    import yt_dlp
-    from bs4 import BeautifulSoup
-    from curl_cffi import requests
-    from PySide6.QtGui import *
-    from PySide6.QtCore import *
-    from PySide6.QtWidgets import *
-    from mutagen.mp4 import MP4
-
-except ImportError:
-    print('The required modules are missing. Module installation begins...')
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', *packages])
-
-finally:
-    import ffmpeg
-    import yt_dlp
-    from bs4 import BeautifulSoup
-    from curl_cffi import requests
-    from PySide6.QtGui import *
-    from PySide6.QtCore import *
-    from PySide6.QtWidgets import *
-    from mutagen.mp4 import MP4
+import ffmpeg
+import yt_dlp
+from bs4 import BeautifulSoup
+from curl_cffi import requests
+from PySide6.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from mutagen.mp4 import MP4
 
 # Локальные модули
 try:
-    from config import files
+    from config import files, font_family
     from core import *
     from master_window import *
     from logger import *
@@ -68,13 +52,13 @@ def Files():
     error = False
     for name, path in files.items():
         if not path.is_file():
-            if name == 'ffmpeg' or name == 'ffprobe':
+            if name == 'ffmpeg_exe' or name == 'ffprobe_exe':
                 print(f'"{path}" not found.')
                 print('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
                 print('After downloading, move the exe file to the bin folder in the root of the project.')
                 error = True
 
-            elif name == 'videos':
+            elif name == 'videos_json':
                 print(f'"{path}" not found.')
 
             else:
@@ -91,8 +75,16 @@ if __name__ == '__main__':
 
     try:
         log.info('Start')
+
         app = QApplication(sys.argv)
         app.setQuitOnLastWindowClosed(True)
+        app.setFont(font_family)
+
+        lock = QLockFile(str(Path(sys.argv[0]).resolve().with_name('app.lock')))
+        lock.setStaleLockTime(0)
+        if not lock.tryLock(100):
+            QMessageBox.warning(None, 'Внимание', 'Приложение уже запущено!')
+            sys.exit(0)
 
         core = CORE()
         master_window = MASTER_WINDOW(core)

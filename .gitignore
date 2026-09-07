@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .idea/
-/Test/
-/Master/bin/
-/Master/data/
+/test/
+/master/bin/
+/master/data/
+/releases/

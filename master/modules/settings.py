@@ -8,7 +8,7 @@
 
 
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, font_family, name, settings
+from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, name, settings
 from master import *
 from presets import *
 from history import *
@@ -29,12 +29,12 @@ class SETTINGS():
         self.blocks = {
             'history': {
                 'geometry': [20, 95, 960, 50],
-                'icon': files['clock_i'],
+                'icon': files['clock_png'],
                 'tooltip': 'Record the link history'
             },
             'folder': {
                 'geometry': [20, 165, 960, 50],
-                'icon': files['folder_i'],
+                'icon': files['folder_png'],
                 'tooltip': 'Path for saving downloaded videos'
             }
         }
@@ -44,19 +44,19 @@ class SETTINGS():
             'social': {
                 'github': {
                     'geometry': [929, 529, 52, 52],
-                    'icon': files['github_i'],
+                    'icon': files['github_png'],
                     'tooltip': 'Open GitHub repository',
                     'link': 'https://github.com/Dinger-JC/Deubaso-Composifity'
                 },
                 'telegram': {
                     'geometry': [859, 529, 52, 52],
-                    'icon': files['telegram_i'],
+                    'icon': files['telegram_png'],
                     'tooltip': 'Open Telegram channel',
                     'link': 'https://t.me/Jitus_Circus'
                 },
                 'tiktok': {
                     'geometry': [789, 529, 52, 52],
-                    'icon': files['tiktok_i'],
+                    'icon': files['tiktok_png'],
                     'tooltip': 'Open TikTok account',
                     'link': 'https://www.tiktok.com/@dinger_jc'
                 }
@@ -64,12 +64,12 @@ class SETTINGS():
             'other': {
                 'rofl': {
                     'geometry': [19, 529, 52, 52],
-                    'icon': files['logo_i'],
+                    'icon': files['logo_png'],
                     'tooltip': 'Хэллоу("print"): в рот'
                 },
                 'clear_history': {
                     'geometry': [89, 529, 52, 52],
-                    'icon': files['trash_i'],
+                    'icon': files['trash_png'],
                     'tooltip': 'Clear history',
                     'command': 'clear'
                 }
@@ -112,7 +112,6 @@ class SETTINGS():
                 border-radius: 4px;
 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
                 padding: 2px;
             }}
@@ -140,7 +139,6 @@ class SETTINGS():
                 background-color: transparent;
                 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
         ''')
@@ -171,7 +169,6 @@ class SETTINGS():
                 background-color: transparent;
 
                 color: {colors['info']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
 
@@ -248,7 +245,7 @@ class SETTINGS():
             if hasattr(self, 'settings'):
                 settings['history'] = new_value
 
-            with open(files['settings_j'], 'w', encoding = 'utf-8') as file:
+            with open(files['settings_json'], 'w', encoding = 'utf-8') as file:
                 json.dump(settings, file, ensure_ascii = False, indent = 2)
 
             Update_Slider(True)
@@ -298,7 +295,7 @@ class SETTINGS():
                 settings['path'] = new_path
                 log.info(f'Video folder has changed: {new_path}')
 
-                with open(files['settings_j'], 'w', encoding = 'utf-8') as file:
+                with open(files['settings_json'], 'w', encoding = 'utf-8') as file:
                     json.dump(settings, file, indent = 2, ensure_ascii = False)
                     text_right.setText(new_path.replace('\\', '/'))
 
@@ -315,7 +312,6 @@ class SETTINGS():
                 border: none;
 
                 color: {colors['info']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
                 text-align: right;
             }}
@@ -340,7 +336,6 @@ class SETTINGS():
                 border-radius: {border_radius_small}px;
 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_big}px;
             }}
             
@@ -360,7 +355,6 @@ class SETTINGS():
                 border-radius: 4px;
 
                 color: {colors['text']};
-                font-family: '{font_family}';
                 font-size: {font_small}px;
                 padding: 2px;
             }}
@@ -386,8 +380,8 @@ class SETTINGS():
         '''Кнопка очистки истории'''
         def Clear_History():
             '''Переход по ссылке'''
-            if os.path.exists(files['history_j']):
-                os.remove(files['history_j'])
+            if os.path.exists(files['history_json']):
+                os.remove(files['history_json'])
                 log.info('History cleared')
 
         body = self.Button_Preset(button)

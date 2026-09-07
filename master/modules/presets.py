@@ -8,7 +8,7 @@
 
 
 # Локальные модули
-from config import colors, font_family, font_small, size_window, version
+from config import colors, files, font_small, size_window, version
 from master import *
 
 
@@ -17,7 +17,7 @@ def Window(window, title: str, name: str):
     '''Главное окно'''
     # Окно
     window.setWindowTitle(title)
-    window.setWindowIcon(QIcon(str(files['logo_i'])))
+    window.setWindowIcon(QIcon(str(files['logo_png'])))
     window.setFixedSize(size_window[0], size_window[1])
     window.setStyleSheet(f'''
         QMainWindow {{
@@ -43,7 +43,6 @@ def Window(window, title: str, name: str):
                 stop:1 {colors['hover_end']}
             );
     
-            font-family: '{font_family}';
             font-size: 40px;
         }}
     ''')
@@ -54,6 +53,5 @@ def Window(window, title: str, name: str):
     text_version.setStyleSheet(f'''
         background: transparent;
         color: {colors['info']};
-        font-family: '{font_family}';
         font-size: {font_small}px;
     ''')

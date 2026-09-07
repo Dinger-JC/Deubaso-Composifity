@@ -32,18 +32,18 @@ class CORE:
 
     def Aliases(self, url: str) -> str:
         '''Извлечение ссылки'''
-        if not files['videos_j'].is_file():
+        if not files['videos_json'].is_file():
             return url
 
         try:
-            with open(files['videos_j'], encoding = 'utf-8') as file:
+            with open(files['videos_json'], encoding = 'utf-8') as file:
                 videos = json.load(file)
             presets = videos
             if url in videos:
                 url = presets[url]
 
         except json.JSONDecodeError:
-            log.info(f'"{files['videos_j']}" is corrupted or has an incorrect JSON format.')
+            log.info(f'"{files['videos_json']}" is corrupted or has an incorrect JSON format.')
 
         return url
 
@@ -55,7 +55,7 @@ class CORE:
 
         # Проверка ссылки
         if not re.search(r'^https?://[\w\.-]+\/.*(video|watch).*', url):
-            self.signal.Update_Preview(files['preview_i'])
+            self.signal.Update_Preview(files['preview_png'])
 
             self.signal.Status('warning', 'Incorrect link. This link could not be found.')
             sys.exit(1)
@@ -94,7 +94,7 @@ class CORE:
         self.yt_dlp_options = {
             'http_headers': self.headers, # Заголовки HTTP-запросов
             'progress_hooks': [self.Progress_Hook], # Отслеживание прогресса загрузки
-            'ffmpeg_location': str(files['ffmpeg_e']), # Путь к ffmpeg
+            'ffmpeg_location': str(files['ffmpeg_exe']), # Путь к ffmpeg
             'outtmpl': self.cache_name, # Путь сохраняемого файла
             'format': 'bestvideo+bestaudio/best', # Качество видео
             'merge_output_format': 'mp4', # Формат после загрузки
@@ -169,8 +169,8 @@ class CORE:
         time = now.strftime('%H:%M:%S')
 
         if settings['history'] == 1:
-            if files['history_j'].is_file() and files['history_j'].stat().st_size > 0:
-                with open(files['history_j'], 'r', encoding = 'utf-8') as file:
+            if files['history_json'].is_file() and files['history_json'].stat().st_size > 0:
+                with open(files['history_json'], 'r', encoding = 'utf-8') as file:
                     data = json.load(file)
 
             else:
@@ -181,7 +181,7 @@ class CORE:
             day_dict = month_dict.setdefault(date, {})
             day_dict[time] = url
 
-            with open(files['history_j'], 'w', encoding = 'utf-8') as file:
+            with open(files['history_json'], 'w', encoding = 'utf-8') as file:
                 json.dump(data, file, indent = 4, ensure_ascii = False)
 
     def Progress_Hook(self, data):
@@ -240,7 +240,7 @@ class CORE:
         error = errors.get(code, 'Error occurred.')
         full_message = f'Error {code} {error}'
 
-        self.signal.Update_Preview(files['preview_i'])
+        self.signal.Update_Preview(files['preview_png'])
         self.signal.Status('error', full_message)
 
         sys.exit(1)
@@ -256,13 +256,13 @@ class CORE:
             self.signal.Status('info', 'Preparing...')
 
         except requests.exceptions.ConnectionError:
-            self.signal.Update_Preview(files['preview_i'])
+            self.signal.Update_Preview(files['preview_png'])
 
             self.signal.Status('error', f'Connection error to "{self.domain}". The resource may be blocked and may require a VPN or Proxy.')
             sys.exit(1)
 
         except requests.exceptions.Timeout:
-            self.signal.Update_Preview(files['preview_i'])
+            self.signal.Update_Preview(files['preview_png'])
 
             self.signal.Status('error', f'Exceeded the waiting time for a response from "{self.domain}".')
             sys.exit(1)
@@ -333,7 +333,7 @@ class CORE:
         self.signal.Status('info', 'Getting additional information...')
 
         try:
-            video_info = ffmpeg.probe(self.video_url, cmd = files['ffprobe_e'],  **self.ffprobe_options)
+            video_info = ffmpeg.probe(self.video_url, cmd = files['ffprobe_exe'],  **self.ffprobe_options)
             video_stream = next((stream for stream in video_info['streams'] if stream['codec_type'] == 'video'), None)
 
             width = video_stream.get('width', 0)
@@ -376,9 +376,6 @@ class CORE:
             tags.delete()
             tags['\xa9nam'] = self.title  # Название
             tags['\xa9cmt'] = 'https://github.com/Dinger-JC/Deubaso-Composifity' # Комментарий
-            tags['\xa9ART'] = f'{self.domain}' # Исполнитель
-            tags['\xa9day'] = f'{datetime.now().strftime('%Y')}' # Год
-            tags['\xa9gen'] = 'Porn' # Жанр
             tags.save()
 
         except Exception as e:

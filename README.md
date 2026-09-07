@@ -5,9 +5,16 @@
 Beginning of development 06.01.2026.
 
 ---
+## Libs
+Install requirements
 
-### Create
-If you want to add video links to your favorites, create a `Master/data/videos.json` file and write the following code, then add the links to the dictionary:
+```powershell
+pip install -r requirements.txt && python Master\modules\master.py
+```
+
+---
+## Create
+If you want to add video links to your favorites, create a `Master/data/videos.json` file and write the following code, then add the links to the dictionary
 
 ```json
 {
