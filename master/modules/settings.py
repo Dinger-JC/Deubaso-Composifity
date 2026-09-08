@@ -242,9 +242,6 @@ class SETTINGS():
             new_value = 0 if settings['history'] == 1 else 1
             settings['history'] = new_value
 
-            if hasattr(self, 'settings'):
-                settings['history'] = new_value
-
             with open(files['settings_json'], 'w', encoding = 'utf-8') as file:
                 json.dump(settings, file, ensure_ascii = False, indent = 2)
 
@@ -369,7 +366,7 @@ class SETTINGS():
 
         body = self.Button_Preset(button)
 
-        if not button.get('link', '') == '':
+        if button.get('link'):
             body.clicked.connect(Link)
 
     def Button_Other(self, button):
@@ -385,8 +382,5 @@ class SETTINGS():
                 log.info('History cleared')
 
         body = self.Button_Preset(button)
-
-        if not button.get('command', '') == '':
+        if button.get('command'):
             body.clicked.connect(Clear_History)
-
-

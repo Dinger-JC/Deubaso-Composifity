@@ -42,8 +42,9 @@ try:
     from logger import *
     log = Log()
 
-except ImportError:
-    print(f'Could not import modules.')
+except Exception as e:
+    print(f'Could not import modules: {e}')
+    sys.exit(1)
 
 
 
@@ -76,16 +77,24 @@ if __name__ == '__main__':
     try:
         log.info('Start')
 
+        # Приложение
         app = QApplication(sys.argv)
         app.setQuitOnLastWindowClosed(True)
-        app.setFont(font_family)
 
+        # Инициализация шрифта
+        font_id = QFontDatabase.addApplicationFont(str(files['font_otf']))
+        if font_id != -1:
+            font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        app.setFont(QFont(font_family))
+
+        # Защита от повторного запуска
         lock = QLockFile(str(Path(sys.argv[0]).resolve().with_name('app.lock')))
-        lock.setStaleLockTime(0)
+        lock.setStaleLockTime(10000)
         if not lock.tryLock(100):
             QMessageBox.warning(None, 'Внимание', 'Приложение уже запущено!')
             sys.exit(0)
 
+        # Структура
         core = CORE()
         master_window = MASTER_WINDOW(core)
         core.signal = master_window

@@ -26,6 +26,7 @@ class MASTER_WINDOW():
         self.core = core
         self.settings = SETTINGS(self.window)
         self.size_preview = [534, 300]
+        self.placeholder = 'Strip2, XGroovy, AnalMedia, Rule34Video'
 
         # Блоки
         self.blocks = {
@@ -60,10 +61,10 @@ class MASTER_WINDOW():
 
         self.Block_Input()
 
-        self.title = self.Text_Content('Hi, enter the link to the video and download it!')
+        self.title = self.Text_Content(self.placeholder)
         self.status = self.Text_Status()
 
-        self.progress = self.Block_Progress_Bar()
+        self.Block_Progress_Bar()
 
         self.speed = self.Block_Info(self.blocks['speed'])
         self.max_speed = self.Block_Info(self.blocks['max_speed'])
@@ -84,7 +85,7 @@ class MASTER_WINDOW():
         '''Блок строки ввода'''
         self.input = QLineEdit(self.window)
         self.input.setGeometry(19, 94, 962, 52)
-        self.input.setPlaceholderText('Insert the link to the video (Strip2, XGroovy, AnalMedia)')
+        self.input.setPlaceholderText('Insert the link to the video')
         self.input.returnPressed.connect(self.Info)
         self.input.setStyleSheet(f'''
             QLineEdit {{
@@ -146,13 +147,10 @@ class MASTER_WINDOW():
         '''Показ статуса'''
         if type == 'info':
             log.info(text)
-
         elif type == 'good':
             log.info(text)
-
         elif type == 'warning':
             log.warning(text)
-
         elif type == 'error':
             log.error(text)
 
@@ -167,7 +165,6 @@ class MASTER_WINDOW():
             self.status.setText(text)
             self.status.raise_()
             self.status.show()
-
         else:
             self.status.hide()
 
@@ -198,7 +195,7 @@ class MASTER_WINDOW():
         ''')
         return self.progress_bar
 
-    def Block_Info(self, blocks: list, number: str = '-') -> QLabel:
+    def Block_Info(self, blocks: dict, number: str = '-') -> QLabel:
         '''Блок информации'''
         block = QFrame(self.window)
         block.setGeometry(*blocks['geometry'])
@@ -452,7 +449,7 @@ class MASTER_WINDOW():
 
     def Reset(self):
         '''Сброс метрик'''
-        self.title.setText('Hi, enter the link to the video and download it!')
+        self.title.setText(self.placeholder)
         self.button.setEnabled(False)
 
         self.progress_bar.setTextVisible(False)

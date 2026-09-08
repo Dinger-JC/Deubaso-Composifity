@@ -9,7 +9,6 @@
 
 # Стандартные библиотеки
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -39,31 +38,22 @@ colors = {
     'hover_fill': 'rgba(0, 67, 112, 0.5)'
 }
 
-# Файлы
+# Корневая папка проекта
 if getattr(sys, 'frozen', False):
     project = Path(sys.executable).resolve().parent
-
 else:
     project = Path(__file__).resolve().parent.parent
 
-# Рабочие папки рядом с exe
-(project / 'config').mkdir(parents = True, exist_ok = True)
+# Индивидуальная папка рядом с exe
 (project / 'data').mkdir(parents = True, exist_ok = True)
 
-if not (project / 'config' / 'settings.json').exists():
-    (project / 'config' / 'settings.json').write_text('{\n  "path": "D:/Saved Videos",\n  "history": 1\n}', encoding = 'utf-8')
-
-if not (project / 'data' / 'history.json').exists():
-    (project / 'data' / 'history.json').write_text('{}', encoding = 'utf-8')
-
-if not (project / 'data' / 'videos.json').exists():
-    (project / 'data' / 'videos.json').write_text('{}', encoding = 'utf-8')
-
+# Файлы
 files = {
     # Папка bin
     'ffmpeg_exe': project / 'bin' / 'ffmpeg.exe',
     'ffprobe_exe': project / 'bin' / 'ffprobe.exe',
     # Папка config
+    'font_otf': project / 'config' / 'gungsuh_w33.otf',
     'settings_json': project / 'config' / 'settings.json',
     'sites_json': project / 'config' / 'sites.json',
     # Папка data
@@ -98,20 +88,21 @@ files = {
     'core_py': project / 'modules' / 'core.py',
     'history_py': project / 'modules' / 'history.py',
     'logger_py': project / 'modules' / 'logger.py',
+    'master_py': project / 'modules' / 'master.py',
     'master_window_py': project / 'modules' / 'master_window.py',
     'presets_py': project / 'modules' / 'presets.py',
-    'settings_py': project / 'modules' / 'settings.py',
+    'settings_py': project / 'modules' / 'settings.py'
 }
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.09.08.0r'
+version = '2026.09.09.0'
 size_window = [1000, 600]
 border_radius_small = 10
 border_radius_big = 15
 font_big = 18
 font_small = 14
-font_family = 'Sitka Small'
+font_family = ''
 
 # Настройки
 with open(files['settings_json'], encoding = 'utf-8') as file:
@@ -120,11 +111,3 @@ with open(files['settings_json'], encoding = 'utf-8') as file:
 # Поддерживаемые сайты
 with open(files['sites_json'], encoding = 'utf-8') as file:
     sites = json.load(file)
-
-# История
-if not os.path.exists(files['history_json']):
-    with open(files['history_json'], 'w', encoding = 'utf-8') as file:
-        json.dump({}, file)
-
-with open(files['history_json'], encoding = 'utf-8') as file:
-    history = json.load(file)

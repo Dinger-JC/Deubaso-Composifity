@@ -7,6 +7,13 @@
 
 
 
+# Сторонние библиотеки
+from yt_dlp.utils._utils import _UnsafeExtensionError
+
+# Стандартные библиотеки
+import time
+
+
 # Локальные модули
 from config import files, settings, sites
 from master import *
@@ -23,6 +30,7 @@ class CORE:
         self.chrome = '131'
         self.timeout = 30
         self.factor = {'KiB': 1024, 'MiB': 1024 ** 2, 'GiB': 1024 ** 3}
+        self.tags = ['4k', '2k', '1080p', '720p', '640p', '480p', '360p', '240p', '144p']
 
         # Сброс
         self.max_speed = 0
@@ -38,12 +46,12 @@ class CORE:
         try:
             with open(files['videos_json'], encoding = 'utf-8') as file:
                 videos = json.load(file)
-            presets = videos
-            if url in videos:
-                url = presets[url]
 
-        except json.JSONDecodeError:
-            log.info(f'"{files['videos_json']}" is corrupted or has an incorrect JSON format.')
+        except (FileNotFoundError, json.JSONDecodeError):
+            return url
+
+        if url in videos:
+            url = videos[url]
 
         return url
 
@@ -54,7 +62,7 @@ class CORE:
         log.info(f'| Link: {url}')
 
         # Проверка ссылки
-        if not re.search(r'^https?://[\w\.-]+\/.*(video|watch).*', url):
+        if not url.startswith(('http://', 'https://')):
             self.signal.Update_Preview(files['preview_png'])
 
             self.signal.Status('warning', 'Incorrect link. This link could not be found.')
@@ -98,11 +106,6 @@ class CORE:
             'outtmpl': self.cache_name, # Путь сохраняемого файла
             'format': 'bestvideo+bestaudio/best', # Качество видео
             'merge_output_format': 'mp4', # Формат после загрузки
-            # Принудительная конвертация в .mp4
-            'postprocessors': [{
-                'key': 'FFmpegVideoConvertor',
-                'preferedformat': 'mp4'
-            }],
             'socket_timeout': self.timeout, # Время ожидания ответа от сервера (в секундах)
             'sleep_interval': 0, # Минимальная случайная пауза между загрузками (в секундах)
             'max_sleep_interval': 2, # Максимальная случайная пауза между запросами (в секундах)
@@ -134,12 +137,12 @@ class CORE:
         user_agent = f'Mozilla/5.0 (Windows NT {windows_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version} Safari/537.36'
         return user_agent
 
-    def Convert_Bytes(self, value: int = 0, format: str = '') -> str:
+    def Convert_Bytes(self, value: int = 0, units: str = '') -> str:
         '''Конвертация байтов'''
         if value is None or value == 0:
             return 'N/A'
         if value < self.factor['KiB']:
-            return f'{value} B' + format
+            return f'{value} B' + units
         if value < self.factor['MiB']:
             num = value / self.factor['KiB']
             unit = 'KiB'
@@ -158,7 +161,7 @@ class CORE:
             precision = 1
         else:
             precision = 0
-        return f'{num:.{precision}f} {unit}' + format
+        return f'{num:.{precision}f} {unit}' + units
 
     def Write_History(self, url: str):
         '''Запись в историю'''
@@ -269,13 +272,13 @@ class CORE:
 
     def Get_Info(self):
         '''Парсинг названий и прямых ссылок'''
-        if self.domain == sites['Strip2']['domain']:
-            raw_title = self.page.find('title').text
-            self.title = re.sub(r'\s*[-–—]\s*Strip2.co\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
+        raw_title = self.page.find('title').text
 
+        if self.domain == sites['strip2']['domain']:
             links = []
+            self.title = re.sub(r'\s*[-–—]\s*Strip2.co\s*$', '', raw_title, flags = re.IGNORECASE).strip()
             self.video_url = self.page.find_all('a', href = True)
+
             for link in self.video_url:
                 if 'vps402.strip2.co.mp4' in link['href']:
                     links.append(link['href'])
@@ -285,28 +288,40 @@ class CORE:
                 if find_link and f'/x{len(links) - 1}/' in find_link:
                     self.video_url = find_link
 
-        elif self.domain == sites['XGroovy']['domain']:
-            raw_title = self.page.find('title').text
+        elif self.domain == sites['xgroovy']['domain']:
             self.title = raw_title
-            self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
 
-            tags = ['4k', '1080p', '720p', '480p', '240p']
-            for tag in tags:
+            for tag in self.tags:
                 video = self.page.find('source', title = tag)
                 if video:
                     self.video_url = video.get('src')
                     break
 
-        elif self.domain == sites['AnalMedia']['domain']:
-            raw_title = self.page.find('title').text
+        elif self.domain == sites['analmedia']['domain']:
             self.title = re.sub(r'\s*[-–—]\s*AnalMedia\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
+            self.video_url = self.page.select_one('video source')['src']
 
-            video = self.page.find('video')
-            self.video_url = video.find('source')['src']
+        elif self.domain == sites['rule34video']['domain']:
+            links = {}
+            self.title = raw_title
+            self.video_url = self.page.find_all('a', class_ = 'tag_item tag_item_download')
+
+            for link in self.video_url:
+                text = link.text.lower()
+                url = link.get('href')
+
+                for tag in self.tags:
+                    if tag in text:
+                        links[tag] = url
+                        break
+
+            for tag in self.tags:
+                if tag in links:
+                    self.video_url = links[tag]
+                    break
 
         else:
-            self.signal.Status('warning', 'Downloads are only available from Strip2, XGroovy, AnalMedia.')
+            self.signal.Status('warning', 'Downloads are only available from Strip2, XGroovy, AnalMedia, Rule34Video.')
             sys.exit(1)
 
         self.signal.title.setText(self.title)
@@ -316,26 +331,53 @@ class CORE:
 
     def Get_Preview(self):
         '''Получение превью'''
-        key = next((i for i, v in sites.items() if v['domain'] == self.domain), None)
-        if key:
-            match = re.search(sites[key]['pattern'], str(self.page))
-            if match:
-                image = match.group(0)
-                link_image = requests.get(image, impersonate = f'chrome{self.chrome}', timeout = self.timeout).content
-                with open(self.temp_preview, 'wb') as preview:
-                    preview.write(link_image)
-                self.signal.Update_Preview(self.temp_preview)
+        try:
+            image = None
+            key = next((i for i, v in sites.items() if v['domain'] == self.domain), None)
+            pattern = sites[key]['pattern']
 
-        log.info(f'| Preview: {image}')
+            if '{tag}' in pattern:
+                for tag in self.tags:
+                    match = re.search(pattern.replace('{tag}', re.escape(tag)), str(self.page))
+                    if match:
+                        image = match.group(0)
+                        break
+
+            else:
+                image = re.search(pattern, str(self.page)).group(0)
+
+            link_image = requests.get(image, impersonate = f'chrome{self.chrome}', timeout = self.timeout).content
+            with open(self.temp_preview, 'wb') as preview:
+                preview.write(link_image)
+            self.signal.Update_Preview(self.temp_preview)
+
+            log.info(f'| Preview: {image}')
+
+        except Exception as e:
+            self.signal.Status('warning', f'Preview error: {e}')
 
     def Get_Add_Info(self):
         '''Получение дополнительной информации'''
         self.signal.Status('info', 'Getting additional information...')
 
         try:
-            video_info = ffmpeg.probe(self.video_url, cmd = files['ffprobe_exe'],  **self.ffprobe_options)
-            video_stream = next((stream for stream in video_info['streams'] if stream['codec_type'] == 'video'), None)
+            ffprobe_video_info = None
 
+            for attempt in range(1, 4):
+                try:
+                    ffprobe_video_info = ffmpeg.probe(self.video_url, cmd = files['ffprobe_exe'],  **self.ffprobe_options)
+                    break
+
+                except Exception as e:
+                    self.signal.Status('warning', f'Attempt {attempt} failed: {e}')
+
+                    if attempt < 3:
+                        time.sleep(1)
+
+            if ffprobe_video_info is None:
+                raise Exception('Ffprobe did not read the stream after 3 attempts')
+
+            video_stream = next((stream for stream in ffprobe_video_info['streams'] if stream['codec_type'] == 'video'), None)
             width = video_stream.get('width', 0)
             height = video_stream.get('height', 0)
             fps = f'{math.ceil(float(Fraction(video_stream.get('avg_frame_rate', 'N/A'))))}'
@@ -353,17 +395,19 @@ class CORE:
             self.signal.Status('good', 'Video is ready to download!')
 
         except Exception as e:
-            self.signal.Status('error', f'Error reading technical info via ffprobe: {e}')
+            self.signal.Status('warning', f'Error reading technical info via ffprobe: {e}')
 
         finally:
             self.signal.button.setEnabled(True)
 
     def File_Name(self):
         '''Создание уникального имени файла'''
+        site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
         date = datetime.now().strftime('%Y.%m.%d')
         counter = 1
+
         while True:
-            self.final_name = self.path / f'{date} {self.site} VID {counter}.mp4'
+            self.final_name = self.path / f'{date} {site} VID {counter}.mp4'
             if not self.final_name.exists():
                 os.rename(self.cache_name, self.final_name)
                 break
@@ -386,6 +430,8 @@ class CORE:
         self.cancel_download = False
         self.signal.Status('info', 'Downloading videos...')
 
+        _UnsafeExtensionError._enabled = False
+
         try:
             with yt_dlp.YoutubeDL(self.yt_dlp_options) as video:
                 video.download([self.video_url])
@@ -404,6 +450,7 @@ class CORE:
                 sys.exit(1)
 
         finally:
+            _UnsafeExtensionError._enabled = True
             try:
                 os.remove(self.temp_preview)
 

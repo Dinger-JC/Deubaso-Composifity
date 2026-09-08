@@ -7,8 +7,11 @@
 
 
 
+# Стандартные библиотеки
+import json
+
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, font_big, font_small, history, name
+from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, name
 from master import *
 from presets import *
 from logger import *
@@ -130,15 +133,22 @@ class HISTORY():
         '''Обновление истории'''
         self.tree.clear()
 
-        for year in sorted(history.keys(), reverse = True):
+        try:
+            with open(files['history_json'], encoding = 'utf-8') as file:
+                data = json.load(file)
+
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {}
+
+        for year in sorted(data.keys(), reverse = True):
             year_item = QTreeWidgetItem(self.tree, [f'🌏 {year}'])
 
-            for month in sorted(history[year].keys()):
+            for month in sorted(data[year].keys(), reverse = True):
                 month_item = QTreeWidgetItem(year_item, [f'📅 {month}'])
 
-                for date in sorted(history[year][month].keys(), reverse = True):
+                for date in sorted(data[year][month].keys(), reverse = True):
                     date_item = QTreeWidgetItem(month_item, [f'📌 {date}'])
-                    day = history[year][month][date]
+                    day = data[year][month][date]
 
                     for time_str in sorted(day.keys(), reverse = True):
                         url = day[time_str]

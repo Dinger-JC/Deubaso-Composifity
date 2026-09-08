@@ -20,6 +20,7 @@ If you want to add video links to your favorites, create a `Master/data/videos.j
 {
   "1": "https://vps402.strip2.co/video/...",
   "2": "https://rt.xgroovy.com/videos/...",
-  "3": "https://anal.media/ru/video/..."
+  "3": "https://anal.media/ru/video/...",
+  "4": "https://rule34video.com/contents/..."
 }
 ```

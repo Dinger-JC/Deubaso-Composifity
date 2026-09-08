@@ -1,6 +1,6 @@
-beautifulsoup4
-curl-cffi
-ffmpeg-python
-mutagen
-PySide6
-yt-dlp
+beautifulsoup4==4.15.0
+curl-cffi==0.16.3
+ffmpeg-python==0.2.0
+mutagen==1.48.1
+PySide6==6.11.2
+yt-dlp==2026.8.19
