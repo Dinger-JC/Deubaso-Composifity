@@ -7,12 +7,15 @@
 
 
 
+# Стандартные библиотеки
+import threading
+
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, name
-from master import *
+from config import files
+from logger import Log
 from presets import *
-from settings import *
-from logger import *
+from settings import SETTINGS
+
 log = Log()
 
 
@@ -28,8 +31,30 @@ class MASTER_WINDOW():
         self.size_preview = [534, 300]
         self.placeholder = 'Strip2, XGroovy, AnalMedia, Rule34Video'
 
+        # Кнопки
+        buttons = {
+            'download_video': {
+                'geometry': [574, 530, 264, 50],
+                'title': 'Download video',
+                'tooltip': 'Download video',
+                'icon': None
+            },
+            'stop': {
+                'geometry': [857, 529, 53, 52],
+                'title': '',
+                'tooltip': 'Abort the download',
+                'icon': files['images']['png']['buttons']['stop']
+            },
+            'settings': {
+                'geometry': [928, 529, 53, 52],
+                'title': '',
+                'tooltip': 'Settings',
+                'icon': files['images']['png']['buttons']['settings']
+            }
+        }
+
         # Блоки
-        self.blocks = {
+        blocks = {
             'speed': {
                 'geometry': [573, 279, 124, 82],
                 'title': 'Speed'
@@ -66,16 +91,16 @@ class MASTER_WINDOW():
 
         self.Block_Progress_Bar()
 
-        self.speed = self.Block_Info(self.blocks['speed'])
-        self.max_speed = self.Block_Info(self.blocks['max_speed'])
-        self.size = self.Block_Info(self.blocks['size'])
-        self.quality = self.Block_Info(self.blocks['quality'])
-        self.fps = self.Block_Info(self.blocks['fps'])
-        self.duration = self.Block_Info(self.blocks['duration'])
+        self.speed = self.Block_Info(blocks['speed'])
+        self.max_speed = self.Block_Info(blocks['max_speed'])
+        self.size = self.Block_Info(blocks['size'])
+        self.quality = self.Block_Info(blocks['quality'])
+        self.fps = self.Block_Info(blocks['fps'])
+        self.duration = self.Block_Info(blocks['duration'])
 
-        self.Button_Download()
-        self.Button_Stop()
-        self.Button_Settings()
+        self.Button_Download_Video(buttons['download_video'])
+        self.Button_Stop(buttons['stop'])
+        self.Button_Settings(buttons['settings'])
 
         self.Block_Preview()
 
@@ -85,7 +110,7 @@ class MASTER_WINDOW():
         '''Блок строки ввода'''
         self.input = QLineEdit(self.window)
         self.input.setGeometry(19, 94, 962, 52)
-        self.input.setPlaceholderText('Insert the link to the video')
+        self.input.setPlaceholderText('Insert link to video')
         self.input.returnPressed.connect(self.Info)
         self.input.setStyleSheet(f'''
             QLineEdit {{
@@ -108,7 +133,7 @@ class MASTER_WINDOW():
 
         icon = QLabel(self.input)
         icon.setGeometry(11, 11, 30, 30)
-        icon.setPixmap(QPixmap(str(files['link_png'])))
+        icon.setPixmap(QPixmap(str(files['images']['png']['other']['link'])))
         icon.setScaledContents(True)
 
     def Text_Content(self, title: str):
@@ -116,7 +141,7 @@ class MASTER_WINDOW():
         # Иконка
         icon = QLabel(self.window)
         icon.setGeometry(21, 165, 44, 45)
-        icon.setPixmap(QPixmap(str(files['download_png'])))
+        icon.setPixmap(QPixmap(str(files['images']['png']['other']['download'])))
         icon.setScaledContents(True)
 
         # Название
@@ -133,7 +158,7 @@ class MASTER_WINDOW():
 
     def Text_Status(self):
         '''Статус'''
-        self.status = QLabel('The download status will be displayed here', self.window)
+        self.status = QLabel('Download status will be displayed here', self.window)
         self.status.setGeometry(85, 190, 895, 20)
         self.status.setStyleSheet(f'''
                 QLabel {{
@@ -241,13 +266,15 @@ class MASTER_WINDOW():
         ''')
         return value
 
-    def Button_Download(self):
+    def Button_Download_Video(self, button: dict):
         '''Кнопка скачивания видео'''
-        self.button = QPushButton('Download', self.window)
-        self.button.setGeometry(574, 530, 264, 50)
-        self.button.setToolTip('Download video')
-        self.button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.button.setStyleSheet(f'''
+        self.button_download = QPushButton(button['title'], self.window)
+        self.button_download.setGeometry(*button['geometry'])
+        self.button_download.setToolTip(button['tooltip'])
+        self.button_download.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.button_download.clicked.connect(self.Download_Video)
+        self.button_download.setEnabled(False)
+        self.button_download.setStyleSheet(f'''
             QPushButton {{
                 background: qlineargradient(
                     spread:pad, 
@@ -284,18 +311,16 @@ class MASTER_WINDOW():
             }}
         ''')
 
-        self.button.clicked.connect(self.Download)
-        self.button.setEnabled(False)
-
-    def Button_Stop(self):
+    def Button_Stop(self, button: dict):
         '''Кнопка остановки скачивания видео'''
-        button = QPushButton('', self.window)
-        button.setGeometry(857, 529, 53, 52)
-        button.setToolTip('Abort the download')
-        button.setIcon(QIcon(str(files['stop_png']).replace('\\', '/')))
-        button.setIconSize(QSize(30, 30))
-        button.setCursor(Qt.CursorShape.PointingHandCursor)
-        button.setStyleSheet(f'''
+        self.button_stop = QPushButton(button['title'], self.window)
+        self.button_stop.setGeometry(*button['geometry'])
+        self.button_stop.setToolTip(button['tooltip'])
+        self.button_stop.setIcon(QIcon(str(button['icon']).replace('\\', '/')))
+        self.button_stop.setIconSize(QSize(30, 30))
+        self.button_stop.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.button_stop.clicked.connect(self.core.Stop_Download)
+        self.button_stop.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
                 border: 2px solid {colors['stroke']};
@@ -326,17 +351,16 @@ class MASTER_WINDOW():
             }}
         ''')
 
-        button.clicked.connect(self.core.Stop_Download)
-
-    def Button_Settings(self):
+    def Button_Settings(self, button: dict):
         '''Кнопка настроек'''
-        button = QPushButton('', self.window)
-        button.setGeometry(928, 529, 53, 52)
-        button.setToolTip('Settings')
-        button.setIcon(QIcon(str(files['settings_png']).replace('\\', '/')))
-        button.setIconSize(QSize(30, 30))
-        button.setCursor(Qt.CursorShape.PointingHandCursor)
-        button.setStyleSheet(f'''
+        self.button_settings = QPushButton(button['title'], self.window)
+        self.button_settings.setGeometry(*button['geometry'])
+        self.button_settings.setToolTip(button['tooltip'])
+        self.button_settings.setIcon(QIcon(str(button['icon']).replace('\\', '/')))
+        self.button_settings.setIconSize(QSize(30, 30))
+        self.button_settings.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.button_settings.clicked.connect(lambda: self.settings.Show())
+        self.button_settings.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
                 border: 2px solid {colors['stroke']};
@@ -366,18 +390,29 @@ class MASTER_WINDOW():
                 padding: 2px;
             }}
         ''')
-
-        button.clicked.connect(lambda: self.settings.Show())
 
     def Block_Preview(self):
         '''Блок превью'''
         # Основное окно
-        preview = QLabel(self.window)
+        preview = QPushButton(self.window)
         preview.setGeometry(20, 280, self.size_preview[0], self.size_preview[1])
+        preview.setCursor(Qt.CursorShape.PointingHandCursor)
+        preview.setToolTip('Click to download preview')
+        preview.clicked.connect(self.Download_Preview)
         preview.setStyleSheet(f'''
-            QLabel {{
+            QPushButton {{
                 background-color: #000000;
                 border-radius: {border_radius_small}px;
+            }}
+            
+            QToolTip {{
+                background-color: {colors['hover_fill']};
+                border: 2px solid {colors['hover_stroke']};
+                border-radius: 4px;
+                
+                color: {colors['text']};
+                font-size: {font_small}px;
+                padding: 2px;
             }}
         ''')
 
@@ -390,6 +425,7 @@ class MASTER_WINDOW():
         self.blur = QLabel(preview)
         self.blur.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
         self.blur.setGraphicsEffect(self.blur_effect)
+        self.blur.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.blur.setStyleSheet(f'''
             QLabel {{
                 background: transparent;
@@ -402,6 +438,7 @@ class MASTER_WINDOW():
         self.image.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
         self.image.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         self.image.setScaledContents(False)
+        self.image.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.image.setStyleSheet(f'''
             QLabel {{
                 background: transparent;
@@ -410,7 +447,7 @@ class MASTER_WINDOW():
         ''')
 
         # Подгон размера
-        scaled_pixmap = QPixmap(str(files['preview_png'])).scaled(
+        scaled_pixmap = QPixmap(str(files['images']['png']['other']['preview'])).scaled(
             QSize(self.size_preview[0], self.size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation
@@ -450,7 +487,8 @@ class MASTER_WINDOW():
     def Reset(self):
         '''Сброс метрик'''
         self.title.setText(self.placeholder)
-        self.button.setEnabled(False)
+
+        self.button_download.setEnabled(False)
 
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setValue(0)
@@ -458,7 +496,6 @@ class MASTER_WINDOW():
         self.speed.setText('-')
         self.max_speed.setText('-')
         self.size.setText('-')
-
         self.quality.setText('-')
         self.fps.setText('-')
         self.duration.setText('-')
@@ -467,20 +504,25 @@ class MASTER_WINDOW():
         '''Поиск основной информации'''
         self.Reset()
 
-        def Thread(url: str):
-            self.core.Prepare_Info(self.core.Aliases(url))
-            self.core.Get_Info()
+        def Thread():
+            self.core.Prepare(self.input_url)
+            self.core.title, self.core.video_link, self.core.site, self.core.id = self.core.Get_Video()
 
             self.core.Get_Preview()
-            self.core.Get_Add_Info()
+            self.core.Get_Info()
 
-        url = self.input.text()
+        self.input_url = self.input.text()
         self.input.clear()
 
-        thread = threading.Thread(target = Thread, args = (url,), daemon = True)
+        thread = threading.Thread(target = Thread, daemon = True)
         thread.start()
 
-    def Download(self):
+    def Download_Preview(self):
+        '''Скачивание превью'''
+        thread = threading.Thread(target = self.core.Download_Preview, daemon = True)
+        thread.start()
+
+    def Download_Video(self):
         '''Скачивание видео'''
         thread = threading.Thread(target = self.core.Download_Video, daemon = True)
         thread.start()

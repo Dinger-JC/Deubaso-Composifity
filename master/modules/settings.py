@@ -7,12 +7,18 @@
 
 
 
+# Стандартные библиотеки
+import json
+import os
+
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, name, settings
-from master import *
+from config import files, settings
+from history import HISTORY
+from info import INFO
+from logger import Log
+from logs import LOGS
 from presets import *
-from history import *
-from logger import *
+
 log = Log()
 
 
@@ -23,18 +29,20 @@ class SETTINGS():
         '''Инициализация'''
         # Основное
         self.window = QMainWindow(parent_window)
+        self.info = INFO(self.window)
+        self.logs = LOGS(self.window)
         self.history = HISTORY(self.window)
 
         # Блоки
         self.blocks = {
             'history': {
                 'geometry': [20, 95, 960, 50],
-                'icon': files['clock_png'],
-                'tooltip': 'Record the link history'
+                'icon': files['images']['png']['bars']['clock'],
+                'tooltip': 'Record link history'
             },
             'folder': {
                 'geometry': [20, 165, 960, 50],
-                'icon': files['folder_png'],
+                'icon': files['images']['png']['bars']['folder'],
                 'tooltip': 'Path for saving downloaded videos'
             }
         }
@@ -44,32 +52,37 @@ class SETTINGS():
             'social': {
                 'github': {
                     'geometry': [929, 529, 52, 52],
-                    'icon': files['github_png'],
+                    'icon': files['images']['png']['buttons']['github'],
                     'tooltip': 'Open GitHub repository',
                     'link': 'https://github.com/Dinger-JC/Deubaso-Composifity'
                 },
                 'telegram': {
                     'geometry': [859, 529, 52, 52],
-                    'icon': files['telegram_png'],
+                    'icon': files['images']['png']['buttons']['telegram'],
                     'tooltip': 'Open Telegram channel',
                     'link': 'https://t.me/Jitus_Circus'
                 },
                 'tiktok': {
                     'geometry': [789, 529, 52, 52],
-                    'icon': files['tiktok_png'],
+                    'icon': files['images']['png']['buttons']['tiktok'],
                     'tooltip': 'Open TikTok account',
                     'link': 'https://www.tiktok.com/@dinger_jc'
                 }
             },
             'other': {
-                'rofl': {
+                'info': {
                     'geometry': [19, 529, 52, 52],
-                    'icon': files['logo_png'],
-                    'tooltip': 'Хэллоу("print"): в рот'
+                    'icon': files['images']['png']['other']['logo'],
+                    'tooltip': 'Info'
+                },
+                'logs': {
+                    'geometry': [89, 529, 52, 52],
+                    'icon': files['images']['png']['buttons']['logs'],
+                    'tooltip': 'Logs'
                 },
                 'clear_history': {
-                    'geometry': [89, 529, 52, 52],
-                    'icon': files['trash_png'],
+                    'geometry': [159, 529, 52, 52],
+                    'icon': files['images']['png']['buttons']['trash'],
                     'tooltip': 'Clear history',
                     'command': 'clear'
                 }
@@ -85,7 +98,8 @@ class SETTINGS():
         self.Button_Social(self.buttons['social']['github'])
         self.Button_Social(self.buttons['social']['telegram'])
         self.Button_Social(self.buttons['social']['tiktok'])
-        self.Button_Other(self.buttons['other']['rofl'])
+        self.Button_Info(self.buttons['other']['info'])
+        self.Button_Logs(self.buttons['other']['logs'])
         self.Button_Clear_History(self.buttons['other']['clear_history'])
 
     def Show(self):
@@ -242,7 +256,7 @@ class SETTINGS():
             new_value = 0 if settings['history'] == 1 else 1
             settings['history'] = new_value
 
-            with open(files['settings_json'], 'w', encoding = 'utf-8') as file:
+            with open(files['config']['settings'], 'w', encoding = 'utf-8') as file:
                 json.dump(settings, file, ensure_ascii = False, indent = 2)
 
             Update_Slider(True)
@@ -292,7 +306,7 @@ class SETTINGS():
                 settings['path'] = new_path
                 log.info(f'Video folder has changed: {new_path}')
 
-                with open(files['settings_json'], 'w', encoding = 'utf-8') as file:
+                with open(files['config']['settings'], 'w', encoding = 'utf-8') as file:
                     json.dump(settings, file, indent = 2, ensure_ascii = False)
                     text_right.setText(new_path.replace('\\', '/'))
 
@@ -318,15 +332,15 @@ class SETTINGS():
             }}
         ''')
 
-    def Button_Preset(self, links: dict) -> QPushButton:
+    def Button_Preset(self, button: dict) -> QPushButton:
         '''Кнопка'''
-        button = QPushButton('', self.window)
-        button.setGeometry(*links['geometry'])
-        button.setToolTip(links['tooltip'])
-        button.setIcon(QIcon(str(links['icon']).replace('\\', '/')))
-        button.setIconSize(QSize(30, 30))
-        button.setCursor(Qt.CursorShape.PointingHandCursor)
-        button.setStyleSheet(f'''
+        button_body = QPushButton('', self.window)
+        button_body.setGeometry(*button['geometry'])
+        button_body.setToolTip(button['tooltip'])
+        button_body.setIcon(QIcon(str(button['icon']).replace('\\', '/')))
+        button_body.setIconSize(QSize(30, 30))
+        button_body.setCursor(Qt.CursorShape.PointingHandCursor)
+        button_body.setStyleSheet(f'''
             QPushButton {{
                 background-color: {colors['fill']};
                 border: 2px solid {colors['stroke']};
@@ -356,9 +370,9 @@ class SETTINGS():
                 padding: 2px;
             }}
         ''')
-        return button
+        return button_body
 
-    def Button_Social(self, button):
+    def Button_Social(self, button: dict):
         '''Кнопка с ссылкой'''
         def Link():
             '''Переход по ссылке'''
@@ -369,16 +383,22 @@ class SETTINGS():
         if button.get('link'):
             body.clicked.connect(Link)
 
-    def Button_Other(self, button):
-        '''Другая кнопка'''
-        self.Button_Preset(button)
+    def Button_Info(self, button: dict):
+        '''Кнопка информации'''
+        body = self.Button_Preset(button)
+        body.mousePressEvent = lambda event: self.info.Show()
 
-    def Button_Clear_History(self, button):
+    def Button_Logs(self, button: dict):
+        '''Кнопка логов'''
+        body = self.Button_Preset(button)
+        body.mousePressEvent = lambda event: self.logs.Show()
+
+    def Button_Clear_History(self, button: dict):
         '''Кнопка очистки истории'''
         def Clear_History():
             '''Переход по ссылке'''
-            if os.path.exists(files['history_json']):
-                os.remove(files['history_json'])
+            if os.path.exists(files['data']['history']):
+                os.remove(files['data']['history'])
                 log.info('History cleared')
 
         body = self.Button_Preset(button)

@@ -11,10 +11,10 @@
 import json
 
 # Локальные модули
-from config import border_radius_big, border_radius_small, colors, files, font_big, font_small, name
-from master import *
+from config import files
+from logger import Log
 from presets import *
-from logger import *
+
 log = Log()
 
 
@@ -134,7 +134,7 @@ class HISTORY():
         self.tree.clear()
 
         try:
-            with open(files['history_json'], encoding = 'utf-8') as file:
+            with open(files['data']['history'], encoding = 'utf-8') as file:
                 data = json.load(file)
 
         except (FileNotFoundError, json.JSONDecodeError):

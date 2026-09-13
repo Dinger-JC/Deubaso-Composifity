@@ -8,42 +8,25 @@
 
 
 # Стандартные библиотеки
-import ctypes
-import json
-import logging
-import math
 import os
-import re
-import secrets
-import subprocess
 import sys
-import threading
-from datetime import timedelta, datetime
-from fractions import Fraction
-from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from urllib.parse import urlparse
 
-# Сторонние библиотеки
-import ffmpeg
-import yt_dlp
-from bs4 import BeautifulSoup
-from curl_cffi import requests
-from PySide6.QtGui import *
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
-from mutagen.mp4 import MP4
+os.system('')
 
 # Локальные модули
 try:
-    from config import files, font_family
-    from core import *
-    from master_window import *
-    from logger import *
+    from config import files
+    from core import CORE
+    from logger import Log
+    from master_window import MASTER_WINDOW
+    from presets import *
+
     log = Log()
 
-except Exception as e:
-    print(f'Could not import modules: {e}')
+except ImportError as e:
+    print(f'\033[91mCould not import modules: \033[7;91m{e.name}\033[0m')
+    print(f'Make sure dependencies are installed: \033[4mpip install -r requirements.txt\033[0m')
     sys.exit(1)
 
 
@@ -51,20 +34,30 @@ except Exception as e:
 def Files():
     '''Проверка наличия файлов'''
     error = False
-    for name, path in files.items():
-        if not path.is_file():
-            if name == 'ffmpeg_exe' or name == 'ffprobe_exe':
-                print(f'"{path}" not found.')
-                print('You can download it here: https://github.com/GyanD/codexffmpeg/releases/tag/2026-01-05-git-2892815c45.')
-                print('After downloading, move the exe file to the bin folder in the root of the project.')
-                error = True
+    items = list(files.items())
 
-            elif name == 'videos_json':
-                print(f'"{path}" not found.')
+    while items:
+        name, value = items.pop()
 
-            else:
-                print(f'"{path}" not found.')
-                error = True
+        if isinstance(value, dict):
+            items.extend(value.items())
+            continue
+
+        if value.is_file():
+            continue
+
+        if name in ('ffmpeg', 'ffprobe'):
+            print(f'\033[7;91m"{value}"\033[91m not found\033[0m')
+            print(f'\033[93mYou can download it here: \033[3;91mhttps://github.com/GyanD/codexffmpeg/releases/tag/9.0.1.\033[0m')
+            print(f'After downloading, move exe file to bin folder in root of project')
+            error = True
+
+        elif name == 'videos':
+            print(f'\033[7;93m"{value}"\033[93m not found\033[0m')
+
+        else:
+            print(f'\033[7;91m"{value}"\033[91m not found\033[0m')
+            error = True
 
     if error:
         sys.exit(1)
@@ -82,7 +75,7 @@ if __name__ == '__main__':
         app.setQuitOnLastWindowClosed(True)
 
         # Инициализация шрифта
-        font_id = QFontDatabase.addApplicationFont(str(files['font_otf']))
+        font_id = QFontDatabase.addApplicationFont(str(files['config']['font']))
         if font_id != -1:
             font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         app.setFont(QFont(font_family))
@@ -91,7 +84,7 @@ if __name__ == '__main__':
         lock = QLockFile(str(Path(sys.argv[0]).resolve().with_name('app.lock')))
         lock.setStaleLockTime(10000)
         if not lock.tryLock(100):
-            QMessageBox.warning(None, 'Внимание', 'Приложение уже запущено!')
+            QMessageBox.warning(None, 'Warning', 'App is already running!')
             sys.exit(0)
 
         # Структура
