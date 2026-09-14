@@ -67,6 +67,7 @@ files = {
                 'folder': project / 'images' / 'svg' / 'bars' / 'folder.svg'
             },
             'buttons': {
+                'download_preview': project / 'images' / 'svg' / 'buttons' / 'download_preview.svg',
                 'logs': project / 'images' / 'svg' / 'buttons' / 'logs.svg',
                 'settings': project / 'images' / 'svg' / 'buttons' / 'settings.svg',
                 'stop': project / 'images' / 'svg' / 'buttons' / 'stop.svg',
@@ -95,6 +96,10 @@ files = {
 # Настройки
 with open(files['config']['settings'], encoding = 'utf-8') as file:
     settings = json.load(file)
+
+# Директория для сохранения порна
+if settings.get('path', '').strip() in ('', 'C:\\Users\\{user}\\Videos'):
+    settings['path'] = str(Path.home() / 'Videos')
 
 # Поддерживаемые сайты
 with open(files['config']['sites'], encoding = 'utf-8') as file:

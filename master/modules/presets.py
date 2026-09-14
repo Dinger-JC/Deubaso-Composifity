@@ -10,6 +10,7 @@
 # Сторонние библиотеки
 from PySide6.QtCore import *
 from PySide6.QtGui import *
+from PySide6.QtSvg import *
 from PySide6.QtWidgets import *
 
 # Локальные модули
@@ -21,6 +22,7 @@ from config import files
 name = 'Deubaso Composifity'
 version = '2026.09.14.0'
 size_window = [1000, 600]
+icon_size = 64
 border_radius_small = 10
 border_radius_big = 15
 font_big = 18

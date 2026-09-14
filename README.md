@@ -1,24 +1,47 @@
-# Parser Deubaso-Composifity
+<a name="readme-top"></a>
 
-**Deubaso Composifity** - modern app for downloading videos from 18+ websites. Users can download videos and their previews, as well as add their favorite videos to their favorites. Downloads videos only in the best quality.
+<div align="center">
+  <h1>Deubaso Composifity</h1>
+  <p>Modern app for downloading videos from 18+ websites.<br/>Downloads videos and previews in the best quality.</p>
 
-Beginning of development 06.01.2026.
+  <a href="https://github.com/Dinger-JC/Deubaso-Composifity">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+  <a href="https://t.me/Jitus_Circus">
+    <img src="https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram">
+  </a>
+</div>
 
 ---
-## Libs
-Install requirements
-```powershell
-pip install -r requirements.txt
-```
+
+## Frameworks
+
+Basic frameworks and libraries used in the project:
+
+<div align="center">
+
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/) [![PySide6](https://img.shields.io/badge/PySide6-41CD52?style=for-the-badge&logo=qt&logoColor=white)](https://doc.qt.io/qtforpython-6/) [![yt-dlp](https://img.shields.io/badge/yt--dlp-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://github.com/yt-dlp/yt-dlp) [![FFmpeg](https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white)](https://ffmpeg.org/) [![BeautifulSoup](https://img.shields.io/badge/BeautifulSoup-59666C?style=for-the-badge&logo=python&logoColor=white)](https://www.crummy.com/software/BeautifulSoup/)
+
+[![curl_cffi](https://img.shields.io/badge/curl_cffi-073551?style=for-the-badge&logo=curl&logoColor=white)](https://github.com/lexiforest/curl_cffi) [![Mutagen](https://img.shields.io/badge/Mutagen-FF6C37?style=for-the-badge&logo=python&logoColor=white)](https://mutagen.readthedocs.io/) [![Pillow](https://img.shields.io/badge/Pillow-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python-pillow.org/)
+
+</div>
 
 ---
-## Create
-If you want to add video links to your favorites, create a `master/data/videos.json` file and write the following code, then add the links to the dictionary
-```json
-{
-  "1": "https://vps402.strip2.co/video/...",
-  "2": "https://rt.xgroovy.com/videos/...",
-  "3": "https://anal.media/ru/video/...",
-  "4": "https://rule34video.com/contents/..."
-}
-```
+
+## Screenshots
+
+| Main window                                                                     | Settings                                                                     |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| <img src="master/images/png/README/main_win.png" alt="Main window" width="360"> | <img src="master/images/png/README/settings.png" alt="Settings" width="360"> |
+
+| History                                                                    | Logs                                                                 |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| <img src="master/images/png/README/history.png" alt="History" width="360"> | <img src="master/images/png/README/logs.png" alt="Logs" width="360"> |
+
+---
+
+## Roadmap
+
+- [ ] Add "Info" functionality
+- [ ] Add "Logs" functionality
+- [ ] Expand functionality Settings

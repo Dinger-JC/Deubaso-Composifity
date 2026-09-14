@@ -8,6 +8,7 @@
 
 
 # Стандартные библиотеки
+import math
 import threading
 
 # Локальные модули
@@ -18,6 +19,19 @@ from settings import SETTINGS
 
 log = Log()
 
+
+class slow_graph():
+    def __call__(self, progress):
+        elapsed = progress * 0.6
+        frequency = (80 / 1) ** 0.5
+        damping_ratio = 20 / (2 * (80 * 1) ** 0.5)
+        damped_frequency = frequency * abs(damping_ratio ** 2 - 1) ** 0.5
+        decay = math.exp(-damping_ratio * frequency * elapsed)
+        if damping_ratio < 1:
+            return 1 - decay * (math.cos(damped_frequency * elapsed) + damping_ratio / damped_frequency * math.sin(damped_frequency * elapsed))
+        if damping_ratio > 1:
+            return 1 - decay * (math.cosh(damped_frequency * elapsed) + damping_ratio / damped_frequency * math.sinh(damped_frequency * elapsed))
+        return 1 - decay * (1 + frequency * elapsed)
 
 
 class MASTER_WINDOW():
@@ -397,24 +411,78 @@ class MASTER_WINDOW():
         preview = QPushButton(self.window)
         preview.setGeometry(20, 280, self.size_preview[0], self.size_preview[1])
         preview.setCursor(Qt.CursorShape.PointingHandCursor)
-        preview.setToolTip('Click to download preview')
         preview.clicked.connect(self.Download_Preview)
         preview.setStyleSheet(f'''
             QPushButton {{
                 background-color: #000000;
                 border-radius: {border_radius_small}px;
             }}
-            
-            QToolTip {{
-                background-color: {colors['hover_fill']};
-                border: 2px solid {colors['hover_stroke']};
-                border-radius: 4px;
-                
-                color: {colors['text']};
-                font-size: {font_small}px;
-                padding: 2px;
+        ''')
+
+        # Ховер
+        self.hover_icon = QLabel(preview)
+        self.hover_icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        dl_svg = QSvgRenderer(str(files['images']['svg']['buttons']['download_preview']))
+        icon = QPixmap(
+            icon_size, 
+            icon_size
+        )
+        icon.fill(Qt.GlobalColor.transparent)
+        painter = QPainter(icon)
+        dl_svg.render(
+            painter, 
+            QRectF(0, 0, icon_size, icon_size))
+        painter.end()
+        self.hover_icon.setPixmap(icon)
+        self.hover_icon.setGeometry(
+            (self.size_preview[0] - icon_size) // 2,
+            (self.size_preview[1] - icon_size) // 2,
+            icon_size, icon_size
+        )
+
+        self.icon_effect = QGraphicsOpacityEffect(self.hover_icon)
+        self.hover_icon.setGraphicsEffect(self.icon_effect)
+        self.icon_effect.setOpacity(0)
+        self.hover_overlay = QLabel(preview)
+        self.hover_overlay.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
+        self.hover_overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+
+        # фигма Radial 
+        self.hover_overlay.setStyleSheet(f'''
+            QLabel {{
+                background: qradialgradient(
+                    cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,
+                    stop:0 rgba(42, 41, 41, 0),
+                    stop:1 #000000
+                );
+                border: none;
             }}
         ''')
+        self.overlay_effect = QGraphicsOpacityEffect(self.hover_overlay)
+        self.hover_overlay.setGraphicsEffect(self.overlay_effect)
+        self.overlay_effect.setOpacity(0)
+
+
+        def hover_state(shown):
+            self.overlay_effect.setOpacity(shown)
+            self.icon_effect.setOpacity(shown)
+        slow = slow_graph()
+
+
+        def hover(appear):
+            self.appearing = appear
+            self.anim.stop()
+            self.anim.start()
+        self.anim = QVariantAnimation(self.window)
+        self.anim.setDuration(600)
+        self.anim.setStartValue(0.0)
+        self.anim.setEndValue(1.0)
+        self.anim.valueChanged.connect(
+            lambda incel: hover_state(slow(float(incel))) if self.appearing else hover_state(1 - slow(float(incel)))
+        )
+        
+        preview.enterEvent = lambda e: hover(True)
+        preview.leaveEvent = lambda e: hover(False)
 
         # Размытие
         self.blur_effect = QGraphicsBlurEffect()
@@ -465,6 +533,8 @@ class MASTER_WINDOW():
         painter.end()
 
         preview.setMask(mask)
+        self.hover_overlay.raise_()
+        self.hover_icon.raise_()
 
     def Update_Preview(self, preview_path: str = ''):
         '''Подгрузка нового превью'''
