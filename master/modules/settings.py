@@ -37,12 +37,12 @@ class SETTINGS():
         self.blocks = {
             'history': {
                 'geometry': [20, 95, 960, 50],
-                'icon': files['images']['png']['bars']['clock'],
+                'icon': files['images']['svg']['bars']['clock'],
                 'tooltip': 'Record link history'
             },
             'folder': {
                 'geometry': [20, 165, 960, 50],
-                'icon': files['images']['png']['bars']['folder'],
+                'icon': files['images']['svg']['bars']['folder'],
                 'tooltip': 'Path for saving downloaded videos'
             }
         }
@@ -77,12 +77,12 @@ class SETTINGS():
                 },
                 'logs': {
                     'geometry': [89, 529, 52, 52],
-                    'icon': files['images']['png']['buttons']['logs'],
+                    'icon': files['images']['svg']['buttons']['logs'],
                     'tooltip': 'Logs'
                 },
                 'clear_history': {
                     'geometry': [159, 529, 52, 52],
-                    'icon': files['images']['png']['buttons']['trash'],
+                    'icon': files['images']['svg']['buttons']['trash'],
                     'tooltip': 'Clear history',
                     'command': 'clear'
                 }
@@ -338,7 +338,7 @@ class SETTINGS():
         button_body.setGeometry(*button['geometry'])
         button_body.setToolTip(button['tooltip'])
         button_body.setIcon(QIcon(str(button['icon']).replace('\\', '/')))
-        button_body.setIconSize(QSize(30, 30))
+        button_body.setIconSize(size_icon)
         button_body.setCursor(Qt.CursorShape.PointingHandCursor)
         button_body.setStyleSheet(f'''
             QPushButton {{

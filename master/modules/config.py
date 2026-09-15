@@ -41,22 +41,12 @@ files = {
     },
     'images': {
         'png': {
-            'bars': {
-                'clock': project / 'images' / 'png' / 'bars' / 'clock.png',
-                'folder': project / 'images' / 'png' / 'bars' / 'folder.png'
-            },
             'buttons': {
                 'github': project / 'images' / 'png' / 'buttons' / 'github.png',
-                'logs': project / 'images' / 'png' / 'buttons' / 'logs.png',
-                'settings': project / 'images' / 'png' / 'buttons' / 'settings.png',
-                'stop': project / 'images' / 'png' / 'buttons' / 'stop.png',
                 'telegram': project / 'images' / 'png' / 'buttons' / 'telegram.png',
-                'tiktok': project / 'images' / 'png' / 'buttons' / 'tiktok.png',
-                'trash': project / 'images' / 'png' / 'buttons' / 'trash.png'
+                'tiktok': project / 'images' / 'png' / 'buttons' / 'tiktok.png'
             },
             'other': {
-                'download': project / 'images' / 'png' / 'other' / 'download.png',
-                'link': project / 'images' / 'png' / 'other' / 'link.png',
                 'logo': project / 'images' / 'png' / 'other' / 'logo.png',
                 'preview': project / 'images' / 'png' / 'other' / 'preview.png'
             }
@@ -96,16 +86,17 @@ files = {
 # Настройки
 with open(files['config']['settings'], encoding = 'utf-8') as file:
     settings = json.load(file)
-
-# Директория для сохранения порна
-if settings.get('path', '').strip() in ('', 'C:\\Users\\{user}\\Videos'):
-    settings['path'] = str(Path.home() / 'Videos')
+    current_path = settings.get('path', '').strip()
+    default_path = Path.home() / 'Videos'
+    if not current_path or Path(current_path) == default_path:
+        settings['path'] = str(default_path)
 
 # Поддерживаемые сайты
 with open(files['config']['sites'], encoding = 'utf-8') as file:
     sites = json.load(file)
 
 # Константы
+placeholder = 'Rule34Video, XGroovy, Strip2, AnalMedia'
 chrome = '131'
 tags = ['4k', '2k', '1080p', '720p', '640p', '480p', '360p', '240p', '144p']
 factor = {

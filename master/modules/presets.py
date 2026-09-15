@@ -20,9 +20,9 @@ from config import files
 
 # Основное
 name = 'Deubaso Composifity'
-version = '2026.09.14.0'
-size_window = [1000, 600]
-icon_size = 64
+version = '2026.09.15.0'
+size_window = (1000, 600)
+size_icon = QSize(30, 30)
 border_radius_small = 10
 border_radius_big = 15
 font_big = 18

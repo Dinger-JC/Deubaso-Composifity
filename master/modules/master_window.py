@@ -12,26 +12,13 @@ import math
 import threading
 
 # Локальные модули
-from config import files
+from config import files, placeholder
 from logger import Log
 from presets import *
 from settings import SETTINGS
 
 log = Log()
 
-
-class slow_graph():
-    def __call__(self, progress):
-        elapsed = progress * 0.6
-        frequency = (80 / 1) ** 0.5
-        damping_ratio = 20 / (2 * (80 * 1) ** 0.5)
-        damped_frequency = frequency * abs(damping_ratio ** 2 - 1) ** 0.5
-        decay = math.exp(-damping_ratio * frequency * elapsed)
-        if damping_ratio < 1:
-            return 1 - decay * (math.cos(damped_frequency * elapsed) + damping_ratio / damped_frequency * math.sin(damped_frequency * elapsed))
-        if damping_ratio > 1:
-            return 1 - decay * (math.cosh(damped_frequency * elapsed) + damping_ratio / damped_frequency * math.sinh(damped_frequency * elapsed))
-        return 1 - decay * (1 + frequency * elapsed)
 
 
 class MASTER_WINDOW():
@@ -42,8 +29,8 @@ class MASTER_WINDOW():
         self.window = QMainWindow()
         self.core = core
         self.settings = SETTINGS(self.window)
+
         self.size_preview = [534, 300]
-        self.placeholder = 'Strip2, XGroovy, AnalMedia, Rule34Video'
 
         # Кнопки
         buttons = {
@@ -57,13 +44,13 @@ class MASTER_WINDOW():
                 'geometry': [857, 529, 53, 52],
                 'title': '',
                 'tooltip': 'Abort the download',
-                'icon': files['images']['png']['buttons']['stop']
+                'icon': files['images']['svg']['buttons']['stop']
             },
             'settings': {
                 'geometry': [928, 529, 53, 52],
                 'title': '',
                 'tooltip': 'Settings',
-                'icon': files['images']['png']['buttons']['settings']
+                'icon': files['images']['svg']['buttons']['settings']
             }
         }
 
@@ -100,7 +87,7 @@ class MASTER_WINDOW():
 
         self.Block_Input()
 
-        self.title = self.Text_Content(self.placeholder)
+        self.title = self.Text_Content(placeholder)
         self.status = self.Text_Status()
 
         self.Block_Progress_Bar()
@@ -147,7 +134,7 @@ class MASTER_WINDOW():
 
         icon = QLabel(self.input)
         icon.setGeometry(11, 11, 30, 30)
-        icon.setPixmap(QPixmap(str(files['images']['png']['other']['link'])))
+        icon.setPixmap(QPixmap(str(files['images']['svg']['other']['link'])))
         icon.setScaledContents(True)
 
     def Text_Content(self, title: str):
@@ -155,7 +142,7 @@ class MASTER_WINDOW():
         # Иконка
         icon = QLabel(self.window)
         icon.setGeometry(21, 165, 44, 45)
-        icon.setPixmap(QPixmap(str(files['images']['png']['other']['download'])))
+        icon.setPixmap(QPixmap(str(files['images']['svg']['other']['download'])))
         icon.setScaledContents(True)
 
         # Название
@@ -331,7 +318,7 @@ class MASTER_WINDOW():
         self.button_stop.setGeometry(*button['geometry'])
         self.button_stop.setToolTip(button['tooltip'])
         self.button_stop.setIcon(QIcon(str(button['icon']).replace('\\', '/')))
-        self.button_stop.setIconSize(QSize(30, 30))
+        self.button_stop.setIconSize(size_icon)
         self.button_stop.setCursor(Qt.CursorShape.PointingHandCursor)
         self.button_stop.clicked.connect(self.core.Stop_Download)
         self.button_stop.setStyleSheet(f'''
@@ -371,7 +358,7 @@ class MASTER_WINDOW():
         self.button_settings.setGeometry(*button['geometry'])
         self.button_settings.setToolTip(button['tooltip'])
         self.button_settings.setIcon(QIcon(str(button['icon']).replace('\\', '/')))
-        self.button_settings.setIconSize(QSize(30, 30))
+        self.button_settings.setIconSize(size_icon)
         self.button_settings.setCursor(Qt.CursorShape.PointingHandCursor)
         self.button_settings.clicked.connect(lambda: self.settings.Show())
         self.button_settings.setStyleSheet(f'''
@@ -418,71 +405,6 @@ class MASTER_WINDOW():
                 border-radius: {border_radius_small}px;
             }}
         ''')
-
-        # Ховер
-        self.hover_icon = QLabel(preview)
-        self.hover_icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        dl_svg = QSvgRenderer(str(files['images']['svg']['buttons']['download_preview']))
-        icon = QPixmap(
-            icon_size, 
-            icon_size
-        )
-        icon.fill(Qt.GlobalColor.transparent)
-        painter = QPainter(icon)
-        dl_svg.render(
-            painter, 
-            QRectF(0, 0, icon_size, icon_size))
-        painter.end()
-        self.hover_icon.setPixmap(icon)
-        self.hover_icon.setGeometry(
-            (self.size_preview[0] - icon_size) // 2,
-            (self.size_preview[1] - icon_size) // 2,
-            icon_size, icon_size
-        )
-
-        self.icon_effect = QGraphicsOpacityEffect(self.hover_icon)
-        self.hover_icon.setGraphicsEffect(self.icon_effect)
-        self.icon_effect.setOpacity(0)
-        self.hover_overlay = QLabel(preview)
-        self.hover_overlay.setGeometry(0, 0, self.size_preview[0], self.size_preview[1])
-        self.hover_overlay.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-
-        # фигма Radial 
-        self.hover_overlay.setStyleSheet(f'''
-            QLabel {{
-                background: qradialgradient(
-                    cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,
-                    stop:0 rgba(42, 41, 41, 0),
-                    stop:1 #000000
-                );
-                border: none;
-            }}
-        ''')
-        self.overlay_effect = QGraphicsOpacityEffect(self.hover_overlay)
-        self.hover_overlay.setGraphicsEffect(self.overlay_effect)
-        self.overlay_effect.setOpacity(0)
-
-
-        def hover_state(shown):
-            self.overlay_effect.setOpacity(shown)
-            self.icon_effect.setOpacity(shown)
-        slow = slow_graph()
-
-
-        def hover(appear):
-            self.appearing = appear
-            self.anim.stop()
-            self.anim.start()
-        self.anim = QVariantAnimation(self.window)
-        self.anim.setDuration(600)
-        self.anim.setStartValue(0.0)
-        self.anim.setEndValue(1.0)
-        self.anim.valueChanged.connect(
-            lambda incel: hover_state(slow(float(incel))) if self.appearing else hover_state(1 - slow(float(incel)))
-        )
-        
-        preview.enterEvent = lambda e: hover(True)
-        preview.leaveEvent = lambda e: hover(False)
 
         # Размытие
         self.blur_effect = QGraphicsBlurEffect()
@@ -533,8 +455,6 @@ class MASTER_WINDOW():
         painter.end()
 
         preview.setMask(mask)
-        self.hover_overlay.raise_()
-        self.hover_icon.raise_()
 
     def Update_Preview(self, preview_path: str = ''):
         '''Подгрузка нового превью'''
@@ -556,12 +476,11 @@ class MASTER_WINDOW():
 
     def Reset(self):
         '''Сброс метрик'''
-        self.title.setText(self.placeholder)
-
         self.button_download.setEnabled(False)
-
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setValue(0)
+
+        self.title.setText(placeholder)
 
         self.speed.setText('-')
         self.max_speed.setText('-')

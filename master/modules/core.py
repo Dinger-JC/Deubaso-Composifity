@@ -30,7 +30,7 @@ from PIL import Image
 from yt_dlp.utils._utils import _UnsafeExtensionError
 
 # Локальные модули
-from config import chrome, factor, files, settings, sites, tags
+from config import chrome, factor, files, settings, placeholder, sites, tags
 from logger import Log
 
 log = Log()
@@ -300,34 +300,7 @@ class CORE:
         raw_title = self.page.find('title').text
         video_link = ''
 
-        if self.domain == sites['strip2']['domain']:
-            links = []
-            title = re.sub(r'\s*[-–—]\s*Strip2.co\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            found_links = self.page.find_all('a', href = True)
-
-            for link in found_links:
-                if 'vps402.strip2.co.mp4' in link['href']:
-                    links.append(link['href'])
-
-            for _, href in enumerate(links):
-                find_link = str(href)
-                if find_link and f'/x{len(links) - 1}/' in find_link:
-                    video_link = find_link
-
-        elif self.domain == sites['xgroovy']['domain']:
-            title = raw_title
-
-            for tag in tags:
-                source = self.page.find('source', title = tag)
-                if source:
-                    video_link = source.get('src')
-                    break
-
-        elif self.domain == sites['analmedia']['domain']:
-            title = re.sub(r'\s*[-–—]\s*AnalMedia\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            video_link = self.page.select_one('video source')['src']
-
-        elif self.domain == sites['rule34video']['domain']:
+        if self.domain == sites['rule34video']['domain']:
             links = {}
             title = raw_title
             found_links = self.page.find_all('a', class_ = 'tag_item tag_item_download')
@@ -346,8 +319,35 @@ class CORE:
                     video_link = links[tag]
                     break
 
+        elif self.domain == sites['xgroovy']['domain']:
+            title = raw_title
+
+            for tag in tags:
+                source = self.page.find('source', title = tag)
+                if source:
+                    video_link = source.get('src')
+                    break
+
+        if self.domain == sites['strip2']['domain']:
+            links = []
+            title = re.sub(r'\s*[-–—]\s*Strip2.co\s*$', '', raw_title, flags = re.IGNORECASE).strip()
+            found_links = self.page.find_all('a', href = True)
+
+            for link in found_links:
+                if 'vps402.strip2.co.mp4' in link['href']:
+                    links.append(link['href'])
+
+            for _, href in enumerate(links):
+                find_link = str(href)
+                if find_link and f'/x{len(links) - 1}/' in find_link:
+                    video_link = find_link
+
+        elif self.domain == sites['analmedia']['domain']:
+            title = re.sub(r'\s*[-–—]\s*AnalMedia\s*$', '', raw_title, flags = re.IGNORECASE).strip()
+            video_link = self.page.select_one('video source')['src']
+
         else:
-            self.signal.Status('warning', 'Downloads are only available from Strip2, XGroovy, AnalMedia, Rule34Video')
+            self.signal.Status('warning', f'Downloads are only available from {placeholder}')
             sys.exit(1)
 
         site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
