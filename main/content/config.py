@@ -32,10 +32,10 @@ files = {
     'content': {
         'colors': project / 'content' / 'colors.json',
         'config': project / 'content' / 'config.py',
+        'font': project / 'content' / 'universal_antiqua.ttf',
         'font_logs': project / 'content' / 'jetbrains_mono_nl.ttf',
         'presets': project / 'content' / 'presets.py',
         'sites': project / 'content' / 'sites.json',
-        'font': project / 'content' / 'universal_antiqua.ttf'
     },
     'data': {
         'history': project / 'data' / 'history.json',
