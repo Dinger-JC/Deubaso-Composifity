@@ -29,11 +29,11 @@ Functionality
 
 Website support: Strip2, Rule34Video, XGroovy, AnalMedia
 
-Download videos in the best possible quality
+Download videos in the best quality
 
 Download previews in the best quality
 
-Introduction of logs
+Logging
 
 Recording history
 
