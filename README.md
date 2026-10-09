@@ -45,8 +45,8 @@ View additional video settings
 Screenshots
 </h2>
 
-<img src="readme/main start.png" alt="Main start">
-<img src="readme/main download.png" alt="Main download">
+<img src="readme/main_start.png" alt="Main start">
+<img src="readme/main_download.png" alt="Main download">
 <img src="readme/settings.png" alt="Settings">
 <img src="readme/history.png" alt="History">
 <img src="readme/info.png" alt="Info">
