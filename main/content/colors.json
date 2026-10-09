@@ -1,0 +1,28 @@
+{
+  "main": {
+    "start": "rgba(7, 17, 37, 1)",
+    "end": "rgba(14, 32, 65, 1)"
+  },
+  "signal": {
+    "text": "rgba(255, 255, 255, 1)",
+    "info": "rgba(180, 180, 180, 1)",
+    "good": "rgba(64, 218, 136, 1)",
+    "warning": "rgba(255, 193, 62, 1)",
+    "error": "rgba(227, 88, 111, 1)"
+  },
+  "tooltip": {
+    "stroke": "rgba(1, 179, 189, 1)",
+    "fill": "rgba(0, 67, 112, 0.5)"
+  },
+  "download": {
+    "start": "rgba(99, 146, 234, 1)",
+    "end": "rgba(2, 219, 172, 1)",
+    "start_pressed": "rgba(99, 146, 234, 0.4)",
+    "end_pressed": "rgba(2, 219, 172, 0.4)"
+  },
+  "other": {
+    "fill": "rgba(255, 255, 255, 0.15)",
+    "press": "rgba(15, 20, 39, 1)",
+    "stroke": "rgba(0, 0, 0, 0)"
+  }
+}
