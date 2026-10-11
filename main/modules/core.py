@@ -316,7 +316,7 @@ class CORE:
         elif self.domain == sites['rule34video']['domain']:
             links = {}
             title = raw_title
-            found_links = self.page.find_all('a', class_ = 'tag_item tag_item_download')
+            found_links = self.page.find_all('a', class_ = 'tag_item')
 
             for link in found_links:
                 text = link.text.lower()

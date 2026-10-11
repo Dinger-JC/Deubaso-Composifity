@@ -223,9 +223,6 @@ class LOGS():
             return
 
         lines = self.Read_Logs()
-        if not lines:
-            return
-
         offset = self.Session_Start(lines)
         if offset != self.offset or len(lines) < self.rows or self.shown != self.filter:
             self.Rebuild()
