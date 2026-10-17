@@ -65,8 +65,7 @@ class LOGS():
         self.list.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         self.list.setStyleSheet(f'''
             QListWidget {{
-                background-color: transparent;
-                border: none;
+                {STYLES.empty}
 
                 color: {colors['signal']['info']};
                 font-size: {font_small}px;
@@ -123,12 +122,7 @@ class LOGS():
         '''Подсветка активного фильтра'''
         active = f'''
             QPushButton {{
-                background: qlineargradient(
-                    spread:pad,
-                    x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {colors['download']['start']},
-                    stop:1 {colors['download']['end']}
-                );
+                background: {STYLES.active_gradient}
                 border: none;
                 border-radius: {border_radius_small}px;
 

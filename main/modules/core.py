@@ -136,7 +136,7 @@ class CORE:
         # Проверка ссылки
         if not url.startswith(('http://', 'https://')):
             self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
-            self.signals.signal_status.emit('warning', 'Incorrect link.')
+            self.signals.signal_status.emit('warning', 'Incorrect link')
             return False
 
         self.Write_History(url)

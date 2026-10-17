@@ -39,12 +39,12 @@ class SETTINGS():
         self.Block_History()
         self.Block_Folder()
 
-        self.Button_Social(Settings_Layouts.Buttons()['github'])
-        self.Button_Social(Settings_Layouts.Buttons()['telegram'])
-        self.Button_Social(Settings_Layouts.Buttons()['tiktok'])
-        self.Button_Info(Settings_Layouts.Buttons()['info'])
-        self.Button_Logs(Settings_Layouts.Buttons()['logs'])
-        self.Button_Clear_History(Settings_Layouts.Buttons()['clear_history'])
+        self.Button_Social(Settings_Layouts.buttons['github'])
+        self.Button_Social(Settings_Layouts.buttons['telegram'])
+        self.Button_Social(Settings_Layouts.buttons['tiktok'])
+        self.Button_Info(Settings_Layouts.buttons['info'])
+        self.Button_Logs(Settings_Layouts.buttons['logs'])
+        self.Button_Clear_History(Settings_Layouts.buttons['clear_history'])
 
     def Show(self):
         '''Показ окна'''
@@ -64,15 +64,7 @@ class SETTINGS():
                 border-radius: {border_radius_small}px;
             }}
             
-            QToolTip {{
-                background-color: {colors['tooltip']['fill']};
-                border: 2px solid {colors['tooltip']['stroke']};
-                border-radius: 4px;
-
-                color: {colors['signal']['text']};
-                font-size: {font_small}px;
-                padding: 2px;
-            }}
+            {STYLES.tooltip}
         ''')
 
         # Иконка
@@ -87,8 +79,7 @@ class SETTINGS():
         ))
         icon.setStyleSheet(f'''
             QLabel {{
-                background-color: transparent;
-                border: none;
+                {STYLES.empty}
             }}
         ''')
 
@@ -98,7 +89,7 @@ class SETTINGS():
         text_left.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         text_left.setStyleSheet(f'''
             QLabel {{
-                background-color: transparent;
+                {STYLES.empty}
                 
                 color: {colors['signal']['text']};
                 font-size: {font_big}px;
@@ -118,7 +109,7 @@ class SETTINGS():
 
     def Block_History(self):
         '''Блок истории'''
-        card = self.Block_Setting('History', Settings_Layouts.Blocks()['history'])
+        card = self.Block_Setting('History', Settings_Layouts.blocks['history'])
         size = (20, 20)
 
         # Правый текст
@@ -129,7 +120,7 @@ class SETTINGS():
         text_right.mousePressEvent = lambda event: self.history.Show()
         text_right.setStyleSheet(f'''
             QLabel {{
-                background-color: transparent;
+                {STYLES.empty}
 
                 color: {colors['signal']['info']};
                 font-size: {font_big}px;
@@ -150,11 +141,7 @@ class SETTINGS():
 
                 slider.setStyleSheet(f'''
                     QFrame {{
-                        background: qlineargradient(
-                            x1:0, y1:0, x2:1, y2:0,
-                            stop:0 {colors['download']['start']},
-                            stop:1 {colors['download']['end']}
-                        );
+                        background: {STYLES.active_gradient}
                         border-radius: {border_radius_big}px;
                     }}
                 ''')
@@ -217,11 +204,7 @@ class SETTINGS():
         slider.mousePressEvent = lambda event: Toggle()
         slider.setStyleSheet(f'''
             QFrame {{
-                background: qlineargradient(
-                    x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {colors['download']['start']},
-                    stop:1 {colors['download']['end']}
-                );
+                background: {STYLES.active_gradient}
                 border-radius: {border_radius_big}px;
             }}
         ''')
@@ -259,7 +242,7 @@ class SETTINGS():
                     json.dump(settings, file, indent = 2, ensure_ascii = False)
                     text_right.setText(new_path.replace('\\', '/'))
 
-        card = self.Block_Setting('The path of saved videos', Settings_Layouts.Blocks()['folder'])
+        card = self.Block_Setting('The path of saved videos', Settings_Layouts.blocks['folder'])
 
         # Правый текст
         text_right = QPushButton(settings['path'].replace('\\', '/'), card)
@@ -268,8 +251,7 @@ class SETTINGS():
         text_right.clicked.connect(Choose_Folder)
         text_right.setStyleSheet(f'''
             QPushButton {{
-                background-color: transparent;
-                border: none;
+                {STYLES.empty}
 
                 color: {colors['signal']['info']};
                 font-size: {font_big}px;
@@ -290,34 +272,10 @@ class SETTINGS():
         button_body.setIconSize(size_icon)
         button_body.setCursor(Qt.CursorShape.PointingHandCursor)
         button_body.setStyleSheet(f'''
-            QPushButton {{
-                background-color: {colors['other']['fill']};
-                border: 2px solid {colors['other']['stroke']};
-                border-radius: {border_radius_small}px;
-
-                color: {colors['signal']['text']};
-                font-size: {font_big}px;
-            }}
-            
-            QPushButton:hover {{
-                background-color: {colors['tooltip']['fill']};
-                border-color: {colors['tooltip']['stroke']};
-            }}
-            
-            QPushButton:pressed {{
-                background-color: {colors['other']['press']};
-                border-color: {colors['other']['stroke']};
-            }}
-            
-            QToolTip {{
-                background-color: {colors['tooltip']['fill']};
-                border: 2px solid {colors['tooltip']['stroke']};
-                border-radius: 4px;
-
-                color: {colors['signal']['text']};
-                font-size: {font_small}px;
-                padding: 2px;
-            }}
+            {STYLES.button}
+            {STYLES.button_hover}
+            {STYLES.button_pressed}
+            {STYLES.tooltip}
         ''')
         return button_body
 

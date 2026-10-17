@@ -39,16 +39,16 @@ class MAIN():
 
         self.Block_Progress_Bar()
 
-        self.speed = self.Block_Info(Main_Layouts.Blocks()['speed'])
-        self.max_speed = self.Block_Info(Main_Layouts.Blocks()['max_speed'])
-        self.size = self.Block_Info(Main_Layouts.Blocks()['size'])
-        self.quality = self.Block_Info(Main_Layouts.Blocks()['quality'])
-        self.fps = self.Block_Info(Main_Layouts.Blocks()['fps'])
-        self.duration = self.Block_Info(Main_Layouts.Blocks()['duration'])
+        self.speed = self.Block_Info(Main_Layouts.blocks['speed'])
+        self.max_speed = self.Block_Info(Main_Layouts.blocks['max_speed'])
+        self.size = self.Block_Info(Main_Layouts.blocks['size'])
+        self.quality = self.Block_Info(Main_Layouts.blocks['quality'])
+        self.fps = self.Block_Info(Main_Layouts.blocks['fps'])
+        self.duration = self.Block_Info(Main_Layouts.blocks['duration'])
 
-        self.Button_Download_Video(Main_Layouts.Buttons()['download_video'])
-        self.Button_Stop(Main_Layouts.Buttons()['stop'])
-        self.Button_Settings(Main_Layouts.Buttons()['settings'])
+        self.Button_Download_Video(Main_Layouts.buttons['download_video'])
+        self.Button_Stop(Main_Layouts.buttons['stop'])
+        self.Button_Settings(Main_Layouts.buttons['settings'])
 
         self.Block_Preview()
 
@@ -112,7 +112,7 @@ class MAIN():
 
         # Название
         text = QLabel(title, self.window)
-        text.setGeometry(85, 165, 895, 20)
+        text.setGeometry(85, 160, 895, 30)
         text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         text.setStyleSheet(f'''
             QLabel {{
@@ -177,12 +177,7 @@ class MAIN():
             }}
             
             QProgressBar::chunk {{
-                background: qlineargradient(
-                    spread:pad, 
-                    x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {colors['download']['start']}, 
-                    stop:1 {colors['download']['end']}
-                );
+                background: {STYLES.active_gradient}
                 border-radius: {border_radius_big}px;
             }}
         ''')
@@ -216,8 +211,7 @@ class MAIN():
         title.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         title.setStyleSheet(f'''
             QLabel {{
-                background: transparent;
-                border: none;
+                {STYLES.empty}
             
                 color: {colors['signal']['text']};
                 font-size: {font_big}px;
@@ -236,8 +230,7 @@ class MAIN():
             color = colors['signal']['error'] if 'N/A' in text else colors['signal']['info']
             value.setStyleSheet(f'''
                 QLabel {{
-                    background: transparent;
-                    border: none;
+                    {STYLES.empty}
                 
                     color: {color};
                     font-size: {font_small}px;
@@ -260,12 +253,7 @@ class MAIN():
         self.button_download.setEnabled(False)
         self.button_download.setStyleSheet(f'''
             QPushButton {{
-                background: qlineargradient(
-                    spread:pad, 
-                    x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {colors['download']['start']}, 
-                    stop:1 {colors['download']['end']}
-                );
+                background: {STYLES.active_gradient}
                 border: transparent;
                 border-radius: {border_radius_small}px;
                 
@@ -274,36 +262,18 @@ class MAIN():
             }}
             
             QPushButton:pressed {{
-                background: qlineargradient(
-                    spread:pad, 
-                    x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {colors['download']['start_pressed']}, 
-                    stop:1 {colors['download']['end_pressed']}
-                );
+                background: {STYLES.push_gradient}
                 
                 color: {colors['signal']['info']};
             }}
             
             QPushButton:disabled {{
-                background: qlineargradient(
-                    spread:pad, 
-                    x1:0, y1:0, x2:1, y2:0,
-                    stop:0 {colors['download']['start_pressed']}, 
-                    stop:1 {colors['download']['end_pressed']}
-                );
+                background: {STYLES.push_gradient}
                 
                 color: {colors['signal']['info']};
             }}
             
-            QToolTip {{
-                background-color: {colors['tooltip']['fill']};
-                border: 2px solid {colors['tooltip']['stroke']};
-                border-radius: 4px;
-                
-                color: {colors['signal']['text']};
-                font-size: {font_small}px;
-                padding: 2px;
-            }}
+            {STYLES.tooltip}
         ''')
 
     def Button_Stop(self, button: dict):
@@ -317,36 +287,16 @@ class MAIN():
         self.button_stop.clicked.connect(self.core.Stop_Download)
         self.button_stop.setEnabled(False)
         self.button_stop.setStyleSheet(f'''
-            QPushButton {{
-                background-color: {colors['other']['fill']};
-                border: 2px solid {colors['other']['stroke']};
-                border-radius: {border_radius_small}px;
-            }}
-            
-            QPushButton:hover {{
-                background-color: {colors['tooltip']['fill']};
-                border-color: {colors['tooltip']['stroke']};
-            }}
-            
-            QPushButton:pressed {{
-                background-color: {colors['other']['press']};
-                border-color: {colors['other']['stroke']};
-            }}
+            {STYLES.button}
+            {STYLES.button_hover}
+            {STYLES.button_pressed}
             
             QPushButton:disabled {{
                 background-color: {colors['other']['press']};
                 border-color: {colors['other']['stroke']};
             }}
             
-            QToolTip {{
-                background-color: {colors['tooltip']['fill']};
-                border: 2px solid {colors['tooltip']['stroke']};
-                border-radius: 4px;
-                
-                color: {colors['signal']['text']};
-                font-size: {font_small}px;
-                padding: 2px;
-            }}
+            {STYLES.tooltip}
         ''')
 
     def Button_Settings(self, button: dict):
@@ -359,31 +309,10 @@ class MAIN():
         self.button_settings.setCursor(Qt.CursorShape.PointingHandCursor)
         self.button_settings.clicked.connect(lambda: self.settings.Show())
         self.button_settings.setStyleSheet(f'''
-            QPushButton {{
-                background-color: {colors['other']['fill']};
-                border: 2px solid {colors['other']['stroke']};
-                border-radius: {border_radius_small}px;
-            }}
-            
-            QPushButton:hover {{
-                background-color: {colors['tooltip']['fill']};
-                border-color: {colors['tooltip']['stroke']};
-            }}
-            
-            QPushButton:pressed {{
-                background-color: {colors['other']['press']};
-                border-color: {colors['other']['stroke']};
-            }}
-            
-            QToolTip {{
-                background-color: {colors['tooltip']['fill']};
-                border: 2px solid {colors['tooltip']['stroke']};
-                border-radius: 4px;
-                
-                color: {colors['signal']['text']};
-                font-size: {font_small}px;
-                padding: 2px;
-            }}
+            {STYLES.button}
+            {STYLES.button_hover}
+            {STYLES.button_pressed}
+            {STYLES.tooltip}
         ''')
 
     def Block_Preview(self):
@@ -411,8 +340,7 @@ class MAIN():
         self.blur.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.blur.setStyleSheet(f'''
             QLabel {{
-                background: transparent;
-                border: none;
+                {STYLES.empty}
             }}
         ''')
 
@@ -424,8 +352,7 @@ class MAIN():
         self.image.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.image.setStyleSheet(f'''
             QLabel {{
-                background: transparent;
-                border: none;
+                {STYLES.empty}
             }}
         ''')
 

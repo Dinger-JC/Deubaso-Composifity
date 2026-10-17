@@ -86,8 +86,7 @@ class HISTORY():
             }}
 
             QHeaderView {{
-                background-color: transparent;
-                border: none;
+                {STYLES.empty}
             }}
 
             QHeaderView::section {{
@@ -110,15 +109,7 @@ class HISTORY():
                 border-bottom-right-radius: {border_radius_small}px;
             }}
             
-            QToolTip {{
-                background-color: {colors['tooltip']['fill']};
-                border: 2px solid {colors['tooltip']['stroke']};
-                border-radius: 4px;
-                
-                color: {colors['signal']['text']};
-                font-size: {font_small}px;
-                padding: 2px;
-            }}
+            {STYLES.tooltip}
         ''')
 
         # Перегородка

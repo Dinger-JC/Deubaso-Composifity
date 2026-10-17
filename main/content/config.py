@@ -102,7 +102,7 @@ else:
 # История
 if not files['data']['history'].is_file():
     with open(files['data']['history'], 'w', encoding = 'utf-8') as file:
-        json.dump({}, file, indent = 4, ensure_ascii = False)
+        json.dump({}, file, indent = 2, ensure_ascii = False)
 
 # Константы
 placeholder = 'Strip2, Rule34Video, XGroovy, AnalMedia'

@@ -53,9 +53,8 @@ class INFO():
         title.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         title.setStyleSheet(f'''
             QLabel {{
-                background: transparent;
-                border: none;
-
+                {STYLES.empty}
+                
                 color: {colors['signal']['text']};
                 font-size: 30px;
             }}
@@ -68,8 +67,7 @@ class INFO():
         info.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         info.setStyleSheet(f'''
             QLabel {{
-                background: transparent;
-                border: none;
+                {STYLES.empty}
 
                 color: {colors['signal']['text']};
                 font-size: {font_big}px;
