@@ -8,7 +8,7 @@
 
 
 # Локальные модули
-from config import files
+from config import *
 from logger import Log
 from presets import *
 

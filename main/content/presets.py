@@ -17,13 +17,13 @@ from PySide6.QtSvg import *
 from PySide6.QtWidgets import *
 
 # Локальные модули
-from config import files
+from config import *
 
 
 
 # Константы
 name = 'Deubaso Composifity'
-version = '2026.10.12.0'
+version = '2026.10.17.0'
 
 size_window = (1000, 600)
 size_preview = (534, 300)

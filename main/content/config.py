@@ -113,3 +113,5 @@ factor = {
     'MiB': 1_048_576,
     'GiB': 1_073_741_824
 }
+timeout = 30
+retries = 5

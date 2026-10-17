@@ -11,7 +11,7 @@
 import re
 
 # Локальные модули
-from config import files
+from config import *
 from logger import Log
 from presets import *
 
@@ -229,13 +229,11 @@ class LOGS():
 
         elif len(lines) > self.rows:
             bottom = self.list.verticalScrollBar().value() >= self.list.verticalScrollBar().maximum() - 4
-
             for line in lines[self.rows:]:
                 self.Add_Line(line)
 
             self.rows = len(lines)
             self.grid = self.rows
-
             if bottom:
                 self.list.scrollToBottom()
 

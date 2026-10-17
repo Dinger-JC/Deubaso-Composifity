@@ -11,7 +11,7 @@
 import json
 
 # Локальные модули
-from config import files
+from config import *
 from logger import Log
 from presets import *
 
@@ -142,7 +142,7 @@ class HISTORY():
         for year in sorted(data.keys(), reverse = True):
             year_item = QTreeWidgetItem(self.tree, [f'🌏 {year}'])
 
-            for month in sorted(data[year].keys(), reverse = True):
+            for month in sorted(data[year].keys(), reverse = False):
                 month_item = QTreeWidgetItem(year_item, [f'📅 {month}'])
 
                 for date in sorted(data[year][month].keys(), reverse = True):

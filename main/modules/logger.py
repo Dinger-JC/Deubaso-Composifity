@@ -16,7 +16,7 @@ from functools import wraps
 from logging.handlers import RotatingFileHandler
 
 # Локальные модули
-from config import factor, files
+from config import *
 
 
 

@@ -12,7 +12,7 @@ import json
 import os
 
 # Локальные модули
-from config import files, settings
+from config import *
 from history import HISTORY
 from info import INFO
 from logger import Log

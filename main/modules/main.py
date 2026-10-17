@@ -11,7 +11,7 @@
 import threading
 
 # Локальные модули
-from config import files, placeholder
+from config import *
 from logger import Log
 from presets import *
 from settings import SETTINGS
@@ -51,6 +51,21 @@ class MAIN():
         self.Button_Settings(Main_Layouts.Buttons()['settings'])
 
         self.Block_Preview()
+
+        # Сигналы
+        self.core.signals.signal_status.connect(self.Status)
+        self.core.signals.signal_title.connect(self.title.setText)
+        self.core.signals.signal_site.connect(self.Set_Site)
+        self.core.signals.signal_preview.connect(self.Update_Preview)
+        self.core.signals.signal_speed.connect(self.speed.setText)
+        self.core.signals.signal_max_speed.connect(self.max_speed.setText)
+        self.core.signals.signal_size.connect(self.size.setText)
+        self.core.signals.signal_quality.connect(self.quality.setText)
+        self.core.signals.signal_fps.connect(self.fps.setText)
+        self.core.signals.signal_duration.connect(self.duration.setText)
+        self.core.signals.signal_progress.connect(self.Update_Progress_Bar)
+        self.core.signals.signal_buttons.connect(self.button_download.setEnabled)
+        self.core.signals.signal_buttons.connect(self.button_stop.setEnabled)
 
         self.window.show()
 
@@ -170,6 +185,11 @@ class MAIN():
             }}
         ''')
         return self.progress_bar
+
+    def Update_Progress_Bar(self, value: int):
+        '''Обновление полосы загрузки'''
+        self.progress_bar.setTextVisible(True)
+        self.progress_bar.setValue(value)
 
     def Block_Info(self, blocks: dict, number: str = '-') -> QLabel:
         '''Блок информации'''
@@ -595,11 +615,7 @@ class MAIN():
         self.Reset()
 
         def Thread():
-            self.core.Prepare(self.input_url)
-            self.core.title, self.core.video_link, self.core.site, self.core.id = self.core.Get_Video()
-
-            self.core.Get_Preview()
-            self.core.Get_Info()
+            self.core.Search(self.input_url)
 
         self.input_url = self.input.text()
         self.input.clear()

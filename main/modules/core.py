@@ -13,10 +13,10 @@ import math
 import os
 import re
 import secrets
-import sys
 from datetime import timedelta, datetime
 from fractions import Fraction
 from pathlib import Path
+from pprint import pprint
 from urllib.parse import urlparse
 
 # Сторонние библиотеки
@@ -27,13 +27,31 @@ from curl_cffi import requests
 from io import BytesIO
 from mutagen.mp4 import MP4
 from PIL import Image
+from PySide6.QtCore import QObject, Signal
 from yt_dlp.utils._utils import _UnsafeExtensionError
 
 # Локальные модули
-from config import chrome, factor, files, settings, placeholder, sites, tags
+from config import *
 from logger import Log, Timer
 
 log = Log()
+
+
+
+class SIGNALS(QObject):
+    '''Сигналы'''
+    signal_status = Signal(str, str)
+    signal_title = Signal(str)
+    signal_site = Signal(str)
+    signal_preview = Signal(str)
+    signal_speed = Signal(str)
+    signal_max_speed = Signal(str)
+    signal_size = Signal(str)
+    signal_quality = Signal(str)
+    signal_fps = Signal(str)
+    signal_duration = Signal(str)
+    signal_progress = Signal(int)
+    signal_buttons = Signal(bool)
 
 
 
@@ -42,9 +60,7 @@ class CORE:
     def __init__(self):
         '''Инициализация'''
         # Прочее
-        self.timeout = 30
-        self.retries = 5
-
+        self.signals = SIGNALS()
         self.Reset()
 
     def Convert_Bytes(self, value: int = 0, units: str = '') -> str:
@@ -111,18 +127,17 @@ class CORE:
             url = videos[url]
         return url
 
-    def Update_Config(self, url: str):
+    def Update_Config(self, url: str) -> bool:
         '''Обновление конфигурации для каждого видео'''
-        self.signal.Status('info', 'Checking...')
+        self.signals.signal_status.emit('info', 'Checking...')
 
         log.info(f'Link: {url}')
 
         # Проверка ссылки
         if not url.startswith(('http://', 'https://')):
-            self.signal.Update_Preview(files['images']['png']['other']['preview'])
-
-            self.signal.Status('warning', 'Incorrect link.')
-            sys.exit(1)
+            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_status.emit('warning', 'Incorrect link.')
+            return False
 
         self.Write_History(url)
         self.domain = urlparse(url).netloc
@@ -162,10 +177,10 @@ class CORE:
             'outtmpl': self.cache_video_name, # Путь сохраняемого файла
             'format': 'bestvideo+bestaudio/best', # Качество видео
             'merge_output_format': 'mp4', # Формат после загрузки
-            'socket_timeout': self.timeout, # Время ожидания ответа от сервера (в секундах)
+            'socket_timeout': timeout, # Время ожидания ответа от сервера (в секундах)
             'sleep_interval': 0, # Минимальная случайная пауза между загрузками (в секундах)
             'max_sleep_interval': 2, # Максимальная случайная пауза между запросами (в секундах)
-            'retries': self.retries, # Количество попыток переподключения при ошибке загрузки файла
+            'retries': retries, # Количество попыток переподключения при ошибке загрузки файла
             'fragment_retries': 5, # Количество попыток загрузки каждого отдельного фрагмента видео
             'rm_cached_metadata': True, # Очистка метаданных из кэша перед началом загрузки
             'nocheckcertificate': True, # Игнорирование ошибок проверки SSL-сертификатов
@@ -185,6 +200,8 @@ class CORE:
             'seekable': '0', # Чтение потока
             'reconnect_streamed': '1' # Автоматическое переподключение для стримов
         }
+
+        return True
 
     def Generate_User_Agent(self) -> str:
         '''Генерация случайного браузера'''
@@ -219,7 +236,7 @@ class CORE:
     def Progress_Hook(self, data):
         '''Загрузка'''
         if self.cancel_download:
-            self.signal.speed.setText('-')
+            self.signals.signal_speed.emit('-')
             raise Exception('Download aborted')
 
         if data['status'] == 'downloading':
@@ -237,18 +254,16 @@ class CORE:
                 current_percent = 0
             visual_value = max(4, current_percent) if current_percent > 0 else 0
 
-            self.signal.progress_bar.setTextVisible(True)
-            self.signal.progress_bar.setValue(visual_value)
-
-            self.signal.speed.setText(f'{self.Convert_Bytes(speed, '/s')}')
-            self.signal.max_speed.setText(f'{self.Convert_Bytes(self.max_speed, '/s')}')
-            self.signal.size.setText(f'{self.Convert_Bytes(volume)}')
+            self.signals.signal_progress.emit(visual_value)
+            self.signals.signal_speed.emit(f'{self.Convert_Bytes(speed, '/s')}')
+            self.signals.signal_max_speed.emit(f'{self.Convert_Bytes(self.max_speed, '/s')}')
+            self.signals.signal_size.emit(f'{self.Convert_Bytes(volume)}')
 
         elif data['status'] == 'finished':
-            self.signal.progress_bar.setValue(100)
-            self.signal.Status('info', 'File is being compiled...')
+            self.signals.signal_progress.emit(100)
+            self.signals.signal_status.emit('info', 'File is being compiled...')
 
-    def Check_Link(self):
+    def Check_Link(self) -> bool:
         '''Проверка ответа страницы'''
         code = self.response.status_code
         errors = {
@@ -265,36 +280,43 @@ class CORE:
         }
 
         if code in [200, 206]:
-            return
+            return True
 
         full_message = f'Error {code}. {errors.get(code, '?')}'
-        self.signal.Update_Preview(files['images']['png']['other']['preview'])
-        self.signal.Status('error', full_message)
+        self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+        self.signals.signal_status.emit('error', full_message)
         self.Reset()
 
-        sys.exit(1)
+        return False
 
-    def Prepare(self, url: str):
+    def Prepare(self, url: str) -> bool:
         '''Подготовка'''
         try:
             url = self.Aliases(url)
-            self.Update_Config(url)
-            self.response = requests.get(url, impersonate = f'chrome{chrome}', timeout = self.timeout)
+
+            if not self.Update_Config(url):
+                return False
+
+            self.response = requests.get(url, impersonate = f'chrome{chrome}', timeout = timeout)
             self.page = BeautifulSoup(self.response.text, 'html.parser')
-            self.Check_Link()
-            self.signal.Status('info', 'Preparing...')
+
+            if not self.Check_Link():
+                return False
+
+            self.signals.signal_status.emit('info', 'Preparing...')
+            return True
 
         except requests.exceptions.ConnectionError:
-            self.signal.Update_Preview(files['images']['png']['other']['preview'])
-            self.signal.Status('error', f'Connection error to "{self.domain}": resource may be blocked and may require VPN or proxy')
-            sys.exit(1)
+            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_status.emit('error', f'Connection error to "{self.domain}": resource may be blocked and may require VPN or proxy')
+            return False
 
         except requests.exceptions.Timeout:
-            self.signal.Update_Preview(files['images']['png']['other']['preview'])
-            self.signal.Status('error', f'Exceeded waiting time for a response from "{self.domain}"')
-            sys.exit(1)
+            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_status.emit('error', f'Exceeded waiting time for a response from "{self.domain}"')
+            return False
 
-    def Get_Video(self) -> tuple:
+    def Get_Video(self) -> tuple | None:
         '''Получение прямых ссылок'''
         raw_title = self.page.find('title').text
         video_link = ''
@@ -317,6 +339,7 @@ class CORE:
             links = {}
             title = raw_title
             found_links = self.page.find_all('a', class_ = 'tag_item')
+            pprint(found_links)
 
             for link in found_links:
                 text = link.text.lower()
@@ -346,17 +369,20 @@ class CORE:
             video_link = self.page.select_one('video source')['src']
 
         else:
-            self.signal.Status('warning', f'Downloads are only available from {placeholder}')
-            sys.exit(1)
+            self.signals.signal_status.emit('warning', f'Downloads are only available from {placeholder}')
+            return None
 
         site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
         video_id = secrets.token_hex(8)
 
+        if video_link == '' or video_link == None:
+            self.signals.signal_status.emit('error', 'Direct link extraction error')
+            return None
+
         log.info(f'Name: {title}')
         log.info(f'Direct link: {video_link}')
 
-        self.signal.title.setText(title)
-
+        self.signals.signal_title.emit(title)
         return title, video_link, site, video_id
 
     def Get_Preview(self):
@@ -375,18 +401,18 @@ class CORE:
             else:
                 image = re.search(pattern, str(self.page)).group(0)
 
-            self.link_image = requests.get(image, impersonate = f'chrome{chrome}', timeout = self.timeout).content
+            self.link_image = requests.get(image, impersonate = f'chrome{chrome}', timeout = timeout).content
 
             with Image.open(BytesIO(self.link_image)) as preview:
                 preview.save(self.cache_preview_name)
 
-            self.signal.Update_Preview(self.cache_preview_name)
-            self.signal.Set_Site(self.site)
+            self.signals.signal_preview.emit(self.cache_preview_name)
+            self.signals.signal_site.emit(self.site)
 
             log.info(f'Preview: {image}')
 
         except Exception as e:
-            self.signal.Status('warning', f'Error get preview: {e}')
+            self.signals.signal_status.emit('warning', f'Error get preview: {e}')
 
     def Download_Preview(self):
         '''Скачивание превью'''
@@ -399,14 +425,14 @@ class CORE:
             image = Image.open(BytesIO(self.link_image))
             image.save(final_preview_name, format = 'PNG')
 
-            self.signal.Status('good', f'Preview downloaded: {str(final_preview_name).replace('\\', '/')}')
+            self.signals.signal_status.emit('good', f'Preview downloaded: {str(final_preview_name).replace('\\', '/')}')
 
         except Exception as e:
-            self.signal.Status('warning', f'Error download preview: {e}')
+            self.signals.signal_status.emit('warning', f'Error download preview: {e}')
 
     def Get_Info(self):
         '''Получение дополнительной информации'''
-        self.signal.Status('info', 'Getting info...')
+        self.signals.signal_status.emit('info', 'Getting info...')
 
         try:
             ffprobe_video_info = ffmpeg.probe(self.video_link, cmd = files['bin']['ffprobe'],  **self.ffprobe_options)
@@ -435,17 +461,16 @@ class CORE:
                 duration = 'N/A'
                 log.warning(f'Duration: {duration}')
 
-            self.signal.quality.setText(quality)
-            self.signal.fps.setText(fps)
-            self.signal.duration.setText(duration)
-            self.signal.Status('good', 'Video is ready!')
+            self.signals.signal_quality.emit(quality)
+            self.signals.signal_fps.emit(fps)
+            self.signals.signal_duration.emit(duration)
+            self.signals.signal_status.emit('good', 'Video is ready!')
 
         except Exception as e:
-            self.signal.Status('warning', f'Error get info: {e}')
+            self.signals.signal_status.emit('warning', f'Error get info: {e}')
 
         finally:
-            self.signal.button_download.setEnabled(True)
-            self.signal.button_stop.setEnabled(True)
+            self.signals.signal_buttons.emit(True)
 
     def Edit_Tags(self, video_name: str, title: str):
         '''Редактирование тегов'''
@@ -456,7 +481,7 @@ class CORE:
             tags.save()
 
         except Exception as e:
-            self.signal.Status('error', f'Error edit tags: {e}')
+            self.signals.signal_status.emit('error', f'Error edit tags: {e}')
 
     @Timer
     def Download_Video(self):
@@ -467,7 +492,7 @@ class CORE:
         _UnsafeExtensionError._enabled = False
         aborted = False
         self.cancel_download = False
-        self.signal.Status('info', 'Downloading videos...')
+        self.signals.signal_status.emit('info', 'Downloading videos...')
 
         try:
             with yt_dlp.YoutubeDL(self.yt_dlp_options) as video:
@@ -477,18 +502,16 @@ class CORE:
             os.rename(self.cache_video_name, final_video_name)
             self.Edit_Tags(final_video_name, self.title)
 
-            self.signal.speed.setText('-')
-            self.signal.button_download.setEnabled(False)
-            self.signal.button_stop.setEnabled(False)
-            self.signal.Status('good', f'Video downloaded: {str(final_video_name).replace('\\', '/')}')
+            self.signals.signal_speed.emit('-')
+            self.signals.signal_buttons.emit(False)
+            self.signals.signal_status.emit('good', f'Video downloaded: {str(final_video_name).replace('\\', '/')}')
 
         except Exception as e:
             if 'Download aborted' in str(e):
                 aborted = True
-                self.signal.Status('warning', 'Download aborted')
+                self.signals.signal_status.emit('warning', 'Download aborted')
             else:
-                self.signal.Status('error', f'Error download video: {e}')
-                sys.exit(1)
+                self.signals.signal_status.emit('error', f'Error download video: {e}')
 
         finally:
             try:
@@ -499,3 +522,17 @@ class CORE:
             if not aborted:
                 _UnsafeExtensionError._enabled = True
                 self.Reset()
+
+    def Search(self, url: str):
+        '''Поиск информации'''
+        if not self.Prepare(url):
+            return
+
+        video = self.Get_Video()
+        if video is None:
+            return
+
+        self.title, self.video_link, self.site, self.id = video
+
+        self.Get_Preview()
+        self.Get_Info()

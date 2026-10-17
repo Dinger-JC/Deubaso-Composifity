@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'content'))
 
 # Локальные модули
 try:
-    from config import files, project
+    from config import *
     from core import CORE
     from logger import Log
     from main import MAIN
@@ -94,7 +94,6 @@ if __name__ == '__main__':
         # Структура
         core = CORE()
         main = MAIN(core)
-        core.signal = main
 
         sys.exit(app.exec())
 
