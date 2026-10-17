@@ -23,7 +23,7 @@ from config import *
 
 # Константы
 name = 'Deubaso Composifity'
-version = '2026.10.17.1'
+version = '2026.10.17.2'
 
 size_window = (1000, 600)
 size_preview = (534, 300)
@@ -87,6 +87,7 @@ def Window(window, title: str, name: str):
         background: transparent;
         color: {colors['signal']['info']};
         font-size: {font_small}px;
+        font-family: {files['content']['font_logs']};
     ''')
 
 

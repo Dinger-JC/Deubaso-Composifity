@@ -45,7 +45,7 @@ class HISTORY():
         self.tree.setHeaderLabels(['Date', 'Link'])
         self.tree.headerItem().setTextAlignment(0, Qt.AlignmentFlag.AlignCenter)
         self.tree.headerItem().setTextAlignment(1, Qt.AlignmentFlag.AlignCenter)
-        self.tree.setColumnWidth(0, 220)
+        self.tree.setColumnWidth(0, 230)
         self.tree.itemClicked.connect(Copy_Url)
         self.tree.setStyleSheet(f'''
             QTreeWidget {{
@@ -55,6 +55,8 @@ class HISTORY():
 
                 color: {colors['signal']['text']};
                 font-size: {font_small}px;
+                font-family: {files['content']['font_logs']};
+                
                 outline: 0;
                 show-decoration-selected: 0;
             }}
@@ -121,7 +123,7 @@ class HISTORY():
 
         # Перегородка
         line = QFrame(self.window)
-        line.setGeometry(238, 105, 4, size_small)
+        line.setGeometry(248, 105, 4, size_small)
         line.setStyleSheet(f'''
             QFrame {{
                 background-color: {colors['other']['press']};

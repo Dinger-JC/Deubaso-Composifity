@@ -129,7 +129,8 @@ class MAIN():
         self.status.setStyleSheet(f'''
                 QLabel {{
                     color: {colors['signal']['info']};
-                    font-size: {font_small}px; 
+                    font-size: {font_small}px;
+                    font-family: {files['content']['font_logs']};
                 }}
             ''')
         return self.status
@@ -148,7 +149,8 @@ class MAIN():
         self.status.setStyleSheet(f'''
             QLabel {{
                 color: {colors['signal'].get(type)};
-                font-size: {font_small}px; 
+                font-size: {font_small}px;
+                font-family: {files['content']['font_logs']};
             }}
         ''')
 
@@ -239,6 +241,7 @@ class MAIN():
                 
                     color: {color};
                     font-size: {font_small}px;
+                    font-family: {files['content']['font_logs']};
                 }}
             ''')
             setText(text)
