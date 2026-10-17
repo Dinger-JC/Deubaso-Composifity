@@ -151,10 +151,7 @@ class CORE:
 
         # Заголовки HTTP-запросов
         headers = {
-            # Движок
-            'sec-ch-ua': '"Not_A Brand";v="8", '
-                f'"Chromium";v="{chrome}", '
-                f'"Google Chrome";v="{chrome}"',
+            'sec-ch-ua': f'"Not_A Brand";v="8", "Chromium";v="{chrome}", "Google Chrome";v="{chrome}"', # Движок
             'sec-ch-ua-mobile': '?0', # Платформа
             'sec-ch-ua-platform': '"Windows"', # ОС
             'upgrade-insecure-requests': '1', # Просьба о защите
@@ -200,7 +197,6 @@ class CORE:
             'seekable': '0', # Чтение потока
             'reconnect_streamed': '1' # Автоматическое переподключение для стримов
         }
-
         return True
 
     def Generate_User_Agent(self) -> str:
@@ -286,7 +282,6 @@ class CORE:
         self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
         self.signals.signal_status.emit('error', full_message)
         self.Reset()
-
         return False
 
     def Prepare(self, url: str) -> bool:
@@ -339,7 +334,6 @@ class CORE:
             links = {}
             title = raw_title
             found_links = self.page.find_all('a', class_ = 'tag_item')
-            pprint(found_links)
 
             for link in found_links:
                 text = link.text.lower()
@@ -379,10 +373,10 @@ class CORE:
             self.signals.signal_status.emit('error', 'Direct link extraction error')
             return None
 
+        self.signals.signal_title.emit(title)
+
         log.info(f'Name: {title}')
         log.info(f'Direct link: {video_link}')
-
-        self.signals.signal_title.emit(title)
         return title, video_link, site, video_id
 
     def Get_Preview(self):
@@ -421,10 +415,8 @@ class CORE:
 
         try:
             final_preview_name = self.path / f'{self.site} - {self.date} [PREVIEW_{self.id}].png'
-
             image = Image.open(BytesIO(self.link_image))
             image.save(final_preview_name, format = 'PNG')
-
             self.signals.signal_status.emit('good', f'Preview downloaded: {str(final_preview_name).replace('\\', '/')}')
 
         except Exception as e:
