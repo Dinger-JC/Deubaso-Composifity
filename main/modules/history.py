@@ -112,7 +112,6 @@ class HISTORY():
             {STYLES.tooltip}
         ''')
 
-        # Перегородка
         line = QFrame(self.window)
         line.setGeometry(248, 105, 4, size_small)
         line.setStyleSheet(f'''

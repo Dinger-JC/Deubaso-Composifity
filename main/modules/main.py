@@ -74,7 +74,7 @@ class MAIN():
         self.input = QLineEdit(self.window)
         self.input.setGeometry(margin, 95, length, size_big)
         self.input.setPlaceholderText('Insert link to video')
-        self.input.returnPressed.connect(self.Search_Info)
+        self.input.returnPressed.connect(self.Thread_Get_All_Data)
         self.input.setStyleSheet(f'''
             QLineEdit {{
                 background-color: {colors['other']['fill']};
@@ -101,7 +101,6 @@ class MAIN():
 
     def Text_Content(self, title: str):
         '''Блок названия контента'''
-        # Иконка
         icon = QLabel(self.window)
         icon.setGeometry(21, 165, 44, 44)
         icon.setPixmap(QPixmap(str(files['images']['svg']['other']['download'])).scaled(
@@ -110,7 +109,6 @@ class MAIN():
             Qt.SmoothTransformation
         ))
 
-        # Название
         text = QLabel(title, self.window)
         text.setGeometry(85, 160, 895, 30)
         text.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
@@ -205,7 +203,6 @@ class MAIN():
             }}
         ''')
 
-        # Название
         title = QLabel(blocks['title'], block)
         title.setGeometry(10, 10, 102, size_small)
         title.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
@@ -218,7 +215,6 @@ class MAIN():
             }}
         ''')
 
-        # Значение
         value = QLabel(number, block)
         value.setGeometry(10, 40, 102, size_small)
         value.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
@@ -249,7 +245,7 @@ class MAIN():
         self.button_download.setGeometry(*button['geometry'])
         self.button_download.setToolTip(button['tooltip'])
         self.button_download.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.button_download.clicked.connect(self.Download_Video)
+        self.button_download.clicked.connect(self.Thread_Download_Video)
         self.button_download.setEnabled(False)
         self.button_download.setStyleSheet(f'''
             QPushButton {{
@@ -320,7 +316,7 @@ class MAIN():
         preview = QPushButton(self.window)
         preview.setGeometry(margin, 280, size_preview[0], size_preview[1])
         preview.setCursor(Qt.CursorShape.PointingHandCursor)
-        preview.clicked.connect(self.Download_Preview)
+        preview.clicked.connect(self.Thread_Download_Preview)
         preview.setStyleSheet(f'''
             QPushButton {{
                 background-color: #000000;
@@ -530,7 +526,6 @@ class MAIN():
         self.progress_bar.setValue(0)
 
         self.site_label.hide()
-
         self.title.setText(placeholder)
 
         self.speed.setText('-')
@@ -540,25 +535,24 @@ class MAIN():
         self.fps.setText('-')
         self.duration.setText('-')
 
-    def Search_Info(self):
-        '''Поиск основной информации'''
-        self.Reset()
-
+    def Thread_Get_All_Data(self):
+        '''Получение всех данных'''
         def Thread():
-            self.core.Search(self.input_url)
+            self.core.Get_All_Data(self.input_url)
 
+        self.Reset()
         self.input_url = self.input.text()
         self.input.clear()
 
         thread = threading.Thread(target = Thread, daemon = True)
         thread.start()
 
-    def Download_Preview(self):
+    def Thread_Download_Preview(self):
         '''Скачивание превью'''
         thread = threading.Thread(target = self.core.Download_Preview, daemon = True)
         thread.start()
 
-    def Download_Video(self):
+    def Thread_Download_Video(self):
         '''Скачивание видео'''
         thread = threading.Thread(target = self.core.Download_Video, daemon = True)
         thread.start()

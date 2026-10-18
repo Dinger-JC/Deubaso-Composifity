@@ -54,7 +54,6 @@ class SETTINGS():
 
     def Block_Setting(self, name: str, blocks: dict) -> QFrame:
         '''Блок настройки'''
-        # Плашка
         card = QFrame(self.window)
         card.setGeometry(*blocks['geometry'])
         card.setToolTip(blocks['tooltip'])
@@ -67,7 +66,6 @@ class SETTINGS():
             {STYLES.tooltip}
         ''')
 
-        # Иконка
         icon = QLabel(card)
         icon.setGeometry(10, 10, size_icon.width(), size_icon.height())
         icon.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
@@ -83,7 +81,6 @@ class SETTINGS():
             }}
         ''')
 
-        # Левый текст
         text_left = QLabel(name, card)
         text_left.setGeometry(50, 10, 418, size_small)
         text_left.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
@@ -96,7 +93,6 @@ class SETTINGS():
             }}
         ''')
 
-        # Перегородка
         block = QFrame(card)
         block.setGeometry(478, 10, 4, size_small)
         block.setStyleSheet(f'''
@@ -112,7 +108,6 @@ class SETTINGS():
         card = self.Block_Setting('History', Settings_Layouts.blocks['history'])
         size = (20, 20)
 
-        # Правый текст
         text_right = QLabel('Show', card)
         text_right.setGeometry(488, 10, 392, size_small)
         text_right.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -197,7 +192,6 @@ class SETTINGS():
 
             Update_Slider(True)
 
-        # Ползунок
         slider = QFrame(card)
         slider.setGeometry(890, 10, 60, size_small)
         slider.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -209,7 +203,6 @@ class SETTINGS():
             }}
         ''')
 
-        # Круг
         circle = QFrame(slider)
         circle.setGeometry(on.x(), on.y(), *size)
         circle.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
@@ -222,7 +215,6 @@ class SETTINGS():
 
         Update_Slider(False)
 
-        # Анимация
         animation = QPropertyAnimation(circle, b'pos')
         animation.setDuration(150)
         animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
@@ -244,7 +236,6 @@ class SETTINGS():
 
         card = self.Block_Setting('The path of saved videos', Settings_Layouts.blocks['folder'])
 
-        # Правый текст
         text_right = QPushButton(settings['path'].replace('\\', '/'), card)
         text_right.setGeometry(488, 10, 462, size_small)
         text_right.setCursor(Qt.CursorShape.PointingHandCursor)

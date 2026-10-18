@@ -130,7 +130,6 @@ class CORE:
     def Update_Config(self, url: str) -> bool:
         '''Обновление конфигурации для каждого видео'''
         self.signals.signal_status.emit('info', 'Checking...')
-
         log.info(f'Link: {url}')
 
         # Проверка ссылки
@@ -284,8 +283,8 @@ class CORE:
         self.Reset()
         return False
 
-    def Prepare(self, url: str) -> bool:
-        '''Подготовка'''
+    def Connection(self, url: str) -> bool:
+        '''Соединение'''
         try:
             url = self.Aliases(url)
 
@@ -298,7 +297,7 @@ class CORE:
             if not self.Check_Link():
                 return False
 
-            self.signals.signal_status.emit('info', 'Preparing...')
+            self.signals.signal_status.emit('info', 'Connection...')
             return True
 
         except requests.exceptions.ConnectionError:
@@ -311,8 +310,8 @@ class CORE:
             self.signals.signal_status.emit('error', f'Exceeded waiting time for a response from "{self.domain}"')
             return False
 
-    def Get_Video(self) -> tuple | None:
-        '''Получение прямых ссылок'''
+    def Get_Data(self) -> tuple | None:
+        '''Получение данных'''
         raw_title = self.page.find('title').text
         video_link = ''
 
@@ -376,7 +375,7 @@ class CORE:
         self.signals.signal_title.emit(title)
 
         log.info(f'Name: {title}')
-        log.info(f'Direct link: {video_link}')
+        log.info(f'Video: {video_link}')
         return title, video_link, site, video_id
 
     def Get_Preview(self):
@@ -407,20 +406,6 @@ class CORE:
 
         except Exception as e:
             self.signals.signal_status.emit('warning', f'Error get preview: {e}')
-
-    def Download_Preview(self):
-        '''Скачивание превью'''
-        if self.link_image == None:
-            return
-
-        try:
-            final_preview_name = self.path / f'{self.site} - {self.date} [PREVIEW_{self.id}].png'
-            image = Image.open(BytesIO(self.link_image))
-            image.save(final_preview_name, format = 'PNG')
-            self.signals.signal_status.emit('good', f'Preview downloaded: {str(final_preview_name).replace('\\', '/')}')
-
-        except Exception as e:
-            self.signals.signal_status.emit('warning', f'Error download preview: {e}')
 
     def Get_Info(self):
         '''Получение дополнительной информации'''
@@ -463,6 +448,19 @@ class CORE:
 
         finally:
             self.signals.signal_buttons.emit(True)
+
+    def Get_All_Data(self, url: str):
+        '''Получение всех данных'''
+        if not self.Connection(url):
+            return
+
+        video = self.Get_Data()
+        if video is None:
+            return
+        self.title, self.video_link, self.site, self.id = video
+
+        self.Get_Preview()
+        self.Get_Info()
 
     def Edit_Tags(self, video_name: str, title: str):
         '''Редактирование тегов'''
@@ -515,16 +513,16 @@ class CORE:
                 _UnsafeExtensionError._enabled = True
                 self.Reset()
 
-    def Search(self, url: str):
-        '''Поиск информации'''
-        if not self.Prepare(url):
+    def Download_Preview(self):
+        '''Скачивание превью'''
+        if self.link_image == None:
             return
 
-        video = self.Get_Video()
-        if video is None:
-            return
+        try:
+            final_preview_name = self.path / f'{self.site} - {self.date} [PREVIEW_{self.id}].png'
+            image = Image.open(BytesIO(self.link_image))
+            image.save(final_preview_name, format = 'PNG')
+            self.signals.signal_status.emit('good', f'Preview downloaded: {str(final_preview_name).replace('\\', '/')}')
 
-        self.title, self.video_link, self.site, self.id = video
-
-        self.Get_Preview()
-        self.Get_Info()
+        except Exception as e:
+            self.signals.signal_status.emit('warning', f'Error download preview: {e}')

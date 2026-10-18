@@ -79,7 +79,7 @@ if __name__ == '__main__':
         if font_id != -1:
             app.setFont(QFont(QFontDatabase.applicationFontFamilies(font_id)[0]))
 
-        # Шрифт логов
+        # Моноширный шрифт
         font_logs_id = QFontDatabase.addApplicationFont(str(files['content']['font_logs']))
         if font_logs_id != -1:
             files['content']['font_logs'] = QFontDatabase.applicationFontFamilies(font_logs_id)[0]
@@ -94,7 +94,6 @@ if __name__ == '__main__':
         # Структура
         core = CORE()
         main = MAIN(core)
-
         sys.exit(app.exec())
 
     except Exception as e:

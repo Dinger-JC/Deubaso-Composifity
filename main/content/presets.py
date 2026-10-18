@@ -23,7 +23,7 @@ from config import *
 
 # Константы
 name = 'Deubaso Composifity'
-version = '2026.10.17.3'
+version = '2026.10.18.0'
 
 size_window = (1000, 600)
 size_preview = (534, 300)
@@ -58,7 +58,6 @@ def Window(window, title: str, name: str):
         }}
     ''')
 
-    # Заголовок окна
     text_top = QLabel(name, window)
     text_top.setGeometry(margin, 20, length, 55)
     text_top.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
@@ -69,7 +68,6 @@ def Window(window, title: str, name: str):
         }}
     ''')
 
-    # Версия
     text_version = QLabel(f'Version: {version}', window)
     text_version.setGeometry(5, 5, 200, 20)
     text_version.setStyleSheet(f'''
