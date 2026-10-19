@@ -1,18 +1,32 @@
 {
   "strip2": {
+    "link": "https://vps402.strip2.co/video/17553347/?Li=&Lii=17553347&Lt=&Sn=",
     "domain": "vps402.strip2.co",
-    "pattern": "https://inf-xts\\.spac\\.me/tfil/[^\"']+\\.jpg"
-  },
-  "xgroovy": {
-    "domain": "rt.xgroovy.com",
-    "pattern": "https://i\\.xgroovy\\.com/contents/videos_screenshots/[^\"']+\\.jpg"
-  },
-  "analmedia": {
-    "domain": "anal.media",
-    "pattern": "https://anal\\.media/wp-content/uploads/[^\"']+\\.jpg"
+    "video_pattern": "a[href*='vps402.strip2.co.mp4']",
+    "video_attribute": "href",
+    "preview_pattern": "https://inf-xts\\.spac\\.me/tfil/[^\"']+\\.jpg",
+    "title": "\\s*[-–—]\\s*Strip2\\.co\\s*$"
   },
   "rule34video": {
+    "link": "https://rule34video.com/video/4654702/yacht-pool-sex/",
     "domain": "rule34video.com",
-    "pattern": "https://rule34video\\.com/contents/videos_screenshots/\\d+/\\d+/preview_{tag}\\.mp4\\.jpg"
+    "video_pattern": "a.tag_item",
+    "video_attribute": "href",
+    "preview_pattern": "https://rule34video\\.com/contents/videos_screenshots/\\d+/\\d+/preview_{tag}\\.mp4\\.jpg"
+  },
+  "analmedia": {
+    "link": "https://anal.media/ru/video/18-%d0%bb%d0%b5%d1%82%d0%bd%d1%8f%d1%8f-%d0%b4%d0%b5%d0%b2%d1%81%d1%82%d0%b2%d0%b5%d0%bd%d0%bd%d0%b8%d1%86%d0%b0-%d1%81-%d0%b8%d0%b4%d0%b5%d0%b0%d0%bb%d1%8c%d0%bd%d0%be%d0%b9-%d1%84%d0%b8%d0%b3%d1%83/",
+    "domain": "anal.media",
+    "video_pattern": "video source",
+    "video_attribute": "src",
+    "preview_pattern": "https://anal\\.media/wp-content/uploads/[^\"']+\\.jpg",
+    "title": "\\s*[-–—]\\s*AnalMedia\\s*$"
+  },
+  "xgroovy": {
+    "link": "https://rt.xgroovy.com/videos/167306/multiple-creampie-and-cumshot-in-pantie-for-fit-stepmom",
+    "domain": "rt.xgroovy.com",
+    "video_pattern": "source",
+    "video_attribute": "src",
+    "preview_pattern": "https://i\\.xgroovy\\.com/contents/videos_screenshots/[^\"']+\\.jpg"
   }
 }

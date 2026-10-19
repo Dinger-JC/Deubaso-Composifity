@@ -95,6 +95,7 @@ class CORE:
         self.cancel_download = False
         self.domain = None
         self.date = None
+        self.id = None
         self.path = None
         self.cache_video_name = None
         self.cache_preview_name = None
@@ -103,28 +104,18 @@ class CORE:
         self.response = None
         self.page = None
         self.title = None
-        self.video_link = None
+        self.video = None
         self.site = None
-        self.id = None
-        self.link_image = None
+        self.preview = None
 
     def Stop_Download(self):
         '''Прерывание скачивания'''
         self.cancel_download = True
 
     def Aliases(self, url: str) -> str:
-        '''Извлечение ссылки'''
-        if not files['data']['videos'].is_file():
-            return url
-
-        try:
-            with open(files['data']['videos'], encoding = 'utf-8') as file:
-                videos = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
-            return url
-
-        if url in videos:
-            url = videos[url]
+        '''Проверочные ссылки'''
+        if url in sites:
+            url = sites[url]['link']
         return url
 
     def Update_Config(self, url: str) -> bool:
@@ -134,13 +125,15 @@ class CORE:
 
         # Проверка ссылки
         if not url.startswith(('http://', 'https://')):
+            self.signals.signal_status.emit('error', 'Incorrect link')
             self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
-            self.signals.signal_status.emit('warning', 'Incorrect link')
             return False
 
         self.Write_History(url)
         self.domain = urlparse(url).netloc
+        self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
         self.date = datetime.now().strftime('%Y.%m.%d')
+        self.id = secrets.token_hex(8)
 
         # Директория
         self.path = Path(settings['path'])
@@ -278,8 +271,8 @@ class CORE:
             return True
 
         full_message = f'Error {code}. {errors.get(code, '?')}'
-        self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
         self.signals.signal_status.emit('error', full_message)
+        self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
         self.Reset()
         return False
 
@@ -301,88 +294,57 @@ class CORE:
             return True
 
         except requests.exceptions.ConnectionError:
-            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
             self.signals.signal_status.emit('error', f'Connection error to "{self.domain}": resource may be blocked and may require VPN or proxy')
+            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
             return False
 
         except requests.exceptions.Timeout:
-            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
             self.signals.signal_status.emit('error', f'Exceeded waiting time for a response from "{self.domain}"')
+            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
             return False
 
-    def Get_Data(self) -> tuple | None:
-        '''Получение данных'''
-        raw_title = self.page.find('title').text
-        video_link = ''
+    def Get_Title(self):
+        '''Получение названия'''
+        config = sites[self.site]
+        self.title = self.page.find('title').text
 
-        if self.domain == sites['strip2']['domain']:
-            links = []
-            title = re.sub(r'\s*[-–—]\s*Strip2.co\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            found_links = self.page.find_all('a', href = True)
+        if 'title' in config:
+            self.title = re.sub(config['title'], '', self.title, flags = re.IGNORECASE).strip()
 
-            for link in found_links:
-                if 'vps402.strip2.co.mp4' in link['href']:
-                    links.append(link['href'])
+        self.signals.signal_title.emit(self.title)
+        log.info(f'Name: {self.title}')
 
-            for _, href in enumerate(links):
-                find_link = str(href)
-                if find_link and f'/x{len(links) - 1}/' in find_link:
-                    video_link = find_link
+    def Get_Video(self) -> bool:
+        '''Получение видео'''
+        config = sites[self.site]
+        pattern = self.page.select(config['video_pattern'])
+        attribute = config.get('video_attribute')
 
-        elif self.domain == sites['rule34video']['domain']:
-            links = {}
-            title = raw_title
-            found_links = self.page.find_all('a', class_ = 'tag_item')
+        if config['domain'] == sites['strip2']['domain']:
+            links = [node.get(attribute) for node in pattern if node.get(attribute)]
+            self.video = next((l for l in links if f'/x{len(links) - 1}/' in str(l)), links[-1])
 
-            for link in found_links:
-                text = link.text.lower()
-                url = link.get('href')
+        elif config['domain'] == sites['rule34video']['domain']:
+            self.video = next((node.get(attribute) for tag in tags for node in pattern if tag in node.text.lower()), '')
 
-                for tag in tags:
-                    if tag in text:
-                        links[tag] = url
-                        break
+        elif config['domain'] == sites['analmedia']['domain']:
+            self.video = pattern[0].get(attribute) if pattern else ''
 
-            for tag in tags:
-                if tag in links:
-                    video_link = links[tag]
-                    break
+        elif config['domain'] == sites['xgroovy']['domain']:
+            self.video = next((node.get(attribute) for tag in tags for node in pattern if node.get('title') == tag), '')
 
-        elif self.domain == sites['xgroovy']['domain']:
-            title = raw_title
+        if self.video == '' or self.video == None:
+            self.signals.signal_status.emit('error', 'Video extraction error')
+            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            return False
 
-            for tag in tags:
-                source = self.page.find('source', title = tag)
-                if source:
-                    video_link = source.get('src')
-                    break
-
-        elif self.domain == sites['analmedia']['domain']:
-            title = re.sub(r'\s*[-–—]\s*AnalMedia\s*$', '', raw_title, flags = re.IGNORECASE).strip()
-            video_link = self.page.select_one('video source')['src']
-
-        else:
-            self.signals.signal_status.emit('warning', f'Downloads are only available from {placeholder}')
-            return None
-
-        site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
-        video_id = secrets.token_hex(8)
-
-        if video_link == '' or video_link == None:
-            self.signals.signal_status.emit('error', 'Direct link extraction error')
-            return None
-
-        self.signals.signal_title.emit(title)
-
-        log.info(f'Name: {title}')
-        log.info(f'Video: {video_link}')
-        return title, video_link, site, video_id
+        log.info(f'Video: {self.video}')
 
     def Get_Preview(self):
         '''Получение превью'''
         try:
             image = None
-            pattern = sites[self.site]['pattern']
+            pattern = sites[self.site]['preview_pattern']
 
             if '{tag}' in pattern:
                 for tag in tags:
@@ -394,14 +356,13 @@ class CORE:
             else:
                 image = re.search(pattern, str(self.page)).group(0)
 
-            self.link_image = requests.get(image, impersonate = f'chrome{chrome}', timeout = timeout).content
+            self.preview = requests.get(image, impersonate = f'chrome{chrome}', timeout = timeout).content
 
-            with Image.open(BytesIO(self.link_image)) as preview:
+            with Image.open(BytesIO(self.preview)) as preview:
                 preview.save(self.cache_preview_name)
 
-            self.signals.signal_preview.emit(self.cache_preview_name)
             self.signals.signal_site.emit(self.site)
-
+            self.signals.signal_preview.emit(self.cache_preview_name)
             log.info(f'Preview: {image}')
 
         except Exception as e:
@@ -412,7 +373,7 @@ class CORE:
         self.signals.signal_status.emit('info', 'Getting info...')
 
         try:
-            ffprobe_video_info = ffmpeg.probe(self.video_link, cmd = files['bin']['ffprobe'],  **self.ffprobe_options)
+            ffprobe_video_info = ffmpeg.probe(self.video, cmd = files['bin']['ffprobe'],  **self.ffprobe_options)
             video_stream = next((stream for stream in ffprobe_video_info['streams'] if stream['codec_type'] == 'video'), None)
 
             try:
@@ -449,25 +410,37 @@ class CORE:
         finally:
             self.signals.signal_buttons.emit(True)
 
+    def Get_Tags(self):
+        '''Получение тегов'''
+        self.tags = 'tags'
+
     def Get_All_Data(self, url: str):
         '''Получение всех данных'''
         if not self.Connection(url):
             return
 
-        video = self.Get_Data()
-        if video is None:
+        if self.site is None:
+            self.signals.signal_status.emit('warning', f'Downloads are only available from {placeholder}')
+            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
             return
-        self.title, self.video_link, self.site, self.id = video
+
+        self.Get_Title()
+
+        validate = self.Get_Video()
+        if validate == False:
+            return
 
         self.Get_Preview()
         self.Get_Info()
+        self.Get_Tags()
 
     def Edit_Tags(self, video_name: str, title: str):
         '''Редактирование тегов'''
         try:
             tags = MP4(video_name)
             tags.delete()
-            tags['\xa9nam'] = title # Название
+            tags['\xa9nam'] = title
+            tags['\xa9cmt'] = self.tags
             tags.save()
 
         except Exception as e:
@@ -476,7 +449,7 @@ class CORE:
     @Timer
     def Download_Video(self):
         '''Скачивание видео'''
-        if self.video_link == None:
+        if self.video == None:
             return
 
         _UnsafeExtensionError._enabled = False
@@ -486,9 +459,9 @@ class CORE:
 
         try:
             with yt_dlp.YoutubeDL(self.yt_dlp_options) as video:
-                video.download([self.video_link])
+                video.download([self.video])
 
-            final_video_name = self.path / f'{self.site} - {self.date} [VIDEO_{self.id}].mp4'
+            final_video_name = self.path / f'{self.date} {self.site} [VIDEO_{self.id}].mp4'
             os.rename(self.cache_video_name, final_video_name)
             self.Edit_Tags(final_video_name, self.title)
 
@@ -515,12 +488,12 @@ class CORE:
 
     def Download_Preview(self):
         '''Скачивание превью'''
-        if self.link_image == None:
+        if self.preview == None:
             return
 
         try:
             final_preview_name = self.path / f'{self.site} - {self.date} [PREVIEW_{self.id}].png'
-            image = Image.open(BytesIO(self.link_image))
+            image = Image.open(BytesIO(self.preview))
             image.save(final_preview_name, format = 'PNG')
             self.signals.signal_status.emit('good', f'Preview downloaded: {str(final_preview_name).replace('\\', '/')}')
 

@@ -40,8 +40,7 @@ files = {
     'data': {
         'history': project / 'data' / 'history.json',
         'logs': project / 'data' / 'logs.log',
-        'settings': project / 'data' / 'settings.json',
-        'videos': project / 'data' / 'videos.json'
+        'settings': project / 'data' / 'settings.json'
     },
     'images': {
         'png': {
@@ -83,7 +82,7 @@ files = {
     }
 }
 
-# Поддерживаемые сайты
+# Сайты
 with open(files['content']['sites'], encoding = 'utf-8') as file:
     sites = json.load(file)
 
@@ -105,7 +104,7 @@ if not files['data']['history'].is_file():
         json.dump({}, file, indent = 2, ensure_ascii = False)
 
 # Константы
-placeholder = 'Strip2, Rule34Video, XGroovy, AnalMedia'
+placeholder = 'Strip2, Rule34Video, AnalMedia, XGroovy'
 chrome = '131'
 tags = ('4k', '2k', '1080p', '720p', '640p', '480p', '360p', '240p', '144p')
 factor = {

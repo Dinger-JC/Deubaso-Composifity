@@ -53,9 +53,6 @@ def Checking_Files():
             print(f'After downloading, move exe file to bin folder in root of project')
             error = True
 
-        elif name == 'videos':
-            print(f'Not found \033[7;93m"{value}"\033[0;93m')
-
         else:
             print(f'Not found \033[7;91m"{value}"\033[0;91m')
             error = True
