@@ -104,7 +104,7 @@ if not files['data']['history'].is_file():
         json.dump({}, file, indent = 2, ensure_ascii = False)
 
 # Константы
-placeholder = 'Strip2, Rule34Video, AnalMedia, XGroovy'
+placeholder = 'Strip2, AnalMedia, Rule34Video, XGroovy'
 chrome = '131'
 tags = ('4k', '2k', '1080p', '720p', '640p', '480p', '360p', '240p', '144p')
 factor = {

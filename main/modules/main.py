@@ -135,15 +135,6 @@ class MAIN():
 
     def Status(self, type: str, text: str = ''):
         '''Показ статуса'''
-        if type == 'info':
-            log.info(text)
-        elif type == 'good':
-            log.info(text)
-        elif type == 'warning':
-            log.warning(text)
-        elif type == 'error':
-            log.error(text)
-
         self.status.setStyleSheet(f'''
             QLabel {{
                 color: {colors['signal'].get(type)};

@@ -23,7 +23,7 @@ from config import *
 
 # Константы
 name = 'Deubaso Composifity'
-version = '2026.10.19.0'
+version = '2026.10.19.1'
 
 size_window = (1000, 600)
 size_preview = (534, 300)
