@@ -21,7 +21,7 @@ from config import *
 
 
 class Color_Filter(logging.Filter):
-    '''Цветовой фильтр для записи в консоли'''
+    '''Цветовой фильтр'''
     colors = {
         'INFO': '\033[90m',
         'WARNING': '\033[93m',
