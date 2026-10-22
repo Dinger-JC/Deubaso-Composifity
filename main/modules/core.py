@@ -1,6 +1,4 @@
-# Deubaso Composifity
-# Core
-
+# Deubaso Composifity: core
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
@@ -59,7 +57,6 @@ class CORE:
     '''Ядро'''
     def __init__(self):
         '''Инициализация'''
-        # Прочее
         self.signals = SIGNALS()
         self.Reset()
 
@@ -130,7 +127,7 @@ class CORE:
         # Проверка ссылки
         if not url.startswith(('http://', 'https://')):
             self.signals.signal_status.emit('error', 'Incorrect link')
-            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_preview.emit(str(files['images']['png']['preview']))
             log.error('Incorrect link')
             return False
 
@@ -198,9 +195,9 @@ class CORE:
 
     def Generate_User_Agent(self) -> str:
         '''Генерация случайного браузера'''
-        windows_version = secrets.choice(['11.0; Win64; x64', '10.0; Win64; x64', '10.0'])
-        chrome_version = f'{chrome}.0.{secrets.choice(range(6778, 6807))}.{secrets.choice(range(85, 110))}'
-        user_agent = f'Mozilla/5.0 (Windows NT {windows_version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version} Safari/537.36'
+        patch_version = secrets.choice([33, 69, 70, 71, 85, 86, 87, 108, 109, 110, 139, 140, 141, 204, 205, 206, 264, 265, 266, 267])
+        chrome_version = f'{chrome}.0.6778.{patch_version}'
+        user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version} Safari/537.36'
         return user_agent
 
     def Write_History(self, url: str):
@@ -280,7 +277,7 @@ class CORE:
 
         full_message = f'Error {code}. {errors.get(code, '?')}'
         self.signals.signal_status.emit('error', full_message)
-        self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+        self.signals.signal_preview.emit(str(files['images']['png']['preview']))
         log.error(full_message)
         return False
 
@@ -304,13 +301,13 @@ class CORE:
 
         except requests.exceptions.ConnectionError:
             self.signals.signal_status.emit('error', f'Connection error to "{self.domain}": resource may be blocked and may require VPN or proxy')
-            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_preview.emit(str(files['images']['png']['preview']))
             log.error(f'Connection error to "{self.domain}": resource may be blocked and may require VPN or proxy')
             return False
 
         except requests.exceptions.Timeout:
             self.signals.signal_status.emit('error', f'Exceeded waiting time for a response from "{self.domain}"')
-            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_preview.emit(str(files['images']['png']['preview']))
             log.error(f'Exceeded waiting time for a response from "{self.domain}"')
             return False
 
@@ -318,7 +315,6 @@ class CORE:
         '''Получение названия'''
         self.config_site = sites[self.site]
         self.title = self.page.find('title').text
-
         if 'title' in self.config_site:
             self.title = re.sub(self.config_site['title'], '', self.title, flags = re.IGNORECASE).strip()
 
@@ -345,7 +341,7 @@ class CORE:
 
         if self.video == '' or self.video == None:
             self.signals.signal_status.emit('error', 'Video extraction error')
-            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_preview.emit(str(files['images']['png']['preview']))
             log.error('Video extraction error')
             return False
 
@@ -438,7 +434,7 @@ class CORE:
 
         if self.site is None:
             self.signals.signal_status.emit('warning', f'Downloads are only available from {placeholder}')
-            self.signals.signal_preview.emit(str(files['images']['png']['other']['preview']))
+            self.signals.signal_preview.emit(str(files['images']['png']['preview']))
             log.warning(f'Downloads are only available from {placeholder}')
             return
 

@@ -1,6 +1,4 @@
-# Deubaso Composifity
-# Main
-
+# Deubaso Composifity: main
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
@@ -13,7 +11,6 @@ import threading
 # Локальные модули
 from config import *
 from logger import Log
-from presets import *
 from settings import SETTINGS
 
 log = Log()
@@ -24,7 +21,6 @@ class MAIN():
     '''Главное окно'''
     def __init__(self, core):
         '''Инициализация'''
-        # Основное
         self.window = QMainWindow()
         self.core = core
         self.settings = SETTINGS(self.window)
@@ -344,7 +340,7 @@ class MAIN():
         ''')
 
         # Подгон размера
-        scaled_pixmap = QPixmap(str(files['images']['png']['other']['preview'])).scaled(
+        scaled_pixmap = QPixmap(str(files['images']['png']['preview'])).scaled(
             QSize(size_preview[0], size_preview[1]),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation

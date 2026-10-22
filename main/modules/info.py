@@ -1,6 +1,4 @@
-# Deubaso Composifity
-# Info
-
+# Deubaso Composifity: info
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
@@ -10,7 +8,6 @@
 # Локальные модули
 from config import *
 from logger import Log
-from presets import *
 
 log = Log()
 
@@ -20,7 +17,6 @@ class INFO():
     '''Окно информации'''
     def __init__(self, parent_window):
         '''Инициализация'''
-        # Основное
         self.window = QMainWindow(parent_window)
 
         # Отрисовка

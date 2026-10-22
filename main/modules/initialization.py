@@ -1,6 +1,4 @@
-# Deubaso Composifity
-# Initialization
-
+# Deubaso Composifity: initialization
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
@@ -21,7 +19,6 @@ try:
     from core import CORE
     from logger import Log
     from main import MAIN
-    from presets import *
 
     log = Log()
 

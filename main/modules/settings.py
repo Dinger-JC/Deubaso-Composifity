@@ -1,6 +1,4 @@
-# Deubaso Composifity
-# Settings
-
+# Deubaso Composifity: settings
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
@@ -17,7 +15,6 @@ from history import HISTORY
 from info import INFO
 from logger import Log
 from logs import LOGS
-from presets import *
 
 log = Log()
 
@@ -27,7 +24,6 @@ class SETTINGS():
     '''Окно настроек'''
     def __init__(self, parent_window):
         '''Инициализация'''
-        # Основное
         self.window = QMainWindow(parent_window)
         self.info = INFO(self.window)
         self.logs = LOGS(self.window)

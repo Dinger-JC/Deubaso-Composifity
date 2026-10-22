@@ -1,6 +1,4 @@
-# Deubaso Composifity
-# Logger
-
+# Deubaso Composifity: logger
 # Developer: Dinger_JC
 # Project: https://github.com/Dinger-JC/Deubaso-Composifity
 # Telegram channel: https://t.me/Jitus_Circus
