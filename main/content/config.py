@@ -120,7 +120,7 @@ retries = 5
 
 # Для интерфейса
 name = 'Deubaso Composifity'
-version = '2026.10.22.1'
+version = '2026.10.22.2'
 
 size_window = (1000, 600)
 size_preview = (534, 300)
