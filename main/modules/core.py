@@ -133,7 +133,8 @@ class CORE:
 
         self.Write_History(url)
         self.domain = urlparse(url).netloc
-        self.site = next((name for name, info in sites.items() if info['domain'] == self.domain), None)
+        self.site = next((name for name, info in sites.items() if self.Match_Domain(self.domain, info['domain'])), None)
+        self.config_site = sites.get(self.site)
         self.date = datetime.now().strftime('%Y.%m.%d')
         self.id = secrets.token_hex(8)
 
@@ -174,7 +175,7 @@ class CORE:
             'retries': retries, # Количество попыток переподключения при ошибке загрузки файла
             'fragment_retries': 5, # Количество попыток загрузки каждого отдельного фрагмента видео
             'rm_cached_metadata': True, # Очистка метаданных из кэша перед началом загрузки
-            'nocheckcertificate': True, # Игнорирование ошибок проверки SSL-сертификатов
+            'nocheckcertificate': False, # Проверка SSL-сертификатов
             'quiet': True, # Лог
             'verbose': False # Подробный лог
         }
@@ -186,12 +187,16 @@ class CORE:
             'probesize': '10000000', # Максимальный объем данных для анализа (в байтах)
             'rw_timeout': '15000000', # Общее время на операцию (в микросекундах)
             'reconnect_delay_max': '5', # Максимальное время ожидания (в секундах)
-            'tls_verify': '0', # Проверка SSL-сертификатов
+            'tls_verify': '1', # Проверка SSL-сертификатов
             'reconnect': '1', # Автоматическое переподключение
             'seekable': '0', # Чтение потока
             'reconnect_streamed': '1' # Автоматическое переподключение для стримов
         }
         return True
+
+    def Match_Domain(self, domain: str, target: str) -> bool:
+        '''Совпадение поддоменов'''
+        return domain == target or domain.endswith(f'.{target}')
 
     def Generate_User_Agent(self) -> str:
         '''Генерация случайного браузера'''
@@ -313,31 +318,41 @@ class CORE:
 
     def Get_Title(self):
         '''Получение названия'''
-        self.config_site = sites[self.site]
-        self.title = self.page.find('title').text
-        if 'title' in self.config_site:
-            self.title = re.sub(self.config_site['title'], '', self.title, flags = re.IGNORECASE).strip()
+        try:
+            self.title = self.page.find('title').text
+            if 'title' in self.config_site:
+                self.title = re.sub(self.config_site['title'], '', self.title, flags = re.IGNORECASE).strip()
 
-        self.signals.signal_title.emit(self.title)
-        log.info(f'Name: {self.title}')
+            self.signals.signal_title.emit(self.title)
+            log.info(f'Name: {self.title}')
+
+        except Exception as e:
+            self.signals.signal_status.emit('warning', f'Error get title: {e}')
+            log.warning(f'Error get title: {e}')
 
     def Get_Video(self) -> bool:
         '''Получение видео'''
-        pattern = self.page.select(self.config_site['video_pattern'])
-        attribute = self.config_site.get('video_attribute')
+        domain = self.config_site['domain']
 
-        if self.config_site['domain'] == sites['strip2']['domain']:
-            links = [node.get(attribute) for node in pattern if node.get(attribute)]
-            self.video = next((l for l in links if f'/x{len(links) - 1}/' in str(l)), links[-1])
+        if domain == sites['strip2']['domain']:
+            source = [node.get('href') for node in self.page.select('a[href*="vps402.strip2.co.mp4"]') if node.get('href')]
+            self.video = next((i for i in source if f'/x{len(source) - 1}/' in str(i)), source[-1])
 
-        elif self.config_site['domain'] == sites['analmedia']['domain']:
-            self.video = pattern[0].get(attribute) if pattern else ''
+        elif domain == sites['analmedia']['domain']:
+            source = self.page.select_one('video source')
+            self.video = source.get('src', '') if source else ''
 
-        elif self.config_site['domain'] == sites['rule34video']['domain']:
-            self.video = next((node.get(attribute) for tag in tags for node in pattern if tag in node.text.lower()), '')
+        elif domain == sites['rule34video']['domain']:
+            source = self.page.select('a.tag_item')
+            self.video = next((node.get('href') for tag in tags for node in source if tag in node.text.lower()), '')
 
-        elif self.config_site['domain'] == sites['xgroovy']['domain']:
-            self.video = next((node.get(attribute) for tag in tags for node in pattern if node.get('title') == tag), '')
+        elif domain == sites['xgroovy']['domain']:
+            source = self.page.select('source')
+            self.video = next((node.get('src') for tag in tags for node in source if node.get('title') == tag), '')
+
+        elif domain == sites['pornobomba']['domain']:
+            source = re.findall(r'https?://[^\s"\'<>]+?/get_file/\d+/[0-9a-f]+/\d+/\d+/\d+\.mp4/?', str(self.page))
+            self.video = source[0] if source else ''
 
         if self.video == '' or self.video == None:
             self.signals.signal_status.emit('error', 'Video extraction error')
@@ -346,6 +361,12 @@ class CORE:
             return False
 
         log.info(f'Video: {self.video}')
+
+    def Get_Tags(self):
+        '''Получение тегов'''
+        links = self.page.select(self.config_site['tags_pattern'])
+        self.tags = ', '.join([link.text.strip() for link in links])
+        log.info(f'Tags: {self.tags}')
 
     def Get_Preview(self):
         '''Получение превью'''
@@ -361,10 +382,13 @@ class CORE:
                         break
 
             else:
-                image = re.search(pattern, str(self.page)).group(0)
+                match = re.search(pattern, str(self.page))
+                image = match.group(0) if match else None
+                if image:
+                    best = re.sub(r'_m(\.mp4\.jpg)$', r'\1', image)
+                    image = best
 
             self.preview = requests.get(image, impersonate = f'chrome{chrome}', timeout = timeout).content
-
             with Image.open(BytesIO(self.preview)) as preview:
                 preview.save(self.cache_preview_name)
 
@@ -375,12 +399,6 @@ class CORE:
         except Exception as e:
             self.signals.signal_status.emit('warning', f'Error get preview: {e}')
             log.warning(f'Error get preview: {e}')
-
-    def Get_Tags(self):
-        '''Получение тегов'''
-        links = self.page.select(self.config_site['tags_pattern'])
-        self.tags = ', '.join([link.text.strip() for link in links])
-        log.info(f'Tags: {self.tags}')
 
     def Get_Info(self):
         '''Получение дополнительной информации'''
@@ -441,11 +459,11 @@ class CORE:
         self.Get_Title()
 
         validate = self.Get_Video()
-        if validate == False:
+        if validate is False:
             return
 
-        self.Get_Preview()
         self.Get_Tags()
+        self.Get_Preview()
         self.Get_Info()
 
     def Edit_Video(self, name: str, title: str):
@@ -501,8 +519,8 @@ class CORE:
             except Exception:
                 pass
 
+            _UnsafeExtensionError._enabled = True
             if not aborted:
-                _UnsafeExtensionError._enabled = True
                 self.Reset()
 
     def Download_Preview(self):

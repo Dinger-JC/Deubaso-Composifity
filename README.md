@@ -27,7 +27,7 @@ Frameworks
 Functionality
 </h2>
 
-Website support: Strip2, Rule34Video, XGroovy, AnalMedia
+Website support: Strip2, AnalMedia, Rule34Video, XGroovy, PornoBomba
 
 Download videos in the best quality
 

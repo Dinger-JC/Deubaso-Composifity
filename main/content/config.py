@@ -109,7 +109,7 @@ if not files['data']['history'].is_file():
         json.dump({}, file, indent = 2, ensure_ascii = False)
 
 # Константы
-placeholder = 'Strip2, AnalMedia, Rule34Video, XGroovy'
+placeholder = 'Strip2, AnalMedia, Rule34Video, XGroovy, PornoBomba'
 
 # Для ядра
 chrome = '131'
@@ -120,7 +120,7 @@ retries = 5
 
 # Для интерфейса
 name = 'Deubaso Composifity'
-version = '2026.10.22.0'
+version = '2026.10.22.1'
 
 size_window = (1000, 600)
 size_preview = (534, 300)
